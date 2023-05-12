@@ -101,17 +101,17 @@ const Footer: React.FunctionComponent = (props) => {
                 <div className="footer-row">
                     <span className="footer-text">Protect your art against AI/machine learning theft with customizable rainbow watermarks.</span>
                 </div> : null}
-                {attackMode === "pointification" ?
+                {attackMode === "pointifaction" ?
                 <div className="footer-row">
-                    <span className="footer-text">Protect your art against AI/machine learning theft with pointification.</span>
+                    <span className="footer-text">Protect your art against AI/machine learning theft with pointifaction.</span>
                 </div> : null}
                 {attackMode === "rainbow watermarks" ?
                 <div className="footer-row">
                     <span className="footer-text-2">Dotted fonts (eg. Dotline) usually do not get detected as text. Particles are very difficult to remove, so I always recommend adding particles. Animation looks nicer, but may make it easier to detect.</span>
                 </div> : null}
-                {attackMode === "pointification" ?
+                {attackMode === "pointifaction" ?
                 <div className="footer-row">
-                    <span className="footer-text-4">Pointification deletes pixels in the image to make the picture look like random noise to the AI. Make sure that you set the spacing high enough so that it can't be removed with gaussian blur. Randomness looks very bad, but it might make the removal even harder.</span>
+                    <span className="footer-text-4">Pointifaction deletes pixels in the image to make the picture look like random noise to the AI. Make sure that you set the spacing high enough so that it can't be removed with gaussian blur. Randomness looks very bad, but it might make the removal even harder.</span>
                 </div> : null}
                 <div className="footer-row">
                     <span className="footer-text">All editing and rendering is done locally in your browser.</span>

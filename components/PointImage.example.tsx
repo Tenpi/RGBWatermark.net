@@ -110,7 +110,7 @@ const PointImage: React.FunctionComponent = (props) => {
         refCtx.restore()
     }
 
-    const applyPointification = (outputType?: string) => {
+    const applyPointifaction = (outputType?: string) => {
     }
 
     const loadImg = () => {
@@ -156,7 +156,7 @@ const PointImage: React.FunctionComponent = (props) => {
         let timeout = null as any
         const animationLoop = async () => {
             draw(gifPos)
-            applyPointification()
+            applyPointifaction()
             if (gifData) {
                 if (reverse) {
                     gifPos--
@@ -186,13 +186,13 @@ const PointImage: React.FunctionComponent = (props) => {
 
     const jpg = async () => {
         draw(0, true)
-        const img = applyPointification("image/jpeg") as string
+        const img = applyPointifaction("image/jpeg") as string
         functions.download(`${path.basename(imageName, path.extname(imageName))}_pointified.jpg`, img)
     }
 
     const png = async () => {
         draw(0, true)
-        const img = applyPointification("image/png") as string
+        const img = applyPointifaction("image/png") as string
         functions.download(`${path.basename(imageName, path.extname(imageName))}_pointified.png`, img)
     }
 
@@ -202,13 +202,13 @@ const PointImage: React.FunctionComponent = (props) => {
         if (gifData) {
             for (let i = 0; i < gifData.length; i++) {
                 draw(i, true)
-                const img = applyPointification("image/png") as string
+                const img = applyPointifaction("image/png") as string
                 const data = await fetch(img).then((r) => r.arrayBuffer())
                 zip.file(`${path.basename(imageName, path.extname(imageName))}_pointified ${i + 1}.png`, data, {binary: true})
             }
         } else {
             draw(0, true)
-            const img = applyPointification("image/png") as string
+            const img = applyPointifaction("image/png") as string
             const data = await fetch(img).then((r) => r.arrayBuffer())
             zip.file(`${path.basename(imageName, path.extname(imageName))}_pointified 1.png`, data, {binary: true})
         }
@@ -226,14 +226,14 @@ const PointImage: React.FunctionComponent = (props) => {
         if (gifData) {
             for (let i = 0; i < gifData.length; i++) {
                 draw(i, true)
-                const frame = applyPointification("buffer") as ArrayBuffer
+                const frame = applyPointifaction("buffer") as ArrayBuffer
                 frames.push(frame)
                 let delay = gifData[i].delay
                 delays.push(delay)
             }
         } else {
             draw(0, true)
-            const frame = applyPointification("buffer") as ArrayBuffer
+            const frame = applyPointifaction("buffer") as ArrayBuffer
             frames.push(frame)
             let delay = 60
             delays.push(delay)
