@@ -5,6 +5,7 @@ import axios from "axios"
 import fileType from "magic-bytes.js"
 import gifFrames from "gif-frames"
 import {hexToRgb, Color, Solver} from "./Color"
+import {createFFmpeg, fetchFile} from "@ffmpeg/ffmpeg"
 
 let newScrollY = 0
 let lastScrollTop = 0
@@ -17,6 +18,9 @@ let stopInertia = false
 
 const imageExtensions = [".jpg", ".jpeg", ".png", ".webp"]
 const videoExtensions = [".mp4", ".mov", ".avi", ".mkv", ".webm"]
+
+const ffmpeg = createFFmpeg()
+ffmpeg.setLogging(true)
 
 export default class Functions {
     public static isSafari = () => {
@@ -430,6 +434,43 @@ export default class Functions {
         return Functions.streamToBuffer(gif as NodeJS.ReadableStream)
     }
 
+    public static msToFps = (ms: number) => {
+        return Math.floor(1 / ((ms / 2) / 100))
+    }
+
+    public static encodeVideo = async (frames: string[], framerate?: number, audio?: string) => {
+        if (!ffmpeg.isLoaded()) await ffmpeg.load()
+        console.log(frames)
+        for (let i = 0; i < frames.length; i++) {
+            const num = `00${i}`.slice(-3)
+            ffmpeg.FS("writeFile", `${num}.png`, await fetchFile(frames[i]))
+        }
+        if (!framerate) framerate = 30
+        if (audio) {
+            ffmpeg.FS("writeFile", "audio.wav", await fetchFile(audio))
+            await ffmpeg.run("-framerate", String(framerate), "-pattern_type", "glob", "-i", "*.png", "-i", "audio.wav", "-c:a", "aac", "-shortest", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-vf", "pad=ceil(iw/2)*2:ceil(ih/2)*2", "video.mp4")
+        } else {
+            await ffmpeg.run("-framerate", String(framerate), "-pattern_type", "glob", "-i", "*.png", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-vf", "pad=ceil(iw/2)*2:ceil(ih/2)*2", "video.mp4")
+        }
+        const binary = ffmpeg.FS("readFile", "video.mp4")
+        let url = ""
+        if (binary) {
+            const blob = new Blob([new DataView(binary.buffer)], {type: "video/mp4"})
+            url = URL.createObjectURL(blob)
+        }
+        try {
+            for (let i = 0; i < frames.length; i++) {
+                const num = `00${i}`.slice(-3)
+                ffmpeg.FS("unlink", `${num}.png`)
+            }
+            ffmpeg.FS("unlink", "video.mp4")
+            if (audio) ffmpeg.FS("unlink", "audio.wav")
+        } catch {
+            // ignore
+        }
+        return url
+    }
+
     public static noteFactor = (scaleFactor: number) => {
         if (scaleFactor === 1) return 0
         if (scaleFactor < 1) {
@@ -803,5 +844,14 @@ export default class Functions {
         } else {
             return Functions.rgbToHex(newRGB[0], newRGB[1], newRGB[2])
         }
+    }
+
+    public static truncateColor = (value: number) => {
+        if (value < 0) {
+          value = 0
+        } else if (value > 255) {
+          value = 255
+        }
+        return value
     }
 }

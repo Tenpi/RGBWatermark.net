@@ -2,10 +2,11 @@ import React, {useContext, useEffect, useState, useRef} from "react"
 import {useHistory} from "react-router-dom"
 import {HashLink as Link} from "react-router-hash-link"
 import favicon from "../assets/icons/favicon.png"
-import {EnableDragContext, MobileContext, SiteHueContext, SiteSaturationContext, SiteLightnessContext, StopAnimationContext} from "../Context"
+import {EnableDragContext, MobileContext, SiteHueContext, SiteSaturationContext, SiteLightnessContext, StopAnimationContext, ImageContext} from "../Context"
 import functions from "../structures/Functions"
 import Slider from "react-slider"
 import color from "../assets/icons/color.png"
+import placeholder from "../assets/images/placeholder.png"
 import "./styles/titlebar.less"
 
 import frame1 from "../assets/icons/logo/logo 1.png"
@@ -63,6 +64,7 @@ const TitleBar: React.FunctionComponent<Props> = (props) => {
     const {siteSaturation, setSiteSaturation} = useContext(SiteSaturationContext)
     const {siteLightness, setSiteLightness} = useContext(SiteLightnessContext)
     const [activeDropdown, setActiveDropdown] = useState(false)
+    const {image, setImage} = useContext(ImageContext)
     const ref = useRef<HTMLCanvasElement>(null)
     const history = useHistory()
     const [colorPos, setColorPos] =  useState(0)
@@ -70,6 +72,10 @@ const TitleBar: React.FunctionComponent<Props> = (props) => {
     const titleClick = () => {
         history.push("/")
     }
+
+    useEffect(() => {
+        if (!image) setImage(placeholder)
+    }, [image])
 
     useEffect(() => {
         const savedHue = localStorage.getItem("siteHue")

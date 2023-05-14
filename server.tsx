@@ -40,6 +40,8 @@ app.use("/assets", express.static(path.join(__dirname, "./assets")))
 app.get("/*", function(req, res) {
     res.setHeader("Content-Type", mime.getType(req.path) ?? "")
     res.header("Access-Control-Allow-Origin", "*")
+    res.setHeader("Cross-Origin-Opener-Policy", "same-origin")
+    res.setHeader("Cross-Origin-Embedder-Policy", "require-corp")
     const document = fs.readFileSync(path.join(__dirname, "./dist/index.html"), {encoding: "utf-8"})
     res.status(200).send(document)
 })

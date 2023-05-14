@@ -3,7 +3,7 @@ import React, {useContext, useEffect, useState, useRef} from "react"
 import {useHistory} from "react-router-dom"
 import {HashLink as Link} from "react-router-hash-link"
 import path from "path"
-import {EnableDragContext, MobileContext, ImageContext, OutputSizeContext, ImageNameContext, ReverseContext, PixelShiftContext, PixelShiftSizeContext, PixelShiftDirectionContext, patterns} from "../Context"
+import {EnableDragContext, MobileContext, ImageContext, OutputSizeContext, ImageNameContext, ReverseContext, HighContrastSizeContext, HighContrastStrengthContext, HighContrastBrightnessContext, HighContrastContrastContext, HighContrastInvertContext, patterns} from "../Context"
 import functions from "../structures/Functions"
 import Slider from "react-slider"
 import fileType from "magic-bytes.js"
@@ -17,16 +17,18 @@ import "./styles/pointimage.less"
 
 let gifPos = 0
 
-const PixelShiftImage: React.FunctionComponent = (props) => {
+const HighContrastImage: React.FunctionComponent = (props) => {
     const {enableDrag, setEnableDrag} = useContext(EnableDragContext)
     const {mobile, setMobile} = useContext(MobileContext)
     const {image, setImage} = useContext(ImageContext)
     const {imageName, setImageName} = useContext(ImageNameContext)
     const {outputSize, setOutputSize} = useContext(OutputSizeContext)
-    const {pixelShift, setPixelShift} = useContext(PixelShiftContext)
-    const {pixelShiftSize, setPixelShiftSize} = useContext(PixelShiftSizeContext)
     const {reverse, setReverse} = useContext(ReverseContext)
-    const {pixelShiftDirection, setPixelShiftDirection} = useContext(PixelShiftDirectionContext)
+    const {highContrastStrength, setHighContrastStrength} = useContext(HighContrastStrengthContext)
+    const {highContrastSize, setHighContrastSize} = useContext(HighContrastSizeContext)
+    const {highContrastBrightness, setHighContrastBrightness} = useContext(HighContrastBrightnessContext)
+    const {highContrastContrast, setHighContrastContrast} = useContext(HighContrastContrastContext)
+    const {highContrastInvert, setHighContrastInvert} = useContext(HighContrastInvertContext)
     const [gifData, setGIFData] = useState(null) as any
     const [img, setImg] = useState(null as HTMLImageElement | null)
     const ref = useRef<HTMLCanvasElement>(null)
@@ -105,7 +107,7 @@ const PixelShiftImage: React.FunctionComponent = (props) => {
         refCtx.restore()
     }
 
-    const applyPixelShift = (outputType?: string) => {
+    const applyHighContrast = (outputType?: string) => {
     }
 
     const loadImg = () => {
@@ -151,7 +153,7 @@ const PixelShiftImage: React.FunctionComponent = (props) => {
         let timeout = null as any
         const animationLoop = async () => {
             draw(gifPos)
-            applyPixelShift()
+            applyHighContrast()
             if (gifData) {
                 if (reverse) {
                     gifPos--
@@ -173,18 +175,18 @@ const PixelShiftImage: React.FunctionComponent = (props) => {
         return () => {
             clearTimeout(timeout)
         }
-    }, [img, pixelShift, pixelShiftSize, pixelShiftDirection, gifData])
+    }, [img, highContrastSize, highContrastStrength, highContrastBrightness, highContrastContrast, highContrastInvert, gifData])
 
     const jpg = async () => {
         draw(0, true)
-        const img = applyPixelShift("image/jpeg") as string
-        functions.download(`${path.basename(imageName, path.extname(imageName))}_pixelshifted.jpg`, img)
+        const img = applyHighContrast("image/jpeg") as string
+        functions.download(`${path.basename(imageName, path.extname(imageName))}_highcontrast.jpg`, img)
     }
 
     const png = async () => {
         draw(0, true)
-        const img = applyPixelShift("image/png") as string
-        functions.download(`${path.basename(imageName, path.extname(imageName))}_pixelshifted.png`, img)
+        const img = applyHighContrast("image/png") as string
+        functions.download(`${path.basename(imageName, path.extname(imageName))}_highcontrast.png`, img)
     }
 
     const zip = async () => {
@@ -193,17 +195,17 @@ const PixelShiftImage: React.FunctionComponent = (props) => {
         if (gifData) {
             for (let i = 0; i < gifData.length; i++) {
                 draw(i, true)
-                const img = applyPixelShift("image/png") as string
+                const img = applyHighContrast("image/png") as string
                 const data = await fetch(img).then((r) => r.arrayBuffer())
-                zip.file(`${path.basename(imageName, path.extname(imageName))}_pixelshifted ${i + 1}.png`, data, {binary: true})
+                zip.file(`${path.basename(imageName, path.extname(imageName))}_highcontrast ${i + 1}.png`, data, {binary: true})
             }
         } else {
             draw(0, true)
-            const img = applyPixelShift("image/png") as string
+            const img = applyHighContrast("image/png") as string
             const data = await fetch(img).then((r) => r.arrayBuffer())
-            zip.file(`${path.basename(imageName, path.extname(imageName))}_pixelshifted 1.png`, data, {binary: true})
+            zip.file(`${path.basename(imageName, path.extname(imageName))}_highcontrast 1.png`, data, {binary: true})
         }
-        const filename = `${path.basename(imageName, path.extname(imageName))}_pixelshifted.zip`
+        const filename = `${path.basename(imageName, path.extname(imageName))}_highcontrast.zip`
         const blob = await zip.generateAsync({type: "blob"})
         const url = window.URL.createObjectURL(blob)
         functions.download(filename, url)
@@ -217,14 +219,14 @@ const PixelShiftImage: React.FunctionComponent = (props) => {
         if (gifData) {
             for (let i = 0; i < gifData.length; i++) {
                 draw(i, true)
-                const frame = applyPixelShift("buffer") as ArrayBuffer
+                const frame = applyHighContrast("buffer") as ArrayBuffer
                 frames.push(frame)
                 let delay = gifData[i].delay
                 delays.push(delay)
             }
         } else {
             draw(0, true)
-            const frame = applyPixelShift("buffer") as ArrayBuffer
+            const frame = applyHighContrast("buffer") as ArrayBuffer
             frames.push(frame)
             let delay = 60
             delays.push(delay)
@@ -233,26 +235,38 @@ const PixelShiftImage: React.FunctionComponent = (props) => {
         const buffer = await functions.encodeGIF(frames, delays, dimensions.width, dimensions.height, {transparentColor: "#000000"})
         const blob = new Blob([buffer])
         const url = window.URL.createObjectURL(blob)
-        functions.download(`${path.basename(imageName, path.extname(imageName))}_pixelshifted.gif`, url)
+        functions.download(`${path.basename(imageName, path.extname(imageName))}_highcontrast.gif`, url)
         window.URL.revokeObjectURL(url)
     }
 
     const reset = () => {
-        setPixelShift(0)
-        setPixelShiftSize(13)
+        setHighContrastSize(1)
+        setHighContrastStrength(0)
+        setHighContrastBrightness(0)
+        setHighContrastContrast(0)
+        setHighContrastInvert(false)
     }
 
     useEffect(() => {
-        const savedPixelShift = localStorage.getItem("pixelShift")
-        if (savedPixelShift) setPixelShift(Number(savedPixelShift))
-        const savedPixelShiftSize = localStorage.getItem("pixelShiftSize")
-        if (savedPixelShiftSize) setPixelShiftSize(Number(savedPixelShiftSize))
+        const savedHighContrastSize = localStorage.getItem("highContrastSize")
+        if (savedHighContrastSize) setHighContrastSize(Number(savedHighContrastSize))
+        const savedHighContrastStrength = localStorage.getItem("highContrastStrength")
+        if (savedHighContrastStrength) setHighContrastStrength(Number(savedHighContrastStrength))
+        const savedHighContrastBrightness = localStorage.getItem("highContrastBrightness")
+        if (savedHighContrastBrightness) setHighContrastBrightness(Number(savedHighContrastBrightness))
+        const savedHighContrastContrast = localStorage.getItem("highContrastContrast")
+        if (savedHighContrastContrast) setHighContrastContrast(Number(savedHighContrastContrast))
+        const savedHighContrastInvert = localStorage.getItem("highContrastInvert")
+        if (savedHighContrastInvert) setHighContrastInvert(savedHighContrastInvert === "true")
     }, [])
 
     useEffect(() => {
-        localStorage.setItem("pixelShift", pixelShift)
-        localStorage.setItem("pixelShiftSize", pixelShiftSize)
-    }, [pixelShift, pixelShiftSize])
+        localStorage.setItem("highContrastSize", highContrastSize)
+        localStorage.setItem("highContrastStrength", highContrastStrength)
+        localStorage.setItem("highContrastBrightness", highContrastBrightness)
+        localStorage.setItem("highContrastContrast", highContrastContrast)
+        localStorage.setItem("highContrastInvert", highContrastInvert)
+    }, [highContrastSize, highContrastStrength, highContrastBrightness, highContrastContrast, highContrastInvert])
 
     return (
         <div className="point-image-component" onMouseEnter={() => setEnableDrag(false)}>
@@ -282,31 +296,28 @@ const PixelShiftImage: React.FunctionComponent = (props) => {
             </div> : null}
             <div className="point-options-container">
                 <div className="point-row">
-                        <button className="point-button-small" onClick={() => setPixelShiftDirection("xy")} style={{marginLeft: "10px"}}>
-                            <span className="button-hover">
-                                <span className={`point-button-text-small ${pixelShiftDirection === "xy" ? "button-text-selected" : ""}`}>XY</span>
-                            </span>
-                        </button>
-                        <button className="point-button-small" onClick={() => setPixelShiftDirection("x")} style={{marginLeft: "10px"}}>
-                            <span className="button-hover">
-                                <span className={`point-button-text-small ${pixelShiftDirection === "x" ? "button-text-selected" : ""}`}>X</span>
-                            </span>
-                        </button>
-                        <button className="point-button-small" onClick={() => setPixelShiftDirection("y")} style={{marginLeft: "10px"}}>
-                            <span className="button-hover">
-                                <span className={`point-button-text-small ${pixelShiftDirection === "y" ? "button-text-selected" : ""}`}>Y</span>
-                            </span>
-                        </button>
+                    <span className="point-text-mini" style={{width: "55px", fontSize: "20px"}}>Invert?</span>
+                    <img className="point-checkbox" src={highContrastInvert ? checkboxChecked : checkbox} onClick={() => setHighContrastInvert((prev: boolean) => !prev)} style={{filter: getFilter()}}/>
                 </div>
                 <div className="point-row">
-                    <span className="point-text">Shift: </span>
-                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setPixelShift(value)} min={-10} max={10} step={1} value={pixelShift}/>
-                    <span className="point-text-mini">{pixelShift}</span>
+                    <span className="point-text">Strength: </span>
+                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setHighContrastStrength(value)} min={1} max={100} step={1} value={highContrastStrength}/>
+                    <span className="point-text-mini">{highContrastStrength}</span>
                 </div>
                 <div className="point-row">
                     <span className="point-text">Size: </span>
-                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setPixelShiftSize(value)} min={1} max={25} step={1} value={pixelShiftSize}/>
-                    <span className="point-text-mini">{pixelShiftSize}</span>
+                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setHighContrastSize(value)} min={1} max={25} step={1} value={highContrastSize}/>
+                    <span className="point-text-mini">{highContrastSize}</span>
+                </div>
+                <div className="point-row">
+                    <span className="point-text">Brightness: </span>
+                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setHighContrastBrightness(value)} min={0} max={100} step={1} value={highContrastBrightness}/>
+                    <span className="point-text-mini">{highContrastBrightness}</span>
+                </div>
+                <div className="point-row">
+                    <span className="point-text">Contrast: </span>
+                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setHighContrastContrast(value)} min={0} max={100} step={1} value={highContrastContrast}/>
+                    <span className="point-text-mini">{highContrastContrast}</span>
                 </div>
             </div>
             {image ?
@@ -338,4 +349,4 @@ const PixelShiftImage: React.FunctionComponent = (props) => {
     )
 }
 
-export default PixelShiftImage
+export default HighContrastImage
