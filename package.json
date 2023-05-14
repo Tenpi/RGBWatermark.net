@@ -5,8 +5,9 @@
   "main": "dist/server.js",
   "scripts": {
     "start": "npm run clean && webpack && node dist/server.js",
-    "build": "npm run clean && webpack && npm run redirects && npm run favicon",
+    "build": "npm run clean && webpack && npm run redirects && npm run headers && npm run favicon",
     "redirects": "echo \"/* /index.html 200\" | cat > dist/_redirects",
+    "headers": "echo \"/*\nCross-Origin-Opener-Policy: same-origin\nCross-Origin-Embedder-Policy: require-corp\" | cat > dist/_headers",
     "favicon": "cp assets/icons/favicon.png dist/assets/icons/favicon.png",
     "server": "webpack && npm run pm2",
     "pm2": "pm2 stop all && pm2 start dist/server.js",
