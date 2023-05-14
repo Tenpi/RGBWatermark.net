@@ -14,7 +14,7 @@ const Footer: React.FunctionComponent = (props) => {
     const {type, setType} = useContext(TypeContext)
     const {attackMode, setAttackMode} = useContext(AttackModeContext)
     
-    const version = "1.0.8"
+    const version = "1.0.9"
 
     const windows = async () => {
         const filename = `RGBWatermark-Setup-${version}.exe`
