@@ -101,17 +101,25 @@ const Footer: React.FunctionComponent = (props) => {
                 <div className="footer-row">
                     <span className="footer-text">Protect your art against AI/machine learning theft with customizable rainbow watermarks.</span>
                 </div> : null}
-                {attackMode === "pointifaction" ?
+                {attackMode === "pointifiction" ?
                 <div className="footer-row">
-                    <span className="footer-text">Protect your art against AI/machine learning theft with pointifaction.</span>
+                    <span className="footer-text">Protect your art against AI/machine learning theft with pointifiction.</span>
+                </div> : null}
+                {attackMode === "pixel shift" ?
+                <div className="footer-row">
+                    <span className="footer-text">Protect your art against AI/machine learning theft with pixel shifting.</span>
                 </div> : null}
                 {attackMode === "rainbow watermarks" ?
                 <div className="footer-row">
                     <span className="footer-text-2">Dotted fonts (eg. Dotline) usually do not get detected as text. Particles are very difficult to remove, so I always recommend adding particles. Animation looks nicer, but may make it easier to detect.</span>
                 </div> : null}
-                {attackMode === "pointifaction" ?
+                {attackMode === "pointifiction" ?
                 <div className="footer-row">
-                    <span className="footer-text-4">Pointifaction deletes pixels in the image to make the picture look like random noise to the AI. Make sure that you set the spacing high enough so that it can't be removed with gaussian blur. Randomness looks very bad, but it might make the removal even harder.</span>
+                    <span className="footer-text-4">Pointifiction deletes pixels in the image to make the picture look like random noise to the AI. Make sure that you set the spacing high enough so that it can't be removed with gaussian blur. Randomness looks very bad, but it might make the removal even harder.</span>
+                </div> : null}
+                {attackMode === "pixel shift" ?
+                <div className="footer-row">
+                    <span className="footer-text-5">Pixel shifting shifts the pixels in the image horizontally and vertically, breaking continuity. This significantly degrades quality and will make the output produce blocky images.</span>
                 </div> : null}
                 <div className="footer-row">
                     <span className="footer-text">All editing and rendering is done locally in your browser.</span>

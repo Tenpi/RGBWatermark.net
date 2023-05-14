@@ -2,5 +2,6 @@ dist
 node_modules
 .DS_Store
 releases
+components/PixelShiftImage.tsx
 components/PointImage.tsx
 components/RainbowImage.tsx

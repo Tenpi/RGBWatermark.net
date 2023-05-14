@@ -5,6 +5,7 @@ import NavBar from "../components/NavBar"
 import RainbowOptions from "../components/RainbowOptions"
 import RainbowImage from "../components/RainbowImage"
 import PointImage from "../components/PointImage"
+import PixelShiftImage from "../components/PixelShiftImage"
 import Footer from "../components/Footer"
 
 const HomePage: React.FunctionComponent = (props) => {
@@ -19,8 +20,10 @@ const HomePage: React.FunctionComponent = (props) => {
     const getAttack = () => {
         if (attackMode === "rainbow watermarks") {
             return (<><RainbowOptions/><RainbowImage/></>)
-        } else if (attackMode === "pointifaction") {
+        } else if (attackMode === "pointifiction") {
             return (<PointImage/>)
+        } else if (attackMode === "pixel shift") {
+            return (<PixelShiftImage/>)
         }
     }
 
