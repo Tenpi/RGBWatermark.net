@@ -20,7 +20,6 @@ const imageExtensions = [".jpg", ".jpeg", ".png", ".webp"]
 const videoExtensions = [".mp4", ".mov", ".avi", ".mkv", ".webm"]
 
 const ffmpeg = createFFmpeg()
-ffmpeg.setLogging(true)
 
 export default class Functions {
     public static isSafari = () => {

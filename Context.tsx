@@ -48,6 +48,7 @@ export const HighContrastInvertContext = React.createContext<any>(null)
 export const HighContrastSpacingContext = React.createContext<any>(null)
 export const PixelationStrengthContext = React.createContext<any>(null)
 export const PixelationSizeContext = React.createContext<any>(null)
+export const PointShiftContext = React.createContext<any>(null)
 
 export const SiteHueContext = React.createContext<any>(null)
 export const SiteSaturationContext = React.createContext<any>(null)
@@ -120,6 +121,7 @@ const Context: React.FunctionComponent = (props) => {
     const [pointSize, setPointSize] = useState(1)
     const [pointMethod, setPointMethod] = useState("uniform")
     const [pointInvert, setPointInvert] = useState(false)
+    const [pointShift, setPointShift] = useState(false)
     const [pixelShift, setPixelShift] = useState(0)
     const [pixelShiftSize, setPixelShiftSize] = useState(13)
     const [pixelShiftDirection, setPixelShiftDirection] = useState("xy")
@@ -134,6 +136,7 @@ const Context: React.FunctionComponent = (props) => {
 
     return (
         <>  
+            <PointShiftContext.Provider value={{pointShift, setPointShift}}>
             <PixelationSizeContext.Provider value={{pixelationSize, setPixelationSize}}>
             <PixelationStrengthContext.Provider value={{pixelationStrength, setPixelationStrength}}>
             <HighContrastSpacingContext.Provider value={{highContrastSpacing, setHighContrastSpacing}}>
@@ -233,6 +236,7 @@ const Context: React.FunctionComponent = (props) => {
             </HighContrastSpacingContext.Provider>
             </PixelationStrengthContext.Provider>
             </PixelationSizeContext.Provider>
+            </PointShiftContext.Provider>
         </>
     )
 }
