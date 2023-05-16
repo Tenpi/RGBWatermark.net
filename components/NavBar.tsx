@@ -7,6 +7,7 @@ import functions from "../structures/Functions"
 import Slider from "react-slider"
 import "./styles/navbar.less"
 
+import questionmark from "../assets/icons/questionmark.png"
 import pixelation from "../assets/icons/pixelation.png"
 import highcontrast from "../assets/icons/highcontrast.png"
 import pixelshift from "../assets/icons/pixelshift.png"
@@ -35,12 +36,13 @@ const NavBar: React.FunctionComponent<Props> = (props) => {
     }, [attackMode])
 
     return (
-        <div className="navbar" onMouseEnter={() => setEnableDrag(false)}>
+        <div className="navbar" onMouseEnter={() => setEnableDrag(true)}>
             <img className="navbar-item" src={rainbowWatermarks} onClick={() => setAttackMode("rainbow watermarks")}/>
             <img className="navbar-item" src={pointifiction} onClick={() => setAttackMode("pointifiction")}/>
             <img className="navbar-item" src={pixelshift} onClick={() => setAttackMode("pixel shift")}/>
             <img className="navbar-item" src={highcontrast} onClick={() => setAttackMode("high contrast")}/>
             <img className="navbar-item" src={pixelation} onClick={() => setAttackMode("pixelation")}/>
+            <img className="navbar-item" src={questionmark} onClick={() => setAttackMode("question mark")}/>
         </div>
     )
 }

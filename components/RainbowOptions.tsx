@@ -300,7 +300,7 @@ const RainbowOptions: React.FunctionComponent = (props) => {
     }
 
     return (
-        <div className="options" onMouseEnter={() => setEnableDrag(false)}>
+        <div className="options" onMouseEnter={() => setEnableDrag(true)}>
             <div className="options-container">
                 <div className="options-row">
                     <span className="options-text">Image:</span>
@@ -341,8 +341,8 @@ const RainbowOptions: React.FunctionComponent = (props) => {
                         </span>
                     </button>
                     {type === "text" ? 
-                    <div className="options-text-container" onMouseEnter={() => setEnableDrag(false)} style={{marginLeft: "10px"}}>
-                        <input className="options-text-input" type="text" spellCheck="false" value={text} onChange={(event) => setText(event.target.value)}/>
+                    <div className="options-text-container" style={{marginLeft: "10px"}}>
+                        <input className="options-text-input" type="text" spellCheck="false" value={text} onChange={(event) => setText(event.target.value)} onMouseOver={() => setEnableDrag(false)}/>
                     </div> :
                     type === "image" ? 
                     <div className="options-watermark-container">
