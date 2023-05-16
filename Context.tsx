@@ -50,6 +50,7 @@ export const PixelationStrengthContext = React.createContext<any>(null)
 export const PixelationSizeContext = React.createContext<any>(null)
 export const PointShiftContext = React.createContext<any>(null)
 export const PointAngleContext = React.createContext<any>(null)
+export const PointVarianceContext = React.createContext<any>(null)
 
 export const SiteHueContext = React.createContext<any>(null)
 export const SiteSaturationContext = React.createContext<any>(null)
@@ -120,7 +121,7 @@ const Context: React.FunctionComponent = (props) => {
     const [pointBrightness, setPointBrightness] = useState(0)
     const [pointContrast, setPointContrast] = useState(0)
     const [pointSize, setPointSize] = useState(1)
-    const [pointMethod, setPointMethod] = useState("uniform")
+    const [pointMethod, setPointMethod] = useState("point")
     const [pointInvert, setPointInvert] = useState(false)
     const [pointShift, setPointShift] = useState(false)
     const [pixelShift, setPixelShift] = useState(0)
@@ -135,9 +136,11 @@ const Context: React.FunctionComponent = (props) => {
     const [pixelationStrength, setPixelationStrength] = useState(0)
     const [pixelationSize, setPixelationSize] = useState(1)
     const [pointAngle, setPointAngle] = useState(0)
+    const [pointVariance, setPointVariance] = useState(0)
 
     return (
         <>  
+            <PointVarianceContext.Provider value={{pointVariance, setPointVariance}}>
             <PointAngleContext.Provider value={{pointAngle, setPointAngle}}>
             <PointShiftContext.Provider value={{pointShift, setPointShift}}>
             <PixelationSizeContext.Provider value={{pixelationSize, setPixelationSize}}>
@@ -241,6 +244,7 @@ const Context: React.FunctionComponent = (props) => {
             </PixelationSizeContext.Provider>
             </PointShiftContext.Provider>
             </PointAngleContext.Provider>
+            </PointVarianceContext.Provider>
         </>
     )
 }
