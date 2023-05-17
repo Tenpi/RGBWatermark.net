@@ -7,3 +7,4 @@ components/PointImage.tsx
 components/RainbowImage.tsx
 components/HighContrastImage.tsx
 components/PixelationImage.tsx
+components/NoiseImage.tsx

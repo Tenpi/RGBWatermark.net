@@ -8,6 +8,7 @@ import PointImage from "../components/PointImage"
 import PixelShiftImage from "../components/PixelShiftImage"
 import HighContrastImage from "../components/HighContrastImage"
 import PixelationImage from "../components/PixelationImage"
+import NoiseImage from "../components/NoiseImage"
 import Help from "../components/Help"
 import Footer from "../components/Footer"
 
@@ -31,6 +32,8 @@ const HomePage: React.FunctionComponent = (props) => {
             return (<HighContrastImage/>)
         } else if (attackMode === "pixelation") {
             return (<PixelationImage/>)
+        } else if (attackMode === "noise") {
+            return (<NoiseImage/>)
         } else if (attackMode === "question mark") {
             return (<Help/>)
         }

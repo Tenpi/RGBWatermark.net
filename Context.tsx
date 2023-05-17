@@ -51,6 +51,8 @@ export const PixelationSizeContext = React.createContext<any>(null)
 export const PointShiftContext = React.createContext<any>(null)
 export const PointAngleContext = React.createContext<any>(null)
 export const PointVarianceContext = React.createContext<any>(null)
+export const NoiseAmountContext = React.createContext<any>(null)
+export const NoiseSizeContext = React.createContext<any>(null)
 
 export const SiteHueContext = React.createContext<any>(null)
 export const SiteSaturationContext = React.createContext<any>(null)
@@ -137,9 +139,13 @@ const Context: React.FunctionComponent = (props) => {
     const [pixelationSize, setPixelationSize] = useState(1)
     const [pointAngle, setPointAngle] = useState(0)
     const [pointVariance, setPointVariance] = useState(0)
+    const [noiseAmount, setNoiseAmount] = useState(0)
+    const [noiseSize, setNoiseSize] = useState(10)
 
     return (
         <>  
+            <NoiseSizeContext.Provider value={{noiseSize, setNoiseSize}}>
+            <NoiseAmountContext.Provider value={{noiseAmount, setNoiseAmount}}>
             <PointVarianceContext.Provider value={{pointVariance, setPointVariance}}>
             <PointAngleContext.Provider value={{pointAngle, setPointAngle}}>
             <PointShiftContext.Provider value={{pointShift, setPointShift}}>
@@ -245,6 +251,8 @@ const Context: React.FunctionComponent = (props) => {
             </PointShiftContext.Provider>
             </PointAngleContext.Provider>
             </PointVarianceContext.Provider>
+            </NoiseAmountContext.Provider>
+            </NoiseSizeContext.Provider>
         </>
     )
 }
