@@ -14,7 +14,7 @@ const Footer: React.FunctionComponent = (props) => {
     const {type, setType} = useContext(TypeContext)
     const {attackMode, setAttackMode} = useContext(AttackModeContext)
     
-    const version = "1.1.1"
+    const version = "1.1.2"
 
     const windows = async () => {
         const filename = `RGBWatermark-Setup-${version}.exe`
@@ -178,6 +178,10 @@ const Footer: React.FunctionComponent = (props) => {
                 <div className="footer-row">
                     <span className="footer-text">Protect your art against AI/machine learning theft with pixelation.</span>
                 </div> : null}
+                {attackMode === "noise" ?
+                <div className="footer-row">
+                    <span className="footer-text">Protect your art against AI/machine learning theft with noise interpolation.</span>
+                </div> : null}
                 {attackMode === "rainbow watermarks" ?
                 <div className="footer-row">
                     <span className="footer-text-2">Rainbow watermarks will result in a lot of noise and grain in the outputs. It is recommended to use dotted fonts and particles to make them difficult to remove.</span>
@@ -197,6 +201,10 @@ const Footer: React.FunctionComponent = (props) => {
                 {attackMode === "pixelation" ?
                 <div className="footer-row">
                     <span className="footer-text-2">Pixelation will downscale the image while preserving hard edges and is a method to deliberately lower the quality. It will lead to pixelated images in the output.</span>
+                </div> : null}
+                {attackMode === "noise" ?
+                <div className="footer-row">
+                    <span className="footer-text-4">Noise interpolation shifts the pixels closer to a grid of noise, which most notably impacts img2img and controlnet.</span>
                 </div> : null}
                 <div className="footer-row">
                     <span className="footer-text">All editing and rendering is done locally in your browser.</span>

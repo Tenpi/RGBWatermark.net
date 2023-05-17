@@ -53,6 +53,10 @@ export const PointAngleContext = React.createContext<any>(null)
 export const PointVarianceContext = React.createContext<any>(null)
 export const NoiseAmountContext = React.createContext<any>(null)
 export const NoiseSizeContext = React.createContext<any>(null)
+export const NoiseSpacingContext = React.createContext<any>(null)
+export const NoiseHueContext = React.createContext<any>(null)
+export const NoiseSaturationContext = React.createContext<any>(null)
+export const NoiseBrightnessContext = React.createContext<any>(null)
 
 export const SiteHueContext = React.createContext<any>(null)
 export const SiteSaturationContext = React.createContext<any>(null)
@@ -141,9 +145,17 @@ const Context: React.FunctionComponent = (props) => {
     const [pointVariance, setPointVariance] = useState(0)
     const [noiseAmount, setNoiseAmount] = useState(0)
     const [noiseSize, setNoiseSize] = useState(10)
+    const [noiseSpacing, setNoiseSpacing] = useState(0)
+    const [noiseHue, setNoiseHue] = useState(0)
+    const [noiseSaturation, setNoiseSaturation] = useState(0)
+    const [noiseBrightness, setNoiseBrightness] = useState(0)
 
     return (
         <>  
+            <NoiseBrightnessContext.Provider value={{noiseBrightness, setNoiseBrightness}}>
+            <NoiseSaturationContext.Provider value={{noiseSaturation, setNoiseSaturation}}>
+            <NoiseHueContext.Provider value={{noiseHue, setNoiseHue}}>
+            <NoiseSpacingContext.Provider value={{noiseSpacing, setNoiseSpacing}}>
             <NoiseSizeContext.Provider value={{noiseSize, setNoiseSize}}>
             <NoiseAmountContext.Provider value={{noiseAmount, setNoiseAmount}}>
             <PointVarianceContext.Provider value={{pointVariance, setPointVariance}}>
@@ -253,6 +265,10 @@ const Context: React.FunctionComponent = (props) => {
             </PointVarianceContext.Provider>
             </NoiseAmountContext.Provider>
             </NoiseSizeContext.Provider>
+            </NoiseSpacingContext.Provider>
+            </NoiseHueContext.Provider>
+            </NoiseSaturationContext.Provider>
+            </NoiseBrightnessContext.Provider>
         </>
     )
 }
