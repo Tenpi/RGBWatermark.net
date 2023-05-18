@@ -14,8 +14,12 @@ const ColorStopEdit: React.FunctionComponent = (props) => {
 
     useEffect(() => {
         if (!ref.current) return
-        const width = 400
-        const height = 20
+        let width = 400
+        let height = 20
+        if (mobile) {
+            width = 350
+            height = 15
+        }
         ref.current.width = width
         ref.current.height = height
         const refCtx = ref.current.getContext("2d")!

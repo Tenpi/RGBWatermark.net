@@ -74,7 +74,7 @@ const RainbowOptions: React.FunctionComponent = (props) => {
                     const url = URL.createObjectURL(blob)
                     const link = `${url}#.${result.typename}`
                     setImage(link)
-                    setImageName(file.name)
+                    setImageName(file.name.slice(0, 30))
                 }
                 resolve()
             }
@@ -340,7 +340,7 @@ const RainbowOptions: React.FunctionComponent = (props) => {
                             <span className={`button-text ${type === "pattern" ? "button-text-selected" : ""}`}>Particle</span>
                         </span>
                     </button>
-                    {type === "text" ? 
+                    {type === "text" && !mobile ? 
                     <div className="options-text-container" style={{marginLeft: "10px"}}>
                         <input className="options-text-input" type="text" spellCheck="false" value={text} onChange={(event) => setText(event.target.value)} onMouseOver={() => setEnableDrag(false)}/>
                     </div> :
@@ -350,6 +350,12 @@ const RainbowOptions: React.FunctionComponent = (props) => {
                     </div> : 
                     null}
                 </div>
+                {type === "text" && mobile ?
+                <div className="options-row">
+                    <div className="options-text-container">
+                        <input className="options-text-input" type="text" spellCheck="false" value={text} onChange={(event) => setText(event.target.value)} onMouseOver={() => setEnableDrag(false)}/>
+                    </div>
+                </div> : null}
                 {type === "pattern" ? <>
                 <div className="options-column">
                     {generatePatternJSX()}

@@ -27,9 +27,13 @@ const App: React.FunctionComponent = (props) => {
 
     useEffect(() => {
         setTimeout(() => {
+            if (mobile) {
+                if (enableDrag) functions.dragScroll(false)
+                return
+            }
             functions.dragScroll(enableDrag)
         }, 100)
-    }, [enableDrag, history])
+    }, [enableDrag, mobile, history])
 
     useEffect(() => {
         const mobileQuery = (query: any) => {
@@ -39,7 +43,7 @@ const App: React.FunctionComponent = (props) => {
                 setMobile(false)
             }
         }
-        const media = window.matchMedia("(max-width: 500px)")
+        const media = window.matchMedia("(max-width: 700px)")
         media.addEventListener("change", mobileQuery)
         mobileQuery(media)
         document.documentElement.style.visibility = "visible"
