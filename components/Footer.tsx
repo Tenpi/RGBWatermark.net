@@ -182,6 +182,10 @@ const Footer: React.FunctionComponent = (props) => {
                 <div className="footer-row">
                     <span className="footer-text">Protect your art against AI/machine learning theft with noise interpolation.</span>
                 </div> : null}
+                {attackMode === "edge blur" ?
+                <div className="footer-row">
+                    <span className="footer-text">Protect your art against AI/machine learning theft with edge blur.</span>
+                </div> : null}
                 {attackMode === "rainbow watermarks" ?
                 <div className="footer-row">
                     <span className="footer-text-2">Rainbow watermarks will result in a lot of noise and grain in the outputs. It is recommended to use dotted fonts and particles to make them difficult to remove.</span>
@@ -205,6 +209,10 @@ const Footer: React.FunctionComponent = (props) => {
                 {attackMode === "noise" ?
                 <div className="footer-row">
                     <span className="footer-text-4">Noise interpolation shifts the pixels closer to a grid of noise, which most notably impacts img2img and controlnet.</span>
+                </div> : null}
+                {attackMode === "edge blur" ?
+                <div className="footer-row">
+                    <span className="footer-text-5">Edge blur is a controlnet specific method that applies a blur onto the edges of the image. Make sure that you recover the eyes in a separate program.</span>
                 </div> : null}
                 <div className="footer-row">
                     <span className="footer-text">All editing and rendering is done locally in your browser.</span>

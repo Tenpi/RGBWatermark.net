@@ -57,6 +57,11 @@ export const NoiseSpacingContext = React.createContext<any>(null)
 export const NoiseHueContext = React.createContext<any>(null)
 export const NoiseSaturationContext = React.createContext<any>(null)
 export const NoiseBrightnessContext = React.createContext<any>(null)
+export const PixelateOpacityContext = React.createContext<any>(null)
+export const EdgeBlurRadiusContext = React.createContext<any>(null)
+export const EdgeBlurEdgeRadiusContext = React.createContext<any>(null)
+export const EdgeBlurSensitivityContext = React.createContext<any>(null)
+export const EdgeBlurShowEdgesContext = React.createContext<any>(null)
 
 export const SiteHueContext = React.createContext<any>(null)
 export const SiteSaturationContext = React.createContext<any>(null)
@@ -149,9 +154,18 @@ const Context: React.FunctionComponent = (props) => {
     const [noiseHue, setNoiseHue] = useState(0)
     const [noiseSaturation, setNoiseSaturation] = useState(0)
     const [noiseBrightness, setNoiseBrightness] = useState(0)
+    const [pixelateOpacity, setPixelateOpacity] = useState(0)
+    const [edgeBlurRadius, setEdgeBlurRadius] = useState(10)
+    const [edgeBlurEdgeRadius, setEdgeBlurEdgeRadius] = useState(3)
+    const [edgeBlurSensitivity, setEdgeBlurSensitivity] = useState(20)
+    const [edgeBlurShowEdges, setEdgeBlurShowEdges] = useState(false)
 
     return (
         <>  
+            <EdgeBlurShowEdgesContext.Provider value={{edgeBlurShowEdges, setEdgeBlurShowEdges}}>
+            <EdgeBlurSensitivityContext.Provider value={{edgeBlurSensitivity, setEdgeBlurSensitivity}}>
+            <EdgeBlurEdgeRadiusContext.Provider value={{edgeBlurEdgeRadius, setEdgeBlurEdgeRadius}}>
+            <EdgeBlurRadiusContext.Provider value={{edgeBlurRadius, setEdgeBlurRadius}}>
             <NoiseBrightnessContext.Provider value={{noiseBrightness, setNoiseBrightness}}>
             <NoiseSaturationContext.Provider value={{noiseSaturation, setNoiseSaturation}}>
             <NoiseHueContext.Provider value={{noiseHue, setNoiseHue}}>
@@ -269,6 +283,10 @@ const Context: React.FunctionComponent = (props) => {
             </NoiseHueContext.Provider>
             </NoiseSaturationContext.Provider>
             </NoiseBrightnessContext.Provider>
+            </EdgeBlurRadiusContext.Provider>
+            </EdgeBlurEdgeRadiusContext.Provider>
+            </EdgeBlurSensitivityContext.Provider>
+            </EdgeBlurShowEdgesContext.Provider>
         </>
     )
 }

@@ -9,6 +9,7 @@ import PixelShiftImage from "../components/PixelShiftImage"
 import HighContrastImage from "../components/HighContrastImage"
 import PixelationImage from "../components/PixelationImage"
 import NoiseImage from "../components/NoiseImage"
+import EdgeBlurImage from "../components/EdgeBlurImage"
 import Help from "../components/Help"
 import Footer from "../components/Footer"
 
@@ -34,6 +35,8 @@ const HomePage: React.FunctionComponent = (props) => {
             return (<PixelationImage/>)
         } else if (attackMode === "noise") {
             return (<NoiseImage/>)
+        } else if (attackMode === "edge blur") {
+            return (<EdgeBlurImage/>)
         } else if (attackMode === "question mark") {
             return (<Help/>)
         }

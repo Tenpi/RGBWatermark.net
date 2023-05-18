@@ -13,6 +13,7 @@ import pixelshift from "../assets/images/pixelshift.png"
 import highcontrast from "../assets/images/highcontrast.png"
 import pixelation from "../assets/images/pixelation.png"
 import noise from "../assets/images/noise.png"
+import edgeblur from "../assets/images/edgeblur.png"
 
 const Help: React.FunctionComponent = (props) => {
     const {enableDrag, setEnableDrag} = useContext(EnableDragContext)
@@ -45,6 +46,9 @@ const Help: React.FunctionComponent = (props) => {
                 </div>
                 <div className="help-row">
                     <img className="help-img" src={noise}/>
+                </div>
+                <div className="help-row">
+                    <img className="help-img" src={edgeblur}/>
                 </div>
             </div>
         </div>
