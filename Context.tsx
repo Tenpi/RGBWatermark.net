@@ -62,6 +62,8 @@ export const EdgeBlurRadiusContext = React.createContext<any>(null)
 export const EdgeBlurEdgeRadiusContext = React.createContext<any>(null)
 export const EdgeBlurSensitivityContext = React.createContext<any>(null)
 export const EdgeBlurShowEdgesContext = React.createContext<any>(null)
+export const PointFillContext = React.createContext<any>(null)
+export const PointAlphaContext = React.createContext<any>(null)
 
 export const SiteHueContext = React.createContext<any>(null)
 export const SiteSaturationContext = React.createContext<any>(null)
@@ -159,9 +161,13 @@ const Context: React.FunctionComponent = (props) => {
     const [edgeBlurEdgeRadius, setEdgeBlurEdgeRadius] = useState(3)
     const [edgeBlurSensitivity, setEdgeBlurSensitivity] = useState(20)
     const [edgeBlurShowEdges, setEdgeBlurShowEdges] = useState(false)
+    const [pointFill, setPointFill] = useState("#000000")
+    const [pointAlpha, setPointAlpha] = useState(true)
 
     return (
         <>  
+            <PointAlphaContext.Provider value={{pointAlpha, setPointAlpha}}>
+            <PointFillContext.Provider value={{pointFill, setPointFill}}>
             <EdgeBlurShowEdgesContext.Provider value={{edgeBlurShowEdges, setEdgeBlurShowEdges}}>
             <EdgeBlurSensitivityContext.Provider value={{edgeBlurSensitivity, setEdgeBlurSensitivity}}>
             <EdgeBlurEdgeRadiusContext.Provider value={{edgeBlurEdgeRadius, setEdgeBlurEdgeRadius}}>
@@ -287,6 +293,8 @@ const Context: React.FunctionComponent = (props) => {
             </EdgeBlurEdgeRadiusContext.Provider>
             </EdgeBlurSensitivityContext.Provider>
             </EdgeBlurShowEdgesContext.Provider>
+            </PointFillContext.Provider>
+            </PointAlphaContext.Provider>
         </>
     )
 }
