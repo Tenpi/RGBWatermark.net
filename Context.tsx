@@ -57,13 +57,20 @@ export const NoiseSpacingContext = React.createContext<any>(null)
 export const NoiseHueContext = React.createContext<any>(null)
 export const NoiseSaturationContext = React.createContext<any>(null)
 export const NoiseBrightnessContext = React.createContext<any>(null)
-export const PixelateOpacityContext = React.createContext<any>(null)
 export const EdgeBlurRadiusContext = React.createContext<any>(null)
 export const EdgeBlurEdgeRadiusContext = React.createContext<any>(null)
 export const EdgeBlurSensitivityContext = React.createContext<any>(null)
 export const EdgeBlurShowEdgesContext = React.createContext<any>(null)
 export const PointFillContext = React.createContext<any>(null)
 export const PointAlphaContext = React.createContext<any>(null)
+export const SprinkleOpacityContext = React.createContext<any>(null)
+export const SprinklePointSizeContext = React.createContext<any>(null)
+export const SprinklePointSpacingContext = React.createContext<any>(null)
+export const SprinkleDuplicatesContext = React.createContext<any>(null)
+export const SprinkleSpacingContext = React.createContext<any>(null)
+export const SprinkleDirectionContext = React.createContext<any>(null)
+export const TriDirectionContext = React.createContext<any>(null)
+export const PixelationOpacityContext = React.createContext<any>(null)
 
 export const SiteHueContext = React.createContext<any>(null)
 export const SiteSaturationContext = React.createContext<any>(null)
@@ -156,16 +163,31 @@ const Context: React.FunctionComponent = (props) => {
     const [noiseHue, setNoiseHue] = useState(0)
     const [noiseSaturation, setNoiseSaturation] = useState(0)
     const [noiseBrightness, setNoiseBrightness] = useState(0)
-    const [pixelateOpacity, setPixelateOpacity] = useState(0)
     const [edgeBlurRadius, setEdgeBlurRadius] = useState(10)
     const [edgeBlurEdgeRadius, setEdgeBlurEdgeRadius] = useState(3)
     const [edgeBlurSensitivity, setEdgeBlurSensitivity] = useState(20)
     const [edgeBlurShowEdges, setEdgeBlurShowEdges] = useState(false)
     const [pointFill, setPointFill] = useState("#000000")
     const [pointAlpha, setPointAlpha] = useState(true)
+    const [sprinklePointSize, setSprinklePointSize] = useState(3)
+    const [sprinklePointSpacing, setSprinklePointSpacing] = useState(100)
+    const [sprinkleDuplicates, setSprinkleDuplicates] = useState(4)
+    const [sprinkleSpacing, setSprinkleSpacing] = useState(35)
+    const [sprinkleOpacity, setSprinkleOpacity] = useState(100)
+    const [sprinkleDirection, setSprinkleDirection] = useState("45")
+    const [triDirection, setTriDirection] = useState("△")
+    const [pixelationOpacity, setPixelationOpacity] = useState(100)
 
     return (
         <>  
+            <PixelationOpacityContext.Provider value={{pixelationOpacity, setPixelationOpacity}}>
+            <TriDirectionContext.Provider value={{triDirection, setTriDirection}}>
+            <SprinkleDirectionContext.Provider value={{sprinkleDirection, setSprinkleDirection}}>
+            <SprinkleOpacityContext.Provider value={{sprinkleOpacity, setSprinkleOpacity}}>
+            <SprinkleSpacingContext.Provider value={{sprinkleSpacing, setSprinkleSpacing}}>
+            <SprinkleDuplicatesContext.Provider value={{sprinkleDuplicates, setSprinkleDuplicates}}>
+            <SprinklePointSpacingContext.Provider value={{sprinklePointSpacing, setSprinklePointSpacing}}>
+            <SprinklePointSizeContext.Provider value={{sprinklePointSize, setSprinklePointSize}}>
             <PointAlphaContext.Provider value={{pointAlpha, setPointAlpha}}>
             <PointFillContext.Provider value={{pointFill, setPointFill}}>
             <EdgeBlurShowEdgesContext.Provider value={{edgeBlurShowEdges, setEdgeBlurShowEdges}}>
@@ -295,6 +317,14 @@ const Context: React.FunctionComponent = (props) => {
             </EdgeBlurShowEdgesContext.Provider>
             </PointFillContext.Provider>
             </PointAlphaContext.Provider>
+            </SprinklePointSizeContext.Provider>
+            </SprinklePointSpacingContext.Provider>
+            </SprinkleDuplicatesContext.Provider>
+            </SprinkleSpacingContext.Provider>
+            </SprinkleOpacityContext.Provider>
+            </SprinkleDirectionContext.Provider>
+            </TriDirectionContext.Provider>
+            </PixelationOpacityContext.Provider>
         </>
     )
 }

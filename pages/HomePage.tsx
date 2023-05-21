@@ -10,6 +10,7 @@ import HighContrastImage from "../components/HighContrastImage"
 import PixelationImage from "../components/PixelationImage"
 import NoiseImage from "../components/NoiseImage"
 import EdgeBlurImage from "../components/EdgeBlurImage"
+import SprinkleImage from "../components/SprinkleImage"
 import Help from "../components/Help"
 import Footer from "../components/Footer"
 
@@ -37,6 +38,8 @@ const HomePage: React.FunctionComponent = (props) => {
             return (<NoiseImage/>)
         } else if (attackMode === "edge blur") {
             return (<EdgeBlurImage/>)
+        } else if (attackMode === "sprinkles") {
+            return (<SprinkleImage/>)
         } else if (attackMode === "question mark") {
             return (<Help/>)
         }

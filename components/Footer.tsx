@@ -14,7 +14,7 @@ const Footer: React.FunctionComponent = (props) => {
     const {type, setType} = useContext(TypeContext)
     const {attackMode, setAttackMode} = useContext(AttackModeContext)
     
-    const version = "1.1.3"
+    const version = "1.1.4"
 
     const windows = async () => {
         const filename = `RGBWatermark-Setup-${version}.exe`
@@ -186,13 +186,17 @@ const Footer: React.FunctionComponent = (props) => {
                 <div className="footer-row">
                     <span className="footer-text">Protect your art against AI/machine learning theft with edge blur.</span>
                 </div> : null}
+                {attackMode === "sprinkles" ?
+                <div className="footer-row">
+                    <span className="footer-text">Protect your art against AI/machine learning theft with sprinkles.</span>
+                </div> : null}
                 {attackMode === "rainbow watermarks" ?
                 <div className="footer-row">
                     <span className="footer-text-2">Rainbow watermarks will result in a lot of noise and grain in the outputs. It is recommended to use dotted fonts and particles to make them difficult to remove.</span>
                 </div> : null}
                 {attackMode === "pointifiction" ?
                 <div className="footer-row">
-                    <span className="footer-text-4">Pointifiction/Lineifiction deletes pixels in the image to make the picture look like random noise to the AI. Make sure that you set the spacing high enough so that it can't be removed with gaussian blur. This will completely destroy the model and make it only generate noise.</span>
+                    <span className="footer-text-4">Pointifiction/Lineifiction/Trifiction/Rectifiction deletes pixels in the image to make the picture look like random noise to the AI. Make sure that you set the spacing high enough so that it can't be removed with gaussian blur. This will completely destroy the model and make it only generate noise. Use variance to make it difficult to remove.</span>
                 </div> : null}
                 {attackMode === "pixel shift" ?
                 <div className="footer-row">
@@ -213,6 +217,10 @@ const Footer: React.FunctionComponent = (props) => {
                 {attackMode === "edge blur" ?
                 <div className="footer-row">
                     <span className="footer-text-5">Edge blur is a controlnet specific method that applies a blur onto the edges of the image. Make sure that you recover the eyes in a separate program.</span>
+                </div> : null}
+                {attackMode === "sprinkles" ?
+                <div className="footer-row">
+                    <span className="footer-text-5">Sprinkles is a controlnet specific method that applies multiple copies of pointifiction and scatters them. When used in conjuction with edge blur, it should break all controlnet models.</span>
                 </div> : null}
                 <div className="footer-row">
                     <span className="footer-text">All editing and rendering is done locally in your browser.</span>
