@@ -9,11 +9,14 @@ import "./styles/help.less"
 import rainbowWatermarks from "../assets/images/rainbowwatermarks.png"
 import pointifiction from "../assets/images/pointifiction.png"
 import lineifiction from "../assets/images/lineifiction.png"
+import trifiction from "../assets/images/trifiction.png"
+import rectifiction from "../assets/images/rectifiction.png"
 import pixelshift from "../assets/images/pixelshift.png"
 import highcontrast from "../assets/images/highcontrast.png"
 import pixelation from "../assets/images/pixelation.png"
 import noise from "../assets/images/noise.png"
 import edgeblur from "../assets/images/edgeblur.png"
+import sprinkles from "../assets/images/sprinkles.png"
 
 const Help: React.FunctionComponent = (props) => {
     const {enableDrag, setEnableDrag} = useContext(EnableDragContext)
@@ -36,6 +39,12 @@ const Help: React.FunctionComponent = (props) => {
                     <img className="help-img" src={lineifiction}/>
                 </div>
                 <div className="help-row">
+                    <img className="help-img" src={trifiction}/>
+                </div>
+                <div className="help-row">
+                    <img className="help-img" src={rectifiction}/>
+                </div>
+                <div className="help-row">
                     <img className="help-img" src={pixelshift}/>
                 </div>
                 <div className="help-row">
@@ -49,6 +58,9 @@ const Help: React.FunctionComponent = (props) => {
                 </div>
                 <div className="help-row">
                     <img className="help-img" src={edgeblur}/>
+                </div>
+                <div className="help-row">
+                    <img className="help-img" src={sprinkles}/>
                 </div>
             </div>
         </div>
