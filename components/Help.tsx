@@ -17,6 +17,7 @@ import pixelation from "../assets/images/pixelation.png"
 import noise from "../assets/images/noise.png"
 import edgeblur from "../assets/images/edgeblur.png"
 import sprinkles from "../assets/images/sprinkles.png"
+import networkrandomizer from "../assets/images/networkrandomizer.png"
 
 const Help: React.FunctionComponent = (props) => {
     const {enableDrag, setEnableDrag} = useContext(EnableDragContext)
@@ -61,6 +62,9 @@ const Help: React.FunctionComponent = (props) => {
                 </div>
                 <div className="help-row">
                     <img className="help-img" src={sprinkles}/>
+                </div>
+                <div className="help-row">
+                    <img className="help-img" src={networkrandomizer}/>
                 </div>
             </div>
         </div>

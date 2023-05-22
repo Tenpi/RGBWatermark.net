@@ -1,7 +1,7 @@
 {
     "short_name": "rgbwatermark",
     "name": "RGBWatermark",
-    "description": "Protects your art from AI/machine learning thieves with a customizable rainbow watermark.",
+    "description": "Art protection tools against AI/machine learning theft.",
     "icons": [
       {
         "src": "assets/icons/favicon.png",

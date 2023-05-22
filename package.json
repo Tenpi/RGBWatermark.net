@@ -1,7 +1,7 @@
 {
   "name": "rgbwatermark.net",
   "version": "1.0.0",
-  "description": "Protects your art from AI/machine learning theft with a customizable rainbow watermark.",
+  "description": "Art protection tools against AI/machine learning theft.",
   "main": "dist/server.js",
   "scripts": {
     "start": "npm run clean && webpack && node dist/server.js",

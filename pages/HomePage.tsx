@@ -20,7 +20,7 @@ const HomePage: React.FunctionComponent = (props) => {
     const {attackMode, setAttackMode} = useContext(AttackModeContext)
 
     useEffect(() => {
-        document.title = "RGBWatermark: Anti-AI/Machine Learning Watermarks"
+        document.title = "RGBWatermark: Art Protection Tools against AI/Machine Learning Theft"
     }, [])
 
     const getAttack = () => {
