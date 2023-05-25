@@ -16,6 +16,7 @@ import rainbowWatermarks from "../assets/icons/rainbowwatermarks.png"
 import noise from "../assets/icons/noise.png"
 import edgeblur from "../assets/icons/edgeblur.png"
 import sprinkles from "../assets/icons/sprinkles.png"
+import networkrandomizer from "../assets/icons/networkrandomizer.png"
 
 interface Props {
     rerender: () => void

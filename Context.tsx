@@ -71,6 +71,7 @@ export const SprinkleSpacingContext = React.createContext<any>(null)
 export const SprinkleDirectionContext = React.createContext<any>(null)
 export const TriDirectionContext = React.createContext<any>(null)
 export const PixelationOpacityContext = React.createContext<any>(null)
+export const HelpModeContext = React.createContext<any>(null)
 
 export const SiteHueContext = React.createContext<any>(null)
 export const SiteSaturationContext = React.createContext<any>(null)
@@ -177,9 +178,11 @@ const Context: React.FunctionComponent = (props) => {
     const [sprinkleDirection, setSprinkleDirection] = useState("45")
     const [triDirection, setTriDirection] = useState("△")
     const [pixelationOpacity, setPixelationOpacity] = useState(100)
+    const [helpMode, setHelpMode] = useState("ai protection methods")
 
     return (
         <>  
+            <HelpModeContext.Provider value={{helpMode, setHelpMode}}>
             <PixelationOpacityContext.Provider value={{pixelationOpacity, setPixelationOpacity}}>
             <TriDirectionContext.Provider value={{triDirection, setTriDirection}}>
             <SprinkleDirectionContext.Provider value={{sprinkleDirection, setSprinkleDirection}}>
@@ -325,6 +328,7 @@ const Context: React.FunctionComponent = (props) => {
             </SprinkleDirectionContext.Provider>
             </TriDirectionContext.Provider>
             </PixelationOpacityContext.Provider>
+            </HelpModeContext.Provider>
         </>
     )
 }

@@ -155,6 +155,16 @@ const Footer: React.FunctionComponent = (props) => {
         window.URL.revokeObjectURL(url)
     }
 
+    const bottomText = () => {
+        if (attackMode === "network randomizer") return "Network Randomizer is implemented in python so it will only run on the app. You can download it here:"
+        return "We also have standalone apps:"
+    }
+
+    const showRenderingText = () => {
+        if (attackMode === "network randomizer") return false
+        return true
+    }
+
     return (
         <div className="footer" onMouseEnter={() => setEnableDrag(true)}>
             <div className="footer-container">
@@ -222,9 +232,10 @@ const Footer: React.FunctionComponent = (props) => {
                 <div className="footer-row">
                     <span className="footer-text-5">Sprinkles is a controlnet specific method that applies multiple copies of pointifiction and scatters them. When used in conjuction with edge blur, it should break all controlnet models.</span>
                 </div> : null}
+                {showRenderingText() ?
                 <div className="footer-row">
                     <span className="footer-text">All editing and rendering is done locally in your browser.</span>
-                </div>
+                </div> : null}
                 {attackMode === "rainbow watermarks" ?
                 <div className="footer-column">
                     <span className="footer-text-3">If you are using the watermarks with Glaze, it is better to add them before. If you want animation, download the ZIP file, glaze all the images, 
@@ -245,7 +256,7 @@ const Footer: React.FunctionComponent = (props) => {
                     </div>
                 </div> : null}
                 <div className="footer-row">
-                    <span className="footer-text">We also have standalone apps:</span>
+                    <span className="footer-text">{bottomText()}</span>
                 </div>
                 <div className="footer-row">
                     <button className="footer-button windows" onClick={windows}>Windows</button>
