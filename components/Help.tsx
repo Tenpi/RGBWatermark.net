@@ -19,8 +19,11 @@ import edgeblur from "../assets/images/protection methods/edgeblur.jpg"
 import sprinkles from "../assets/images/protection methods/sprinkles.jpg"
 import networkrandomizer from "../assets/images/protection methods/networkrandomizer.jpg"
 import imageencryption from "../assets/images/protection methods/imageencryption.jpg"
+import imagesplitting from "../assets/images/protection methods/imagesplitting.jpg"
+import glaze from "../assets/images/protection methods/glaze.jpg"
+import mist from "../assets/images/protection methods/mist.jpg"
 
-let protectionMethods = [rainbowWatermarks, pointifiction, lineifiction, trifiction, rectifiction, pixelshift, highcontrast, pixelation, noise, edgeblur, sprinkles, networkrandomizer, imageencryption]
+let protectionMethods = [rainbowWatermarks, pointifiction, lineifiction, trifiction, rectifiction, pixelshift, pixelation, highcontrast, noise, edgeblur, sprinkles, glaze, mist, imageencryption, imagesplitting, networkrandomizer]
 
 import aiarttheft1 from "../assets/images/ai art theft/aiarttheft1.jpg"
 import aiarttheft2 from "../assets/images/ai art theft/aiarttheft2.jpg"
