@@ -13,6 +13,8 @@ import EdgeBlurImage from "../components/EdgeBlurImage"
 import SprinkleImage from "../components/SprinkleImage"
 import Help from "../components/Help"
 import Footer from "../components/Footer"
+import Conversion from "../components/Conversion"
+import Inflation from "../components/Inflation"
 
 const HomePage: React.FunctionComponent = (props) => {
     const [ignored, forceUpdate] = useReducer(x => x + 1, 0)
@@ -40,6 +42,10 @@ const HomePage: React.FunctionComponent = (props) => {
             return (<EdgeBlurImage/>)
         } else if (attackMode === "sprinkles") {
             return (<SprinkleImage/>)
+        } else if (attackMode === "conversion") {
+            return (<Conversion/>)
+        } else if (attackMode === "inflation") {
+            return (<Inflation/>)
         } else if (attackMode === "question mark") {
             return (<Help/>)
         }

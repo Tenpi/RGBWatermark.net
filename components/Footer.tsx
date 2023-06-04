@@ -232,6 +232,14 @@ const Footer: React.FunctionComponent = (props) => {
                 <div className="footer-row">
                     <span className="footer-text-5">Sprinkles is a controlnet specific method that applies multiple copies of pointifiction and scatters them. When used in conjuction with edge blur, it should break all controlnet models.</span>
                 </div> : null}
+                {attackMode === "conversion" ?
+                <div className="footer-row">
+                    <span className="footer-text-4">File conversion converts the file to a lesser used format, which should help avoid web crawlers.</span>
+                </div> : null}
+                {attackMode === "inflation" ?
+                <div className="footer-row">
+                    <span className="footer-text-5">File inflation appends random bytes to inflate the filesize, which should slow down web crawlers.</span>
+                </div> : null}
                 {showRenderingText() ?
                 <div className="footer-row">
                     <span className="footer-text">All editing and rendering is done locally in your browser.</span>

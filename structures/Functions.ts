@@ -867,4 +867,11 @@ export default class Functions {
     public static randomRange(min: number, max: number, seed: number = 1) {
         return Math.floor(Functions.random(seed) * (max - min + 1)) + min
     }
+
+    public static concatTypedArrays = (a: any, b: any) => {
+        var c = new (a.constructor)(a.length + b.length)
+        c.set(a, 0)
+        c.set(b, a.length)
+        return c
+    }
 }

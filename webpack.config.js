@@ -17,11 +17,11 @@ module.exports = [
     entry: "./index",
     mode: "production",
     node: {__dirname: false},
-    output: {filename: "script.[hash:8].js", chunkFilename: "script.[hash:8].js", path: path.resolve(__dirname, "./dist"), publicPath: ""},
+    output: {filename: "script.[hash:8].js", chunkFilename: "script.[chunkhash:8].js", path: path.resolve(__dirname, "./dist"), publicPath: ""},
     resolve: {extensions: [".js", ".jsx", ".ts", ".tsx"], alias: {"react-dom$": "react-dom/profiling", "scheduler/tracing": "scheduler/tracing-profiling"},
-    fallback: {fs: false, path: require.resolve("path-browserify"), crypto: require.resolve("crypto-browserify"), stream: require.resolve("stream-browserify"), assert: require.resolve("assert/"), zlib: require.resolve("browserify-zlib"), buffer: require.resolve("buffer/"), url: require.resolve("url/")}},
+    fallback: {"process/browser": require.resolve("process/browser"), fs: false, child_process: false, path: require.resolve("path-browserify"), crypto: require.resolve("crypto-browserify"), stream: require.resolve("stream-browserify"), assert: require.resolve("assert/"), zlib: require.resolve("browserify-zlib"), buffer: require.resolve("buffer/"), url: require.resolve("url/"), os: require.resolve("os-browserify/browser")}},
     performance: {hints: false},
-    optimization: {minimize: true, minimizer: [new TerserJSPlugin({extractComments: false}), new WebpackObfuscator()], moduleIds: "named"},
+    optimization: {minimize: false, minimizer: [new TerserJSPlugin({extractComments: false}), new WebpackObfuscator()], moduleIds: "named"},
     module: {
       rules: [
         {test: /\.(jpe?g|png|gif|webp|svg|mp3|wav|mp4|webm|ttf|otf|pdf|txt|svg)$/, exclude: webExclude, use: [{loader: "file-loader", options: {name: "[path][name].[ext]"}}]},
@@ -29,7 +29,8 @@ module.exports = [
         {test: /\.html$/, exclude: webExclude, use: [{loader: "html-loader", options: {minimize: false}}]},
         {test: /\.less$/, exclude: webExclude, use: [{loader: MiniCssExtractPlugin.loader, options: {hmr: true}}, "css-loader", {loader: "less-loader"}]},
         {test: /\.css$/, exclude: webExclude, use: [{loader: MiniCssExtractPlugin.loader}, "css-loader"]},
-        {test: /\.(tsx?|jsx?)$/, exclude: webExclude, use: [{loader: "ts-loader", options: {transpileOnly: true}}]}
+        {test: /\.(tsx?|jsx?)$/, resolve: {fullySpecified: false}, exclude: webExclude, use: [{loader: "ts-loader", options: {transpileOnly: true}}]},
+        {test: /\.m?js$/, resolve: {fullySpecified: false}}
       ]
     },
     plugins: [

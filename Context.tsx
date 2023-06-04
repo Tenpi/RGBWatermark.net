@@ -72,6 +72,9 @@ export const SprinkleDirectionContext = React.createContext<any>(null)
 export const TriDirectionContext = React.createContext<any>(null)
 export const PixelationOpacityContext = React.createContext<any>(null)
 export const HelpModeContext = React.createContext<any>(null)
+export const AppendBytesContext = React.createContext<any>(null)
+export const SVGColorRatioContext = React.createContext<any>(null)
+export const SVGPreviewContext = React.createContext<any>(null)
 
 export const SiteHueContext = React.createContext<any>(null)
 export const SiteSaturationContext = React.createContext<any>(null)
@@ -179,9 +182,15 @@ const Context: React.FunctionComponent = (props) => {
     const [triDirection, setTriDirection] = useState("△")
     const [pixelationOpacity, setPixelationOpacity] = useState(100)
     const [helpMode, setHelpMode] = useState("ai protection methods")
+    const [appendBytes, setAppendBytes] = useState(10)
+    const [svgColorRatio, setSVGColorRatio] = useState(0)
+    const [previewSVG, setPreviewSVG] = useState(false)
 
     return (
         <>  
+            <SVGPreviewContext.Provider value={{previewSVG, setPreviewSVG}}>
+            <SVGColorRatioContext.Provider value={{svgColorRatio, setSVGColorRatio}}>
+            <AppendBytesContext.Provider value={{appendBytes, setAppendBytes}}>
             <HelpModeContext.Provider value={{helpMode, setHelpMode}}>
             <PixelationOpacityContext.Provider value={{pixelationOpacity, setPixelationOpacity}}>
             <TriDirectionContext.Provider value={{triDirection, setTriDirection}}>
@@ -329,6 +338,9 @@ const Context: React.FunctionComponent = (props) => {
             </TriDirectionContext.Provider>
             </PixelationOpacityContext.Provider>
             </HelpModeContext.Provider>
+            </AppendBytesContext.Provider>
+            </SVGColorRatioContext.Provider>
+            </SVGPreviewContext.Provider>
         </>
     )
 }
