@@ -15,6 +15,8 @@ import utif from "utif"
 import bmpJS from "bmp-js"
 import * as avifJS from "@jsquash/avif"
 import * as webpJS from "@jsquash/webp"
+import * as jxlJS from "@tenpi/jxl"
+import TGA from "tga"
 import ImageTracer from "imagetracerjs"
 import {Canvg} from "canvg"
 import "./styles/pointimage.less"
@@ -56,13 +58,13 @@ const Conversion: React.FunctionComponent = (props) => {
                 const png = result?.mime === "image/png"
                 const gif = result?.mime === "image/gif"
                 const webp = result?.mime === "image/webp"
-                if (jpg || png || gif || webp) {
-                    const blob = new Blob([bytes])
-                    const url = URL.createObjectURL(blob)
-                    const link = `${url}#.${result.typename}`
-                    setImage(link)
-                    setImageName(file.name.slice(0, 30))
-                }
+                // if (jpg || png || gif || webp) {
+                const blob = new Blob([bytes])
+                const url = URL.createObjectURL(blob)
+                const link = `${url}#.${result.typename}`
+                setImage(link)
+                setImageName(file.name.slice(0, 30))
+                // }
                 resolve()
             }
             fileReader.readAsArrayBuffer(file)
@@ -129,7 +131,7 @@ const Conversion: React.FunctionComponent = (props) => {
     }
 
     const stopSVGPreview = async () => {
-        canvasRenderer.stop()
+        if (canvasRenderer) canvasRenderer.stop()
     }
 
     const loadImg = () => {
@@ -201,8 +203,8 @@ const Conversion: React.FunctionComponent = (props) => {
         draw(0, true)
         const ctx = ref.current?.getContext("2d")!
         const pixels = ctx.getImageData(0, 0, ref.current.width, ref.current.height)
-        const avifBuffer = await webpJS.encode(pixels)
-        const blob = new Blob([avifBuffer])
+        const webpBuffer = await webpJS.encode(pixels)
+        const blob = new Blob([webpBuffer])
         const url = URL.createObjectURL(blob)
         functions.download(`${path.basename(imageName, path.extname(imageName))}.webp`, url)
     }
@@ -216,6 +218,17 @@ const Conversion: React.FunctionComponent = (props) => {
         const blob = new Blob([avifBuffer])
         const url = URL.createObjectURL(blob)
         functions.download(`${path.basename(imageName, path.extname(imageName))}.avif`, url)
+    }
+
+    const jxl = async () => {
+        if (!ref.current) return
+        draw(0, true)
+        const ctx = ref.current?.getContext("2d")!
+        const pixels = ctx.getImageData(0, 0, ref.current.width, ref.current.height)
+        const jxlBuffer = await jxlJS.encode(pixels)
+        const blob = new Blob([jxlBuffer])
+        const url = URL.createObjectURL(blob)
+        functions.download(`${path.basename(imageName, path.extname(imageName))}.jxl`, url)
     }
 
     const bmp = async () => {
@@ -247,6 +260,36 @@ const Conversion: React.FunctionComponent = (props) => {
         const blob = new Blob([newBuffer])
         const url = URL.createObjectURL(blob)
         functions.download(`${path.basename(imageName, path.extname(imageName))}.tiff`, url)
+    }
+
+    const tga = async () => {
+        if (!ref.current) return
+        draw(0, true)
+        const ctx = ref.current?.getContext("2d")!
+        const pixels = ctx.getImageData(0, 0, ref.current.width, ref.current.height)
+        let tgaBuffer = TGA.createTgaBuffer(pixels.width, pixels.height, pixels.data);
+        const blob = new Blob([tgaBuffer])
+        const url = URL.createObjectURL(blob)
+        functions.download(`${path.basename(imageName, path.extname(imageName))}.tga`, url)
+    }
+
+    const ppm = async () => {
+        if (!ref.current) return
+        draw(0, true)
+        const ctx = ref.current?.getContext("2d")!
+        let string = ""
+        string += "P3\n"
+        string += `${ref.current.width} ${ref.current.height}\n`
+        string += "255\n"
+        
+        let pxData = [...ctx.getImageData(0,0, ref.current.width, ref.current.height).data]
+        for (let i = 0; i < pxData.length; i++) {
+            if ((i+1) % 4 == 0) continue
+            string += pxData[i] + " "
+        }
+        const blob = new Blob([string], {type: "image/x-portable-pixmap"})
+        const url = URL.createObjectURL(blob)
+        functions.download(`${path.basename(imageName, path.extname(imageName))}.ppm`, url)
     }
 
     const svg = async (preview?: boolean) => {
@@ -316,8 +359,11 @@ const Conversion: React.FunctionComponent = (props) => {
                 <div className="point-image-buttons-container">
                     <button className="point-image-button" onClick={webp}>WEBP</button>
                     <button className="point-image-button" onClick={avif}>AVIF</button>
+                    <button className="point-image-button" onClick={jxl}>JXL</button>
                     <button className="point-image-button" onClick={bmp}>BMP</button>
                     <button className="point-image-button" onClick={tiff}>TIFF</button>
+                    <button className="point-image-button" onClick={tga}>TGA</button>
+                    <button className="point-image-button" onClick={ppm}>PPM</button>
                     <button className="point-image-button" onClick={() => svg()}>SVG</button>
                 </div>
                 <div className="point-row">

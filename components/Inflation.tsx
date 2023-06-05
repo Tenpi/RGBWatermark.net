@@ -52,13 +52,17 @@ const Inflation: React.FunctionComponent = (props) => {
                 const bmp = result?.mime === "image/bmp"
                 const tiff = result?.mime === "image/tiff"
                 const avif = path.extname(file.name) === ".avif"
-                if (jpg || png || gif || webp || bmp || tiff || avif) {
-                    const blob = new Blob([bytes])
-                    const url = URL.createObjectURL(blob)
-                    const link = `${url}#.${result.typename}`
-                    setImage(link)
-                    setImageName(file.name.slice(0, 30))
-                }
+                const ppm = path.extname(file.name) === ".ppm"
+                const tga = path.extname(file.name) === ".tga"
+                const jxl = path.extname(file.name) === ".jxl"
+                const svg = path.extname(file.name) === ".svg"
+                // if (jpg || png || gif || webp || bmp || tiff || avif) {
+                const blob = new Blob([bytes])
+                const url = URL.createObjectURL(blob)
+                const link = `${url}#.${result.typename}`
+                setImage(link)
+                setImageName(file.name.slice(0, 30))
+                // }
                 resolve()
             }
             fileReader.readAsArrayBuffer(file)
@@ -197,7 +201,7 @@ const Inflation: React.FunctionComponent = (props) => {
         const blob = new Blob([concatenated])
         const url = URL.createObjectURL(blob)
         if (getLink) return url
-        functions.download(imageName, url)
+        functions.download(path.basename(imageName, path.extname(imageName)) + path.extname(image), url)
     }
 
     return (

@@ -22,8 +22,10 @@ import imageencryption from "../assets/images/protection methods/imageencryption
 import imagesplitting from "../assets/images/protection methods/imagesplitting.jpg"
 import glaze from "../assets/images/protection methods/glaze.jpg"
 import mist from "../assets/images/protection methods/mist.jpg"
+import fileconversion from "../assets/images/protection methods/fileconversion.jpg"
+import fileinflation from "../assets/images/protection methods/fileinflation.jpg"
 
-let protectionMethods = [rainbowWatermarks, pointifiction, lineifiction, trifiction, rectifiction, pixelshift, pixelation, highcontrast, noise, edgeblur, sprinkles, glaze, mist, imageencryption, imagesplitting, networkrandomizer]
+let protectionMethods = [rainbowWatermarks, pointifiction, lineifiction, trifiction, rectifiction, pixelshift, pixelation, highcontrast, noise, edgeblur, sprinkles, glaze, mist, imageencryption, imagesplitting, networkrandomizer, fileconversion, fileinflation]
 
 import aiarttheft1 from "../assets/images/ai art theft/aiarttheft1.jpg"
 import aiarttheft2 from "../assets/images/ai art theft/aiarttheft2.jpg"
