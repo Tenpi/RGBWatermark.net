@@ -14,7 +14,7 @@ const Footer: React.FunctionComponent = (props) => {
     const {type, setType} = useContext(TypeContext)
     const {attackMode, setAttackMode} = useContext(AttackModeContext)
     
-    const version = "1.1.6"
+    const version = "1.1.7"
 
     const windows = async () => {
         const filename = `RGBWatermark-Setup-${version}.exe`
@@ -157,11 +157,13 @@ const Footer: React.FunctionComponent = (props) => {
 
     const bottomText = () => {
         if (attackMode === "network randomizer") return "Network Randomizer is implemented in python so it will only run on the app. You can download it here:"
+        if (attackMode === "network shifter") return "Network Shifter is implemented in python so it will only run on the app. You can download it here:"
         return "We also have standalone apps:"
     }
 
     const showRenderingText = () => {
         if (attackMode === "network randomizer") return false
+        if (attackMode === "network shifter") return false
         return true
     }
 

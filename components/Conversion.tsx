@@ -19,6 +19,7 @@ import * as jxlJS from "@tenpi/jxl"
 import TGA from "tga"
 import ImageTracer from "imagetracerjs"
 import {Canvg} from "canvg"
+import {optimize} from "svgo"
 import "./styles/pointimage.less"
 
 let gifPos = 0
@@ -298,7 +299,8 @@ const Conversion: React.FunctionComponent = (props) => {
         const ctx = ref.current?.getContext("2d")!
         const pixels = ctx.getImageData(0, 0, ref.current.width, ref.current.height)
         const result = ImageTracer.imagedataToSVG(pixels, {numberofcolors: 24, mincolorratio: svgColorRatio})
-        const blob = new Blob([result])
+        const optimized = optimize(result)
+        const blob = new Blob([optimized.data])
         const url = URL.createObjectURL(blob)
         if (preview) return url
         functions.download(`${path.basename(imageName, path.extname(imageName))}.svg`, url)
