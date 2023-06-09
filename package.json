@@ -4,7 +4,7 @@
   "description": "Art protection tools against AI/machine learning theft.",
   "main": "dist/server.js",
   "scripts": {
-    "start": "npm run clean && webpack && node dist/server.js",
+    "start": "npm run clean && TESTING=true webpack && node dist/server.js",
     "build": "npm run clean && webpack && npm run redirects && npm run headers && npm run favicon",
     "redirects": "echo \"/* /index.html 200\" | cat > dist/_redirects",
     "headers": "echo \"/*\nCross-Origin-Opener-Policy: same-origin\nCross-Origin-Embedder-Policy: require-corp\" | cat > dist/_headers",
@@ -83,6 +83,7 @@
     "gif-frames": "github:tenpi/gif-frames#no-cumulative",
     "image-js": "^0.35.3",
     "image-pixels": "^2.2.2",
+    "images-meta": "github:Tenpi/images-meta",
     "imagetracerjs": "^1.2.2",
     "jszip": "^3.10.1",
     "magic-bytes.js": "^1.0.14",

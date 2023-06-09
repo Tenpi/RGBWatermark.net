@@ -11,6 +11,7 @@ import xIcon from "../assets/icons/x.png"
 import checkboxChecked from "../assets/icons/checkbox-checked.png"
 import checkbox from "../assets/icons/checkbox.png"
 import {Image} from "image-js"
+import inflationCorner from "../assets/icons/inflationcorner.png"
 import "./styles/pointimage.less"
 
 let gifPos = 0
@@ -228,7 +229,10 @@ const Inflation: React.FunctionComponent = (props) => {
             </div>
             {image ?
             <div className="point-image-container">
-                <canvas className="point-image" ref={ref}></canvas>
+                <div className="point-image-relative-container">
+                    <img className="point-image-corner-img" src={inflationCorner}/>
+                    <canvas className="point-image" ref={ref}></canvas>
+                </div>
             </div> : null}
             {image ?
             <div className="point-image-container">

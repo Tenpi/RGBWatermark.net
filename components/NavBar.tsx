@@ -20,6 +20,7 @@ import conversion from "../assets/icons/conversion.png"
 import inflation from "../assets/icons/inflation.png"
 import networkrandomizer from "../assets/icons/networkrandomizer.png"
 import networkshifter from "../assets/icons/networkshifter.png"
+import aiwatermark from "../assets/icons/aiwatermark.png"
 
 interface Props {
     rerender: () => void
@@ -56,6 +57,7 @@ const NavBar: React.FunctionComponent<Props> = (props) => {
             <img className="navbar-item" src={inflation} onClick={() => setAttackMode("inflation")}/>
             <img className="navbar-item" src={networkrandomizer} onClick={() => setAttackMode("network randomizer")}/>
             <img className="navbar-item" src={networkshifter} onClick={() => setAttackMode("network shifter")}/>
+            <img className="navbar-item" src={aiwatermark} onClick={() => setAttackMode("ai watermark")}/>
             <img className="navbar-item" src={questionmark} onClick={() => setAttackMode("question mark")}/>
         </div>
     )

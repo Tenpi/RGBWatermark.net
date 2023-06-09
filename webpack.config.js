@@ -11,6 +11,8 @@ const Dotenv = require("dotenv-webpack")
 let exclude = [/node_modules/, /dist/]
 let webExclude = [...exclude, /server.tsx/, /routes/]
 
+const testing = process.env.TESTING === "true"
+
 module.exports = [
   {
     target: "web",
@@ -21,7 +23,7 @@ module.exports = [
     resolve: {extensions: [".js", ".jsx", ".ts", ".tsx"], alias: {"react-dom$": "react-dom/profiling", "scheduler/tracing": "scheduler/tracing-profiling"},
     fallback: {"process/browser": require.resolve("process/browser"), fs: false, child_process: false, path: require.resolve("path-browserify"), crypto: require.resolve("crypto-browserify"), stream: require.resolve("stream-browserify"), assert: require.resolve("assert/"), zlib: require.resolve("browserify-zlib"), buffer: require.resolve("buffer/"), url: require.resolve("url/"), os: require.resolve("os-browserify/browser")}},
     performance: {hints: false},
-    optimization: {minimize: true, minimizer: [new TerserJSPlugin({extractComments: false}), new WebpackObfuscator()], moduleIds: "named"},
+    optimization: {minimize: testing ? false : true, minimizer: [new TerserJSPlugin({extractComments: false}), new WebpackObfuscator()], moduleIds: "named"},
     module: {
       rules: [
         {test: /\.(jpe?g|png|gif|webp|svg|mp3|wav|mp4|webm|ttf|otf|pdf|txt|svg)$/, exclude: webExclude, use: [{loader: "file-loader", options: {name: "[path][name].[ext]"}}]},

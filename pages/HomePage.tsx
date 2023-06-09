@@ -15,6 +15,7 @@ import Help from "../components/Help"
 import Footer from "../components/Footer"
 import Conversion from "../components/Conversion"
 import Inflation from "../components/Inflation"
+import AIWatermark from "../components/AIWatermark"
 
 const HomePage: React.FunctionComponent = (props) => {
     const [ignored, forceUpdate] = useReducer(x => x + 1, 0)
@@ -46,6 +47,8 @@ const HomePage: React.FunctionComponent = (props) => {
             return (<Conversion/>)
         } else if (attackMode === "inflation") {
             return (<Inflation/>)
+        } else if (attackMode === "ai watermark") {
+            return (<AIWatermark/>)
         } else if (attackMode === "question mark") {
             return (<Help/>)
         }

@@ -5,7 +5,7 @@ import favicon from "../assets/icons/favicon.png"
 import {EnableDragContext, MobileContext, SiteHueContext, SiteSaturationContext, SiteLightnessContext, StopAnimationContext, ImageContext} from "../Context"
 import functions from "../structures/Functions"
 import Slider from "react-slider"
-import color from "../assets/icons/color.png"
+import color from "../assets/icons/color2.png"
 import placeholder from "../assets/images/placeholder.png"
 import "./styles/titlebar.less"
 

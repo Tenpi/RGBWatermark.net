@@ -16,7 +16,7 @@ let inertia = false
 let mouseDown = false
 let stopInertia = false
 
-const imageExtensions = [".jpg", ".jpeg", ".png", ".webp"]
+const imageExtensions = [".jpg", ".jpeg", ".png", ".webp", ".avif", ".bmp", ".tiff"]
 const videoExtensions = [".mp4", ".mov", ".avi", ".mkv", ".webm"]
 
 const ffmpeg = createFFmpeg()

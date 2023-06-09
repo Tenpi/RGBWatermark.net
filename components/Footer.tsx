@@ -242,6 +242,10 @@ const Footer: React.FunctionComponent = (props) => {
                 <div className="footer-row">
                     <span className="footer-text-5">File inflation appends random bytes to inflate the filesize, which should slow down web crawlers.</span>
                 </div> : null}
+                {attackMode === "ai watermark" ?
+                <div className="footer-row">
+                    <span className="footer-text-6">AI watermark adds a watermark to identify content as AI-generated. Any metadata from the original file is preserved.</span>
+                </div> : null}
                 {showRenderingText() ?
                 <div className="footer-row">
                     <span className="footer-text">All editing and rendering is done locally in your browser.</span>
