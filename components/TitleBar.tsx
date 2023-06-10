@@ -9,35 +9,6 @@ import color from "../assets/icons/color2.png"
 import placeholder from "../assets/images/placeholder.png"
 import "./styles/titlebar.less"
 
-import frame1 from "../assets/icons/logo/logo 1.png"
-import frame2 from "../assets/icons/logo/logo 2.png"
-import frame3 from "../assets/icons/logo/logo 3.png"
-import frame4 from "../assets/icons/logo/logo 4.png"
-import frame5 from "../assets/icons/logo/logo 5.png"
-import frame6 from "../assets/icons/logo/logo 6.png"
-import frame7 from "../assets/icons/logo/logo 7.png"
-import frame8 from "../assets/icons/logo/logo 8.png"
-import frame9 from "../assets/icons/logo/logo 9.png"
-import frame10 from "../assets/icons/logo/logo 10.png"
-import frame11 from "../assets/icons/logo/logo 11.png"
-import frame12 from "../assets/icons/logo/logo 12.png"
-import frame13 from "../assets/icons/logo/logo 13.png"
-import frame14 from "../assets/icons/logo/logo 14.png"
-import frame15 from "../assets/icons/logo/logo 15.png"
-import frame16 from "../assets/icons/logo/logo 16.png"
-import frame17 from "../assets/icons/logo/logo 17.png"
-import frame18 from "../assets/icons/logo/logo 18.png"
-import frame19 from "../assets/icons/logo/logo 19.png"
-import frame20 from "../assets/icons/logo/logo 20.png"
-import frame21 from "../assets/icons/logo/logo 21.png"
-import frame22 from "../assets/icons/logo/logo 22.png"
-import frame23 from "../assets/icons/logo/logo 23.png"
-import frame24 from "../assets/icons/logo/logo 24.png"
-
-const frames = [frame1, frame2, frame3, frame4, frame5, frame6, frame7, 
-frame8, frame9, frame10, frame11, frame12, frame13, frame14, frame15, 
-frame16, frame17, frame18, frame19, frame20, frame21, frame22, frame23, frame24]
-
 const colorList = {
     "--selection": "rgba(168, 203, 255, 0.302)",
     "--text": "#1a73ff",
@@ -117,66 +88,7 @@ const TitleBar: React.FunctionComponent<Props> = (props) => {
         return functions.calculateFilter(color)
     }
 
-    const draw = (pos: number) => {
-        const imgElement = document.createElement("img")
-        imgElement.src = frames[pos]
-        imgElement.onload = () => {
-            if (!ref.current) return
-            ref.current.width = imgElement.width
-            ref.current.height = imgElement.height
-            const refCtx = ref.current.getContext("2d")!
-            refCtx.clearRect(0, 0, ref.current.width, ref.current.height)
-            refCtx?.drawImage(imgElement, 0, 0, imgElement.width, imgElement.height)
-        }
-    }
-
     const colors = ["r", "g", "b"]
-
-    /*
-    useEffect(() => {
-        let timeout = null as any
-        const animationLoop = async () => {
-            if (stopAnimations) return
-            let newPos = colorPos + 1
-            if (newPos > colors.length - 1) {
-                newPos = 0
-            }
-            await new Promise<void>((resolve) => {
-                clearTimeout(timeout)
-                timeout = setTimeout(() => {
-                    setColorPos(newPos)
-                    resolve()
-                }, 2000)
-            }).then(animationLoop)
-        }
-        animationLoop()
-        return () => {
-            clearTimeout(timeout)
-        }
-    }, [stopAnimations, colorPos])*/
-
-    /*
-    useEffect(() => {
-        let timeout = null as any
-        const animationLoop = async () => {
-            draw(pos)
-            if (stopAnimations) return
-            pos += 1
-            if (pos > frames.length - 1) {
-                pos = 0
-            }
-            await new Promise<void>((resolve) => {
-                clearTimeout(timeout)
-                timeout = setTimeout(() => {
-                    resolve()
-                }, 100)
-            }).then(animationLoop)
-        }
-        animationLoop()
-        return () => {
-            clearTimeout(timeout)
-        }
-    }, [stopAnimations])*/
 
     const generateTitleJSX = () => {
         let colorPos1 = colorPos

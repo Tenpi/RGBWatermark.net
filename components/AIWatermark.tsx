@@ -12,12 +12,17 @@ import checkboxChecked from "../assets/icons/checkbox-checked.png"
 import checkbox from "../assets/icons/checkbox.png"
 import {Image} from "image-js"
 import JSZip from "jszip"
-import ai from "../assets/icons/AI/ai.png"
-import aiFan from "../assets/icons/AI/ai-fan.png"
-import aiChip from "../assets/icons/AI/ai-chip.png"
-import aiPencil from "../assets/icons/AI/ai-pencil.png"
+// import ai from "../assets/icons/AI/ai.png"
+// import aiFan from "../assets/icons/AI/ai-fan.png"
+// import aiChip from "../assets/icons/AI/ai-chip.png"
+// import aiPencil from "../assets/icons/AI/ai-pencil.png"
 import imagesMeta from "images-meta"
 import "./styles/aiwatermark.less"
+
+const ai = "https://github.com/Tenpi/RGBWatermark.net/blob/main/assets/icons/AI/ai.png?raw=true"
+const aiPencil = "https://github.com/Tenpi/RGBWatermark.net/blob/main/assets/icons/AI/ai-pencil.png?raw=true"
+const aiFan = "https://github.com/Tenpi/RGBWatermark.net/blob/main/assets/icons/AI/ai-fan.png?raw=true"
+const aiChip = "https://github.com/Tenpi/RGBWatermark.net/blob/main/assets/icons/AI/ai-chip.png?raw=true"
 
 let gifPos = 0
 
@@ -186,6 +191,7 @@ const AIWatermark: React.FunctionComponent = (props) => {
         if (aiWatermarkType === "fan") return aiFan
         if (aiWatermarkType === "chip") return aiChip
         if (aiWatermarkType === "pencil") return aiPencil
+        return ai
     }
 
     const loadWatermarkImg = () => {
