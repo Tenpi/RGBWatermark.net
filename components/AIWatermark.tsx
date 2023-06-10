@@ -19,10 +19,10 @@ import JSZip from "jszip"
 import imagesMeta from "images-meta"
 import "./styles/aiwatermark.less"
 
-const ai = "https://github.com/Tenpi/RGBWatermark.net/blob/main/assets/icons/AI/ai.png?raw=true"
-const aiPencil = "https://github.com/Tenpi/RGBWatermark.net/blob/main/assets/icons/AI/ai-pencil.png?raw=true"
-const aiFan = "https://github.com/Tenpi/RGBWatermark.net/blob/main/assets/icons/AI/ai-fan.png?raw=true"
-const aiChip = "https://github.com/Tenpi/RGBWatermark.net/blob/main/assets/icons/AI/ai-chip.png?raw=true"
+const ai = "https://i.imgur.com/xcGAIR0.png"
+const aiPencil = "https://i.imgur.com/Mp1LNwX.png"
+const aiFan = "https://i.imgur.com/FuecjPJ.png"
+const aiChip = "https://i.imgur.com/rPj7bdR.png"
 
 let gifPos = 0
 
@@ -197,6 +197,7 @@ const AIWatermark: React.FunctionComponent = (props) => {
     const loadWatermarkImg = () => {
         const imgElement = document.createElement("img")
         imgElement.src = getWatermarkImage()
+        imgElement.crossOrigin = "Anonymous"
         imgElement.onload = () => {
             setWatermarkImg(imgElement)
         }
