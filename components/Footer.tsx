@@ -246,6 +246,14 @@ const Footer: React.FunctionComponent = (props) => {
                 <div className="footer-row">
                     <span className="footer-text-6">AI watermark adds a watermark to identify content as AI-generated. Any metadata from the original file is preserved.</span>
                 </div> : null}
+                {attackMode === "fence" ?
+                <div className="footer-row">
+                    <span className="footer-text-4">The fence adds a protective fence that looks and performs similar to trifiction.</span>
+                </div> : null}
+                {attackMode === "adversarial noise" ?
+                <div className="footer-row">
+                    <span className="footer-text-5">Adversarial noise adds pre-computed adversarial noise, offering close results to regular adversarial noise without the lengthy computation.</span>
+                </div> : null}
                 {showRenderingText() ?
                 <div className="footer-row">
                     <span className="footer-text">All editing and rendering is done locally in your browser.</span>

@@ -16,6 +16,8 @@ import rainbowWatermarks from "../assets/icons/rainbowwatermarks.png"
 import noise from "../assets/icons/noise.png"
 import edgeblur from "../assets/icons/edgeblur.png"
 import sprinkles from "../assets/icons/sprinkles.png"
+import fence from "../assets/icons/fence.png"
+import adversarialnoise from "../assets/icons/adversarialnoise.png"
 import conversion from "../assets/icons/conversion.png"
 import inflation from "../assets/icons/inflation.png"
 import networkrandomizer from "../assets/icons/networkrandomizer.png"
@@ -53,6 +55,8 @@ const NavBar: React.FunctionComponent<Props> = (props) => {
             <img className="navbar-item" src={noise} onClick={() => setAttackMode("noise")}/>
             <img className="navbar-item" src={edgeblur} onClick={() => setAttackMode("edge blur")}/>
             <img className="navbar-item" src={sprinkles} onClick={() => setAttackMode("sprinkles")}/>
+            <img className="navbar-item" src={fence} onClick={() => setAttackMode("fence")}/>
+            <img className="navbar-item" src={adversarialnoise} onClick={() => setAttackMode("adversarial noise")}/>
             <img className="navbar-item" src={conversion} onClick={() => setAttackMode("conversion")}/>
             <img className="navbar-item" src={inflation} onClick={() => setAttackMode("inflation")}/>
             <img className="navbar-item" src={networkrandomizer} onClick={() => setAttackMode("network randomizer")}/>

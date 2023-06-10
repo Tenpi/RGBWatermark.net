@@ -43,8 +43,9 @@ import howaiartworks2 from "../assets/images/how ai art works/howaiartworks2.jpg
 let howAIArtWorks = [howaiartworks, howaiartworks2]
 
 import aiisuseless from "../assets/images/misc/aiisuseless.jpg"
+import aiwatermark from "../assets/images/misc/aiwatermark.jpg"
 
-let misc = [aiisuseless]
+let misc = [aiisuseless, aiwatermark]
 
 const Help: React.FunctionComponent = (props) => {
     const {enableDrag, setEnableDrag} = useContext(EnableDragContext)

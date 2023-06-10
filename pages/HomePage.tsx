@@ -4,18 +4,20 @@ import TitleBar from "../components/TitleBar"
 import NavBar from "../components/NavBar"
 import RainbowOptions from "../components/RainbowOptions"
 import RainbowImage from "../components/RainbowImage"
-import PointImage from "../components/PointImage"
-import PixelShiftImage from "../components/PixelShiftImage"
-import HighContrastImage from "../components/HighContrastImage"
-import PixelationImage from "../components/PixelationImage"
-import NoiseImage from "../components/NoiseImage"
-import EdgeBlurImage from "../components/EdgeBlurImage"
-import SprinkleImage from "../components/SprinkleImage"
+import PointImage from "../components/Pointifiction"
+import PixelShiftImage from "../components/PixelShift"
+import HighContrastImage from "../components/HighContrast"
+import PixelationImage from "../components/Pixelation"
+import NoiseImage from "../components/Noise"
+import EdgeBlurImage from "../components/EdgeBlur"
+import SprinkleImage from "../components/Sprinkles"
 import Help from "../components/Help"
 import Footer from "../components/Footer"
 import Conversion from "../components/Conversion"
 import Inflation from "../components/Inflation"
 import AIWatermark from "../components/AIWatermark"
+import Fence from "../components/Fence"
+import AdversarialNoise from "../components/AdversarialNoise"
 
 const HomePage: React.FunctionComponent = (props) => {
     const [ignored, forceUpdate] = useReducer(x => x + 1, 0)
@@ -49,6 +51,10 @@ const HomePage: React.FunctionComponent = (props) => {
             return (<Inflation/>)
         } else if (attackMode === "ai watermark") {
             return (<AIWatermark/>)
+        } else if (attackMode === "fence") {
+            return (<Fence/>)
+        } else if (attackMode === "adversarial noise") {
+            return (<AdversarialNoise/>)
         } else if (attackMode === "question mark") {
             return (<Help/>)
         }

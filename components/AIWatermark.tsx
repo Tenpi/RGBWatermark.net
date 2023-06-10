@@ -253,12 +253,12 @@ const AIWatermark: React.FunctionComponent = (props) => {
         draw(0, true, canvasOverride, imgOverride)
         const img = applyWatermark("image/jpeg", canvasOverride) as string
         let inMime = "image/jpeg"
-        if (path.extname(image) === ".png") inMime = "image/png"
+        if (path.extname(imageLink) === ".png") inMime = "image/png"
         const arrayBuffer = await fetch((imageLink)).then((r) => r.arrayBuffer())
         const meta = imagesMeta.readMeta(Buffer.from(arrayBuffer), inMime)
         for (let i = 0; i < meta.length; i++) {
-            if (typeof meta[i].value !== "string") continue
-            meta[i].value = meta[i].value.replaceAll("26UNICODE", "").replaceAll(/\u0000/g, "")
+            if (typeof meta[i].value !== "string") meta[i].value = ""
+            meta[i].value = meta[i].value.replaceAll("UNICODE", "").replaceAll(/\u0000/g, "")
         }
         let metaBuffer = imagesMeta.writeMeta(img, "image/jpeg", meta, "buffer")
         const blob = new Blob([metaBuffer])
@@ -272,12 +272,12 @@ const AIWatermark: React.FunctionComponent = (props) => {
         draw(0, true, canvasOverride, imgOverride)
         const img = applyWatermark("image/png", canvasOverride) as string
         let inMime = "image/jpeg"
-        if (path.extname(image) === ".png") inMime = "image/png"
+        if (path.extname(imageLink) === ".png") inMime = "image/png"
         const arrayBuffer = await fetch((imageLink)).then((r) => r.arrayBuffer())
         const meta = imagesMeta.readMeta(Buffer.from(arrayBuffer), inMime)
         for (let i = 0; i < meta.length; i++) {
-            if (typeof meta[i].value !== "string") continue
-            meta[i].value = meta[i].value.replaceAll("26UNICODE", "").replaceAll(/\u0000/g, "")
+            if (typeof meta[i].value !== "string") meta[i].value = ""
+            meta[i].value = meta[i].value.replaceAll("UNICODE", "").replaceAll(/\u0000/g, "")
         }
         let metaBuffer = imagesMeta.writeMeta(img, "image/png", meta, "buffer")
         const blob = new Blob([metaBuffer])
@@ -320,7 +320,7 @@ const AIWatermark: React.FunctionComponent = (props) => {
         return {images, imageNames}
     }
 
-    const batchJPG = async (event: any) => {
+    const bulkJPG = async (event: any) => {
         const {images, imageNames} = await loadImages(event)
         if (!images) return
         const zip = new JSZip()
@@ -331,9 +331,13 @@ const AIWatermark: React.FunctionComponent = (props) => {
                 img.onload = () => resolve()
                 img.src = images[i]
             })
-            const url = await jpg(images[i], canvas, img, true)
-            const data = await fetch(url!).then((r) => r.arrayBuffer())
-            zip.file(`${path.basename(imageNames[i], path.extname(imageNames[i]))}_aiwatermark ${i + 1}.jpg`, data, {binary: true})
+            try {
+                const url = await jpg(images[i], canvas, img, true)
+                const data = await fetch(url!).then((r) => r.arrayBuffer())
+                zip.file(`${path.basename(imageNames[i], path.extname(imageNames[i]))}_aiwatermark ${i + 1}.jpg`, data, {binary: true})
+            } catch {
+                continue
+            }
         }
         const filename = `${path.basename(imageNames[0], path.extname(imageNames[0]))}_aiwatermark.zip`
         const blob = await zip.generateAsync({type: "blob"})
@@ -342,7 +346,7 @@ const AIWatermark: React.FunctionComponent = (props) => {
         window.URL.revokeObjectURL(url)
     }
 
-    const batchPNG = async (event: any) => {
+    const bulkPNG = async (event: any) => {
         const {images, imageNames} = await loadImages(event)
         if (!images) return
         const zip = new JSZip()
@@ -353,9 +357,13 @@ const AIWatermark: React.FunctionComponent = (props) => {
                 img.onload = () => resolve()
                 img.src = images[i]
             })
-            const url = await png(images[i], canvas, img, true)
-            const data = await fetch(url!).then((r) => r.arrayBuffer())
-            zip.file(`${path.basename(imageNames[i], path.extname(imageNames[i]))}_aiwatermark ${i + 1}.png`, data, {binary: true})
+            try {
+                const url = await png(images[i], canvas, img, true)
+                const data = await fetch(url!).then((r) => r.arrayBuffer())
+                zip.file(`${path.basename(imageNames[i], path.extname(imageNames[i]))}_aiwatermark ${i + 1}.png`, data, {binary: true})
+            } catch {
+                continue
+            }
         }
         const filename = `${path.basename(imageNames[0], path.extname(imageNames[0]))}_aiwatermark.zip`
         const blob = await zip.generateAsync({type: "blob"})
@@ -547,16 +555,16 @@ const AIWatermark: React.FunctionComponent = (props) => {
                         <button className="aiwatermark-image-button" onClick={() => png()}>PNG</button>
                         <label htmlFor="jpg" className="aiwatermark-image-button">
                             <span className="button-hover">
-                                <span className="button-text" style={{fontSize: "20px"}}>Batch JPG</span>
+                                <span className="button-text" style={{fontSize: "20px"}}>Bulk JPG</span>
                             </span>
                         </label>
-                        <input id="jpg" type="file" multiple={true} onChange={(event) => batchJPG(event)}/>
+                        <input id="jpg" type="file" multiple={true} onChange={(event) => bulkJPG(event)}/>
                         <label htmlFor="png" className="aiwatermark-image-button">
                             <span className="button-hover">
-                                <span className="button-text" style={{fontSize: "20px"}}>Batch PNG</span>
+                                <span className="button-text" style={{fontSize: "20px"}}>Bulk PNG</span>
                             </span>
                         </label>
-                        <input id="png" type="file" multiple={true} onChange={(event) => batchPNG(event)}/>
+                        <input id="png" type="file" multiple={true} onChange={(event) => bulkPNG(event)}/>
                     </div>
                 </div> : null}
             </div>
