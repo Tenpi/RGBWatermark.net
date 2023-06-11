@@ -98,7 +98,7 @@ const Help: React.FunctionComponent = (props) => {
             for (let i = 0; i < protectionMethods.length; i++) {
                 jsx.push(
                     <div className="help-row">
-                        <img className="help-img" src={protectionMethods[i]}/>
+                        <img className="help-img" crossOrigin="anonymous" src={protectionMethods[i]}/>
                     </div>
                 )
             }
@@ -106,7 +106,7 @@ const Help: React.FunctionComponent = (props) => {
             for (let i = 0; i < aiArtTheft.length; i++) {
                 jsx.push(
                     <div className="help-row">
-                        <img className="help-img" src={aiArtTheft[i]}/>
+                        <img className="help-img" crossOrigin="anonymous" src={aiArtTheft[i]}/>
                     </div>
                 )
             }
@@ -114,7 +114,7 @@ const Help: React.FunctionComponent = (props) => {
             for (let i = 0; i < howAIArtWorks.length; i++) {
                 jsx.push(
                     <div className="help-row">
-                        <img className="help-img" src={howAIArtWorks[i]}/>
+                        <img className="help-img" crossOrigin="anonymous" src={howAIArtWorks[i]}/>
                     </div>
                 )
             }
@@ -122,7 +122,7 @@ const Help: React.FunctionComponent = (props) => {
             for (let i = 0; i < misc.length; i++) {
                 jsx.push(
                     <div className="help-row">
-                        <img className="help-img" src={misc[i]}/>
+                        <img className="help-img" crossOrigin="anonymous" src={misc[i]}/>
                     </div>
                 )
             }
