@@ -3,13 +3,12 @@ import React, {useContext, useEffect, useState, useRef} from "react"
 import {useHistory} from "react-router-dom"
 import {HashLink as Link} from "react-router-hash-link"
 import path from "path"
-import {EnableDragContext, MobileContext, ImageContext, OutputSizeContext, ImageNameContext, PointInvertContext, BrightnessContext, PointSizeContext, PointSpacingContext, PointRandomnessContext, PointBrightnessContext, PointContrastContext, ReverseContext, PointMethodContext, patterns} from "../Context"
+import {EnableDragContext, MobileContext, ImageContext, OutputSizeContext, ImageNameContext, ReverseContext, patterns} from "../Context"
 import functions from "../structures/Functions"
 import Slider from "react-slider"
 import fileType from "magic-bytes.js"
 import uploadIcon from "../assets/icons/upload.png"
 import xIcon from "../assets/icons/x.png"
-import gifFrames from "gif-frames"
 import JSZip from "jszip"
 import checkboxChecked from "../assets/icons/checkbox-checked.png"
 import checkbox from "../assets/icons/checkbox.png"
@@ -23,14 +22,20 @@ const PointImage: React.FunctionComponent = (props) => {
     const {image, setImage} = useContext(ImageContext)
     const {imageName, setImageName} = useContext(ImageNameContext)
     const {outputSize, setOutputSize} = useContext(OutputSizeContext)
-    const {pointSpacing, setPointSpacing} = useContext(PointSpacingContext)
-    const {pointRandomness, setPointRandomness} = useContext(PointRandomnessContext)
-    const {pointBrightness, setPointBrightness} = useContext(PointBrightnessContext)
-    const {pointContrast, setPointContrast} = useContext(PointContrastContext)
-    const {pointSize, setPointSize} = useContext(PointSizeContext)
-    const {pointMethod, setPointMethod} = useContext(PointMethodContext)
-    const {pointInvert, setPointInvert} = useContext(PointInvertContext)
     const {reverse, setReverse} = useContext(ReverseContext)
+    const [pointSpacing, setPointSpacing] = useState(0)
+    const [pointRandomness, setPointRandomness] = useState(0)
+    const [pointBrightness, setPointBrightness] = useState(0)
+    const [pointContrast, setPointContrast] = useState(0)
+    const [pointSize, setPointSize] = useState(1)
+    const [pointMethod, setPointMethod] = useState("point")
+    const [pointInvert, setPointInvert] = useState(false)
+    const [pointShift, setPointShift] = useState(false)
+    const [pointAngle, setPointAngle] = useState(0)
+    const [pointVariance, setPointVariance] = useState(0)
+    const [pointFill, setPointFill] = useState("#000000")
+    const [pointAlpha, setPointAlpha] = useState(true)
+    const [triDirection, setTriDirection] = useState("△")
     const [gifData, setGIFData] = useState(null) as any
     const [img, setImg] = useState(null as HTMLImageElement | null)
     const [seed, setSeed] = useState(0)
@@ -61,7 +66,7 @@ const PointImage: React.FunctionComponent = (props) => {
                     const url = URL.createObjectURL(blob)
                     const link = `${url}#.${result.typename}`
                     setImage(link)
-                    setImageName(file.name)
+                    setImageName(file.name.slice(0, 30))
                 }
                 resolve()
             }
@@ -109,7 +114,6 @@ const PointImage: React.FunctionComponent = (props) => {
         }
         refCtx.restore()
     }
-
     const applyPointifiction = (outputType?: string) => {
     }
 
@@ -126,15 +130,8 @@ const PointImage: React.FunctionComponent = (props) => {
     }
 
     const parseGIF = async () => {
-        const frames = await gifFrames({url: image, frames: "all", outputType: "canvas"})
-        const newGIFData = [] as any
-        for (let i = 0; i < frames.length; i++) {
-            newGIFData.push({
-                frame: frames[i].getImage(),
-                delay: frames[i].frameInfo.delay * 10
-            })
-        }
-        setGIFData(newGIFData)
+        const frames = await functions.extractGIFFrames(image)
+        setGIFData(frames)
     }
 
     const parseAnimatedWebP = async () => {
@@ -178,41 +175,53 @@ const PointImage: React.FunctionComponent = (props) => {
         return () => {
             clearTimeout(timeout)
         }
-    }, [img, pointSize, pointSpacing, pointRandomness, pointBrightness, pointContrast, pointMethod, pointInvert, seed, gifData])
+    }, [img, pointSize, pointSpacing, pointRandomness, pointBrightness, pointContrast, pointMethod, pointInvert, pointShift, pointAngle, pointVariance, pointFill, pointAlpha, triDirection, seed, gifData])
 
     useEffect(() => {
         setSeed(Math.floor(Math.random() * 1000))
-    }, [pointRandomness])
+    }, [pointRandomness, pointVariance])
 
     const jpg = async () => {
         draw(0, true)
         const img = applyPointifiction("image/jpeg") as string
-        functions.download(`${path.basename(imageName, path.extname(imageName))}_pointified.jpg`, img)
+        let nameExt = "pointified"
+        if (pointMethod === "line") nameExt = "lineified"
+        if (pointMethod === "tri") nameExt = "triangified"
+        if (pointMethod === "rect") nameExt = "rectified"
+        functions.download(`${path.basename(imageName, path.extname(imageName))}_${nameExt}.jpg`, img)
     }
 
     const png = async () => {
         draw(0, true)
         const img = applyPointifiction("image/png") as string
-        functions.download(`${path.basename(imageName, path.extname(imageName))}_pointified.png`, img)
+        let nameExt = "pointified"
+        if (pointMethod === "line") nameExt = "lineified"
+        if (pointMethod === "tri") nameExt = "triangified"
+        if (pointMethod === "rect") nameExt = "rectified"
+        functions.download(`${path.basename(imageName, path.extname(imageName))}_${nameExt}.png`, img)
     }
 
     const zip = async () => {
         if (!gifData) return
         const zip = new JSZip()
+        let nameExt = "pointified"
+        if (pointMethod === "line") nameExt = "lineified"
+        if (pointMethod === "tri") nameExt = "triangified"
+        if (pointMethod === "rect") nameExt = "rectified"
         if (gifData) {
             for (let i = 0; i < gifData.length; i++) {
                 draw(i, true)
                 const img = applyPointifiction("image/png") as string
                 const data = await fetch(img).then((r) => r.arrayBuffer())
-                zip.file(`${path.basename(imageName, path.extname(imageName))}_pointified ${i + 1}.png`, data, {binary: true})
+                zip.file(`${path.basename(imageName, path.extname(imageName))}_${nameExt} ${i + 1}.png`, data, {binary: true})
             }
         } else {
             draw(0, true)
             const img = applyPointifiction("image/png") as string
             const data = await fetch(img).then((r) => r.arrayBuffer())
-            zip.file(`${path.basename(imageName, path.extname(imageName))}_pointified 1.png`, data, {binary: true})
+            zip.file(`${path.basename(imageName, path.extname(imageName))}_${nameExt} 1.png`, data, {binary: true})
         }
-        const filename = `${path.basename(imageName, path.extname(imageName))}_pointified.zip`
+        const filename = `${path.basename(imageName, path.extname(imageName))}_${nameExt}.zip`
         const blob = await zip.generateAsync({type: "blob"})
         const url = window.URL.createObjectURL(blob)
         functions.download(filename, url)
@@ -242,7 +251,39 @@ const PointImage: React.FunctionComponent = (props) => {
         const buffer = await functions.encodeGIF(frames, delays, dimensions.width, dimensions.height, {transparentColor: "#000000"})
         const blob = new Blob([buffer])
         const url = window.URL.createObjectURL(blob)
-        functions.download(`${path.basename(imageName, path.extname(imageName))}_pointified.gif`, url)
+        let nameExt = "pointified"
+        if (pointMethod === "line") nameExt = "lineified"
+        if (pointMethod === "tri") nameExt = "triangified"
+        if (pointMethod === "rect") nameExt = "rectified"
+        functions.download(`${path.basename(imageName, path.extname(imageName))}_${nameExt}.gif`, url)
+        window.URL.revokeObjectURL(url)
+    }
+
+    const mp4 = async () => {
+        if (!img) return
+        let frames = [] as any
+        let delays = [] as any
+        if (gifData) {
+            for (let i = 0; i < gifData.length; i++) {
+                draw(i, true)
+                const frame = applyPointifiction("buffer") as ArrayBuffer
+                frames.push(frame)
+                let delay = gifData[i].delay
+                delays.push(delay)
+            }
+        } else {
+            draw(0, true)
+            const frame = applyPointifiction("buffer") as ArrayBuffer
+            frames.push(frame)
+            let delay = 60
+            delays.push(delay)
+        }
+        const url = await functions.encodeVideo(frames, functions.msToFps(delays[0]))
+        let nameExt = "pointified"
+        if (pointMethod === "line") nameExt = "lineified"
+        if (pointMethod === "tri") nameExt = "triangified"
+        if (pointMethod === "rect") nameExt = "rectified"
+        functions.download(`${path.basename(imageName, path.extname(imageName))}_${nameExt}.mp4`, url)
         window.URL.revokeObjectURL(url)
     }
 
@@ -252,8 +293,13 @@ const PointImage: React.FunctionComponent = (props) => {
         setPointRandomness(0)
         setPointBrightness(0)
         setPointContrast(0)
-        setPointMethod("uniform")
+        setPointMethod("point")
         setPointInvert(false)
+        setPointAngle(0)
+        setPointVariance(0)
+        setPointFill("#000000")
+        setPointAlpha(true)
+        setTriDirection("△")
     }
 
     useEffect(() => {
@@ -271,20 +317,35 @@ const PointImage: React.FunctionComponent = (props) => {
         if (savedPointMethod) setPointMethod(savedPointMethod)
         const savedPointInvert = localStorage.getItem("pointInvert")
         if (savedPointInvert) setPointInvert(savedPointInvert === "true")
+        const savedPointAngle = localStorage.getItem("pointAngle")
+        if (savedPointAngle) setPointAngle(Number(savedPointAngle))
+        const savedPointVariance = localStorage.getItem("pointVariance")
+        if (savedPointVariance) setPointAngle(Number(savedPointVariance))
+        const savedPointFill = localStorage.getItem("pointFill")
+        if (savedPointFill) setPointFill(savedPointFill)
+        const savedPointAlpha = localStorage.getItem("pointAlpha")
+        if (savedPointAlpha) setPointAlpha(savedPointAlpha === "true")
+        const savedTriDirection = localStorage.getItem("triDirection")
+        if (savedTriDirection) setTriDirection(savedTriDirection)
     }, [])
 
     useEffect(() => {
-        localStorage.setItem("pointSize", pointSize)
-        localStorage.setItem("pointSpacing", pointSpacing)
-        localStorage.setItem("pointRandomness", pointRandomness)
-        localStorage.setItem("pointBrightness", pointBrightness)
-        localStorage.setItem("pointContrast", pointContrast)
+        localStorage.setItem("pointSize", String(pointSize))
+        localStorage.setItem("pointSpacing", String(pointSpacing))
+        localStorage.setItem("pointRandomness", String(pointRandomness))
+        localStorage.setItem("pointBrightness", String(pointBrightness))
+        localStorage.setItem("pointContrast", String(pointContrast))
         localStorage.setItem("pointMethod", pointMethod)
-        localStorage.setItem("pointInvert", pointInvert)
-    }, [pointSize, pointSpacing, pointRandomness, pointBrightness, pointContrast, pointMethod, pointInvert])
+        localStorage.setItem("pointInvert", String(pointInvert))
+        localStorage.setItem("pointAngle", String(pointAngle))
+        localStorage.setItem("pointVariance", String(pointVariance))
+        localStorage.setItem("pointFill", pointFill)
+        localStorage.setItem("pointAlpha", String(pointAlpha))
+        localStorage.setItem("triDirection", triDirection)
+    }, [pointSize, pointSpacing, pointRandomness, pointBrightness, pointContrast, pointMethod, pointInvert, pointAngle, pointFill, pointAlpha, pointVariance, triDirection])
 
     return (
-        <div className="point-image-component" onMouseEnter={() => setEnableDrag(false)}>
+        <div className="point-image-component" onMouseEnter={() => setEnableDrag(true)}>
             <div className="point-upload-container">
                 <div className="point-row">
                     <span className="point-text">Image:</span>
@@ -313,14 +374,9 @@ const PointImage: React.FunctionComponent = (props) => {
                 <div className="point-row">
                     <span className="point-text-mini" style={{width: "55px", fontSize: "20px"}}>Invert?</span>
                     <img className="point-checkbox" src={pointInvert ? checkboxChecked : checkbox} onClick={() => setPointInvert((prev: boolean) => !prev)} style={{filter: getFilter()}}/>
-                    <button className="point-button-small" onClick={() => setPointMethod("uniform")} style={{marginLeft: "10px"}}>
+                    <button className="point-button-small" onClick={() => setPointMethod("point")} style={{marginLeft: "10px"}}>
                         <span className="button-hover">
-                            <span className={`point-button-text-small ${pointMethod === "uniform" ? "button-text-selected" : ""}`}>Uniform</span>
-                        </span>
-                    </button>
-                    <button className="point-button-small" onClick={() => setPointMethod("chaotic")} style={{marginLeft: "10px"}}>
-                        <span className="button-hover">
-                            <span className={`point-button-text-small ${pointMethod === "chaotic" ? "button-text-selected" : ""}`}>Chaotic</span>
+                            <span className={`point-button-text-small ${pointMethod === "point" ? "button-text-selected" : ""}`}>Point</span>
                         </span>
                     </button>
                     <button className="point-button-small" onClick={() => setPointMethod("line")} style={{marginLeft: "10px"}}>
@@ -328,24 +384,68 @@ const PointImage: React.FunctionComponent = (props) => {
                             <span className={`point-button-text-small ${pointMethod === "line" ? "button-text-selected" : ""}`}>Line</span>
                         </span>
                     </button>
+                    <button className="point-button-small" onClick={() => setPointMethod("tri")} style={{marginLeft: "10px"}}>
+                        <span className="button-hover">
+                            <span className={`point-button-text-small ${pointMethod === "tri" ? "button-text-selected" : ""}`}>Tri</span>
+                        </span>
+                    </button>
+                    <button className="point-button-small" onClick={() => setPointMethod("rect")} style={{marginLeft: "10px"}}>
+                        <span className="button-hover">
+                            <span className={`point-button-text-small ${pointMethod === "rect" ? "button-text-selected" : ""}`}>Rect</span>
+                        </span>
+                    </button>
+                    <span className="point-text-mini" style={{width: "38px", fontSize: "20px"}}>Fill:</span>
+                    <input className="colorstop" type="color" value={pointFill} onChange={(event) => setPointFill(event.target.value)} style={{marginRight: "5px"}}/>
+                    <span className="point-text-mini" style={{width: "55px", fontSize: "20px"}}>Alpha?</span>
+                    <img className="point-checkbox" src={pointAlpha ? checkboxChecked : checkbox} onClick={() => setPointAlpha((prev: boolean) => !prev)} style={{filter: getFilter()}}/>
                 </div>
+                {pointMethod === "tri" ?
+                <div className="point-row">
+                    <button className="point-button-small" onClick={() => setTriDirection("△")} style={{marginLeft: "10px"}}>
+                        <span className="button-hover">
+                            <span className={`point-button-text-small ${triDirection === "△" ? "button-text-selected" : ""}`}>△</span>
+                        </span>
+                    </button>
+                    <button className="point-button-small" onClick={() => setTriDirection("▽")} style={{marginLeft: "10px"}}>
+                        <span className="button-hover">
+                            <span className={`point-button-text-small ${triDirection === "▽" ? "button-text-selected" : ""}`}>▽</span>
+                        </span>
+                    </button>
+                    <button className="point-button-small" onClick={() => setTriDirection("△▽")} style={{marginLeft: "10px"}}>
+                        <span className="button-hover">
+                            <span className={`point-button-text-small ${triDirection === "△▽" ? "button-text-selected" : ""}`}>△▽</span>
+                        </span>
+                    </button>
+                </div> : null}
+                {pointMethod === "rect" ?
+                <div className="point-row">
+                    <button className="point-button-small" onClick={() => setPointRandomness((prev: number) => prev+1)} style={{marginLeft: "10px"}}>
+                        <span className="button-hover">
+                            <span className={`point-button-text-small`}>Change Seed</span>
+                        </span>
+                    </button>
+                </div> : null}
+                {pointMethod === "line" ?
+                <div className="point-row">
+                    <span className="point-text">Angle: </span>
+                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setPointAngle(value)} min={-45} max={45} step={1} value={pointAngle}/>
+                    <span className="point-text-mini">{pointAngle}</span>
+                </div> : null}
                 <div className="point-row">
                     <span className="point-text">Spacing: </span>
                     <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setPointSpacing(value)} min={0} max={100} step={1} value={pointSpacing}/>
                     <span className="point-text-mini">{pointSpacing}</span>
                 </div>
-                {pointMethod !== "chaotic" ?
                 <div className="point-row">
                     <span className="point-text">Size: </span>
-                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setPointSize(value)} min={1} max={25} step={1} value={pointSize}/>
+                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setPointSize(value)} min={1} max={50} step={1} value={pointSize}/>
                     <span className="point-text-mini">{pointSize}</span>
-                </div> : null}
-                {pointMethod === "chaotic" ?
+                </div>
                 <div className="point-row">
-                    <span className="point-text">Randomness: </span>
-                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setPointRandomness(value)} min={0} max={30} step={1} value={pointRandomness}/>
-                    <span className="point-text-mini">{pointRandomness}</span>
-                </div> : null}
+                    <span className="point-text">Variance: </span>
+                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setPointVariance(value)} min={0} max={25} step={1} value={pointVariance}/>
+                    <span className="point-text-mini">{pointVariance}</span>
+                </div>
                 <div className="point-row">
                     <span className="point-text">Brightness: </span>
                     <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setPointBrightness(value)} min={0} max={100} step={1} value={pointBrightness}/>
@@ -360,16 +460,18 @@ const PointImage: React.FunctionComponent = (props) => {
             {image ?
             <div className="point-image-container">
                 <div className="point-image-buttons-container">
+                    <button className="point-image-button" onClick={jpg}>JPG</button>
                     <button className="point-image-button" onClick={png}>PNG</button>
                     <button className="point-image-button" onClick={zip}>ZIP</button>
                     <button className="point-image-button" onClick={gif}>GIF</button>
+                    <button className="point-image-button" onClick={mp4}>MP4</button>
                 </div>
                 <div className="point-row">
-                    <span className="image-output-text">Output Size:</span>
-                    <input className="image-output-input" type="text" spellCheck="false" value={outputSize} onChange={(event) => setOutputSize(event.target.value)}/>
+                    <span className="point-image-output-text">Output Size:</span>
+                    <input className="point-image-output-input" type="text" spellCheck="false" value={outputSize} onChange={(event) => setOutputSize(event.target.value)} onMouseOver={() => setEnableDrag(false)}/>
                 </div>
                 <div className="point-row">
-                    <span className="image-output-text">{getOutputDimensions().width}x{getOutputDimensions().height}</span>
+                    <span className="point-image-output-text">{getOutputDimensions().width}x{getOutputDimensions().height}</span>
                 </div>
             </div> : null}
             <div className="point-options-container">

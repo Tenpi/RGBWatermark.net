@@ -3,9 +3,9 @@ import React, {useContext, useEffect, useState, useRef} from "react"
 import {useHistory} from "react-router-dom"
 import {HashLink as Link} from "react-router-hash-link"
 import path from "path"
-import {Dropdown, DropdownButton} from "react-bootstrap"
 import {EnableDragContext, MobileContext, ImageContext, OutputSizeContext, ImageNameContext, ReverseContext, patterns} from "../Context"
 import functions from "../structures/Functions"
+import {Dropdown, DropdownButton} from "react-bootstrap"
 import Slider from "react-slider"
 import fileType from "magic-bytes.js"
 import uploadIcon from "../assets/icons/upload.png"
@@ -14,26 +14,26 @@ import JSZip from "jszip"
 import checkboxChecked from "../assets/icons/checkbox-checked.png"
 import checkbox from "../assets/icons/checkbox.png"
 import "./styles/pointimage.less"
+import crt1 from "../assets/icons/textures/crt.jpg"
+
+// const noise1 = "https://i.imgur.com/2HzWloW.jpg"
 
 let gifPos = 0
 
-const NoiseImage: React.FunctionComponent = (props) => {
+const CRT: React.FunctionComponent = (props) => {
     const {enableDrag, setEnableDrag} = useContext(EnableDragContext)
     const {mobile, setMobile} = useContext(MobileContext)
     const {image, setImage} = useContext(ImageContext)
     const {imageName, setImageName} = useContext(ImageNameContext)
     const {outputSize, setOutputSize} = useContext(OutputSizeContext)
     const {reverse, setReverse} = useContext(ReverseContext)
-    const [noiseAmount, setNoiseAmount] = useState(0)
-    const [noiseSize, setNoiseSize] = useState(10)
-    const [noiseSpacing, setNoiseSpacing] = useState(0)
-    const [noiseHue, setNoiseHue] = useState(0)
-    const [noiseSaturation, setNoiseSaturation] = useState(0)
-    const [noiseBrightness, setNoiseBrightness] = useState(0)
-    const [noiseBlendMode, setNoiseBlendMode] = useState("source-over")
     const [gifData, setGIFData] = useState(null) as any
     const [seed, setSeed] = useState(0)
     const [img, setImg] = useState(null as HTMLImageElement | null)
+    const [crtImg, setCrtImg] = useState(null as HTMLImageElement | null)
+    const [crtOpacity, setCrtOpacity] = useState(100)
+    const [crtBlendMode, setCrtBlendMode] = useState("multiply")
+    const [crtScale, setCrtScale] = useState(1.1)
     const ref = useRef<HTMLCanvasElement>(null)
     const history = useHistory()
 
@@ -110,7 +110,7 @@ const NoiseImage: React.FunctionComponent = (props) => {
         refCtx.restore()
     }
 
-    const applyNoise = (outputType?: string) => {
+    const applyCRT = (outputType?: string) => {
     }
 
     const loadImg = () => {
@@ -124,6 +124,19 @@ const NoiseImage: React.FunctionComponent = (props) => {
             setImg(imgElement)
         }
     }
+
+    const loadCRTImg = () => {
+        const imgElement = document.createElement("img")
+        imgElement.src = crt1
+        imgElement.crossOrigin = "Anonymous"
+        imgElement.onload = () => {
+            setCrtImg(imgElement)
+        }
+    }
+
+    useEffect(() => {
+        loadCRTImg()
+    }, [seed])
 
     const parseGIF = async () => {
         const frames = await functions.extractGIFFrames(image)
@@ -149,7 +162,7 @@ const NoiseImage: React.FunctionComponent = (props) => {
         let timeout = null as any
         const animationLoop = async () => {
             draw(gifPos)
-            applyNoise()
+            applyCRT()
             if (gifData) {
                 if (reverse) {
                     gifPos--
@@ -171,22 +184,18 @@ const NoiseImage: React.FunctionComponent = (props) => {
         return () => {
             clearTimeout(timeout)
         }
-    }, [img, noiseAmount, noiseSize, noiseSpacing, noiseHue, noiseBrightness, noiseSaturation, noiseBlendMode, gifData, seed])
-
-    useEffect(() => {
-        setSeed(Math.floor(Math.random() * 1000))
-    }, [noiseSize])
+    }, [img, crtImg, crtBlendMode, crtOpacity, crtScale, gifData, seed])
 
     const jpg = async () => {
         draw(0, true)
-        const img = applyNoise("image/jpeg") as string
-        functions.download(`${path.basename(imageName, path.extname(imageName))}_noisy.jpg`, img)
+        const img = applyCRT("image/jpeg") as string
+        functions.download(`${path.basename(imageName, path.extname(imageName))}_crt.jpg`, img)
     }
 
     const png = async () => {
         draw(0, true)
-        const img = applyNoise("image/png") as string
-        functions.download(`${path.basename(imageName, path.extname(imageName))}_noisy.png`, img)
+        const img = applyCRT("image/png") as string
+        functions.download(`${path.basename(imageName, path.extname(imageName))}_crt.png`, img)
     }
 
     const zip = async () => {
@@ -195,17 +204,17 @@ const NoiseImage: React.FunctionComponent = (props) => {
         if (gifData) {
             for (let i = 0; i < gifData.length; i++) {
                 draw(i, true)
-                const img = applyNoise("image/png") as string
+                const img = applyCRT("image/png") as string
                 const data = await fetch(img).then((r) => r.arrayBuffer())
-                zip.file(`${path.basename(imageName, path.extname(imageName))}_noisy ${i + 1}.png`, data, {binary: true})
+                zip.file(`${path.basename(imageName, path.extname(imageName))}_crt ${i + 1}.png`, data, {binary: true})
             }
         } else {
             draw(0, true)
-            const img = applyNoise("image/png") as string
+            const img = applyCRT("image/png") as string
             const data = await fetch(img).then((r) => r.arrayBuffer())
-            zip.file(`${path.basename(imageName, path.extname(imageName))}_noisy 1.png`, data, {binary: true})
+            zip.file(`${path.basename(imageName, path.extname(imageName))}_crt 1.png`, data, {binary: true})
         }
-        const filename = `${path.basename(imageName, path.extname(imageName))}_noisy.zip`
+        const filename = `${path.basename(imageName, path.extname(imageName))}_crt.zip`
         const blob = await zip.generateAsync({type: "blob"})
         const url = window.URL.createObjectURL(blob)
         functions.download(filename, url)
@@ -219,14 +228,14 @@ const NoiseImage: React.FunctionComponent = (props) => {
         if (gifData) {
             for (let i = 0; i < gifData.length; i++) {
                 draw(i, true)
-                const frame = applyNoise("buffer") as ArrayBuffer
+                const frame = applyCRT("buffer") as ArrayBuffer
                 frames.push(frame)
                 let delay = gifData[i].delay
                 delays.push(delay)
             }
         } else {
             draw(0, true)
-            const frame = applyNoise("buffer") as ArrayBuffer
+            const frame = applyCRT("buffer") as ArrayBuffer
             frames.push(frame)
             let delay = 60
             delays.push(delay)
@@ -235,7 +244,7 @@ const NoiseImage: React.FunctionComponent = (props) => {
         const buffer = await functions.encodeGIF(frames, delays, dimensions.width, dimensions.height, {transparentColor: "#000000"})
         const blob = new Blob([buffer])
         const url = window.URL.createObjectURL(blob)
-        functions.download(`${path.basename(imageName, path.extname(imageName))}_noisy.gif`, url)
+        functions.download(`${path.basename(imageName, path.extname(imageName))}_crt.gif`, url)
         window.URL.revokeObjectURL(url)
     }
 
@@ -246,67 +255,51 @@ const NoiseImage: React.FunctionComponent = (props) => {
         if (gifData) {
             for (let i = 0; i < gifData.length; i++) {
                 draw(i, true)
-                const frame = applyNoise("buffer") as ArrayBuffer
+                const frame = applyCRT("buffer") as ArrayBuffer
                 frames.push(frame)
                 let delay = gifData[i].delay
                 delays.push(delay)
             }
         } else {
             draw(0, true)
-            const frame = applyNoise("buffer") as ArrayBuffer
+            const frame = applyCRT("buffer") as ArrayBuffer
             frames.push(frame)
             let delay = 60
             delays.push(delay)
         }
         const url = await functions.encodeVideo(frames, functions.msToFps(delays[0]))
-        functions.download(`${path.basename(imageName, path.extname(imageName))}_noisy.mp4`, url)
+        functions.download(`${path.basename(imageName, path.extname(imageName))}_crt.mp4`, url)
         window.URL.revokeObjectURL(url)
     }
 
     const reset = () => {
-        setNoiseAmount(0)
-        setNoiseSize(10)
-        setNoiseSpacing(0)
-        setNoiseHue(0)
-        setNoiseSaturation(0)
-        setNoiseBrightness(0)
-        setNoiseBlendMode("source-over")
+        setCrtBlendMode("multiply")
+        setCrtOpacity(100)
+        setCrtScale(1.1)
     }
 
     useEffect(() => {
-        const savedNoiseSize = localStorage.getItem("noiseSize")
-        if (savedNoiseSize) setNoiseSize(Number(savedNoiseSize))
-        const savedNoiseAmount = localStorage.getItem("noiseAmount")
-        if (savedNoiseAmount) setNoiseAmount(Number(savedNoiseAmount))
-        const savedNoiseSpacing = localStorage.getItem("noiseSpacing")
-        if (savedNoiseSpacing) setNoiseSpacing(Number(savedNoiseSpacing))
-        const savedNoiseHue = localStorage.getItem("noiseHue")
-        if (savedNoiseHue) setNoiseHue(Number(savedNoiseHue))
-        const savedNoiseSaturation = localStorage.getItem("noiseSaturation")
-        if (savedNoiseSaturation) setNoiseSaturation(Number(savedNoiseSaturation))
-        const savedNoiseBrightness = localStorage.getItem("noiseBrightness")
-        if (savedNoiseBrightness) setNoiseBrightness(Number(savedNoiseBrightness))
-        const savedNoiseBlendMode = localStorage.getItem("noiseBlendMode")
-        if (savedNoiseBlendMode) setNoiseBlendMode(savedNoiseBlendMode)
+        const savedCrtBlendMode = localStorage.getItem("crtBlendMode")
+        if (savedCrtBlendMode) setCrtBlendMode(savedCrtBlendMode)
+        const savedCrtOpacity = localStorage.getItem("crtOpacity")
+        if (savedCrtOpacity) setCrtOpacity(Number(savedCrtOpacity))
+        const savedCrtScale = localStorage.getItem("crtScale")
+        if (savedCrtScale) setCrtScale(Number(savedCrtScale))
     }, [])
 
     useEffect(() => {
-        localStorage.setItem("noiseSize", String(noiseSize))
-        localStorage.setItem("noiseAmount", String(noiseAmount))
-        localStorage.setItem("noiseSpacing", String(noiseSpacing))
-        localStorage.setItem("noiseHue", String(noiseHue))
-        localStorage.setItem("noiseSaturation", String(noiseSaturation))
-        localStorage.setItem("noiseBrightness", String(noiseBrightness))
-        localStorage.setItem("noiseBlendMode", noiseBlendMode)
-    }, [noiseSize, noiseAmount, noiseSpacing, noiseHue, noiseSaturation, noiseBrightness, noiseBlendMode])
+        localStorage.setItem("crtBlendMode", crtBlendMode)
+        localStorage.setItem("crtOpacity", String(crtOpacity))
+        localStorage.setItem("crtScale", String(crtScale))
+    }, [crtBlendMode, crtOpacity, crtScale])
 
     const getBlendMode = () => {
-        if (noiseBlendMode === "source-over") return "Normal"
-        if (noiseBlendMode === "color-dodge") return "Color Dodge"
-        if (noiseBlendMode === "color-burn") return "Color Burn"
-        if (noiseBlendMode === "hard-light") return "Hard Light"
-        if (noiseBlendMode === "soft-light") return "Soft Light"
-        return functions.toProperCase(noiseBlendMode)
+        if (crtBlendMode === "source-over") return "Normal"
+        if (crtBlendMode === "color-dodge") return "Color Dodge"
+        if (crtBlendMode === "color-burn") return "Color Burn"
+        if (crtBlendMode === "hard-light") return "Hard Light"
+        if (crtBlendMode === "soft-light") return "Soft Light"
+        return functions.toProperCase(crtBlendMode)
     }
 
     return (
@@ -339,51 +332,31 @@ const NoiseImage: React.FunctionComponent = (props) => {
                 <div className="point-row">
                     <span className="options-text">Blend Mode:</span>
                     <DropdownButton title={getBlendMode()} drop="down">
-                        <Dropdown.Item active={noiseBlendMode === "source-over"} onClick={() => setNoiseBlendMode("source-over")}>Normal</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "multiply"} onClick={() => setNoiseBlendMode("multiply")}>Multiply</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "screen"} onClick={() => setNoiseBlendMode("screen")}>Screen</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "overlay"} onClick={() => setNoiseBlendMode("overlay")}>Overlay</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "darken"} onClick={() => setNoiseBlendMode("darken")}>Darken</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "lighten"} onClick={() => setNoiseBlendMode("lighten")}>Lighten</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "color-dodge"} onClick={() => setNoiseBlendMode("color-dodge")}>Color Dodge</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "color-burn"} onClick={() => setNoiseBlendMode("color-burn")}>Color Burn</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "hard-light"} onClick={() => setNoiseBlendMode("hard-light")}>Hard Light</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "soft-light"} onClick={() => setNoiseBlendMode("soft-light")}>Soft Light</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "hue"} onClick={() => setNoiseBlendMode("hue")}>Hue</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "saturation"} onClick={() => setNoiseBlendMode("saturation")}>Saturation</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "color"} onClick={() => setNoiseBlendMode("color")}>Color</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "luminosity"} onClick={() => setNoiseBlendMode("luminosity")}>Luminosity</Dropdown.Item>
+                        <Dropdown.Item active={crtBlendMode === "source-over"} onClick={() => setCrtBlendMode("source-over")}>Normal</Dropdown.Item>
+                        <Dropdown.Item active={crtBlendMode === "multiply"} onClick={() => setCrtBlendMode("multiply")}>Multiply</Dropdown.Item>
+                        <Dropdown.Item active={crtBlendMode === "screen"} onClick={() => setCrtBlendMode("screen")}>Screen</Dropdown.Item>
+                        <Dropdown.Item active={crtBlendMode === "overlay"} onClick={() => setCrtBlendMode("overlay")}>Overlay</Dropdown.Item>
+                        <Dropdown.Item active={crtBlendMode === "darken"} onClick={() => setCrtBlendMode("darken")}>Darken</Dropdown.Item>
+                        <Dropdown.Item active={crtBlendMode === "lighten"} onClick={() => setCrtBlendMode("lighten")}>Lighten</Dropdown.Item>
+                        <Dropdown.Item active={crtBlendMode === "color-dodge"} onClick={() => setCrtBlendMode("color-dodge")}>Color Dodge</Dropdown.Item>
+                        <Dropdown.Item active={crtBlendMode === "color-burn"} onClick={() => setCrtBlendMode("color-burn")}>Color Burn</Dropdown.Item>
+                        <Dropdown.Item active={crtBlendMode === "hard-light"} onClick={() => setCrtBlendMode("hard-light")}>Hard Light</Dropdown.Item>
+                        <Dropdown.Item active={crtBlendMode === "soft-light"} onClick={() => setCrtBlendMode("soft-light")}>Soft Light</Dropdown.Item>
+                        <Dropdown.Item active={crtBlendMode === "hue"} onClick={() => setCrtBlendMode("hue")}>Hue</Dropdown.Item>
+                        <Dropdown.Item active={crtBlendMode === "saturation"} onClick={() => setCrtBlendMode("saturation")}>Saturation</Dropdown.Item>
+                        <Dropdown.Item active={crtBlendMode === "color"} onClick={() => setCrtBlendMode("color")}>Color</Dropdown.Item>
+                        <Dropdown.Item active={crtBlendMode === "luminosity"} onClick={() => setCrtBlendMode("luminosity")}>Luminosity</Dropdown.Item>
                     </DropdownButton>
                 </div>
                 <div className="point-row">
                     <span className="point-text">Opacity: </span>
-                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setNoiseAmount(value)} min={0} max={100} step={1} value={noiseAmount}/>
-                    <span className="point-text-mini">{noiseAmount}</span>
+                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setCrtOpacity(value)} min={0} max={100} step={1} value={crtOpacity}/>
+                    <span className="point-text-mini">{crtOpacity}</span>
                 </div>
                 <div className="point-row">
-                    <span className="point-text">Size: </span>
-                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setNoiseSize(value)} min={1} max={30} step={1} value={noiseSize}/>
-                    <span className="point-text-mini">{noiseSize}</span>
-                </div>
-                <div className="point-row">
-                    <span className="point-text">Spacing: </span>
-                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setNoiseSpacing(value)} min={0} max={50} step={1} value={noiseSpacing}/>
-                    <span className="point-text-mini">{noiseSpacing}</span>
-                </div>
-                <div className="point-row">
-                    <span className="point-text">Hue: </span>
-                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setNoiseHue(value)} min={-90} max={90} step={1} value={noiseHue}/>
-                    <span className="point-text-mini">{noiseHue}</span>
-                </div>
-                <div className="point-row">
-                    <span className="point-text">Saturation: </span>
-                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setNoiseSaturation(value)} min={-100} max={100} step={1} value={noiseSaturation}/>
-                    <span className="point-text-mini">{noiseSaturation}</span>
-                </div>
-                <div className="point-row">
-                    <span className="point-text">Brightness: </span>
-                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setNoiseBrightness(value)} min={-100} max={100} step={1} value={noiseBrightness}/>
-                    <span className="point-text-mini">{noiseBrightness}</span>
+                    <span className="point-text">Scale: </span>
+                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setCrtScale(value)} min={1} max={2} step={0.05} value={crtScale}/>
+                    <span className="point-text-mini">{crtScale}</span>
                 </div>
             </div>
             {image ?
@@ -416,4 +389,4 @@ const NoiseImage: React.FunctionComponent = (props) => {
     )
 }
 
-export default NoiseImage
+export default CRT

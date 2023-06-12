@@ -3,9 +3,9 @@ import React, {useContext, useEffect, useState, useRef} from "react"
 import {useHistory} from "react-router-dom"
 import {HashLink as Link} from "react-router-hash-link"
 import path from "path"
-import {Dropdown, DropdownButton} from "react-bootstrap"
 import {EnableDragContext, MobileContext, ImageContext, OutputSizeContext, ImageNameContext, ReverseContext, patterns} from "../Context"
 import functions from "../structures/Functions"
+import {Dropdown, DropdownButton} from "react-bootstrap"
 import Slider from "react-slider"
 import fileType from "magic-bytes.js"
 import uploadIcon from "../assets/icons/upload.png"
@@ -17,23 +17,25 @@ import "./styles/pointimage.less"
 
 let gifPos = 0
 
-const NoiseImage: React.FunctionComponent = (props) => {
+const RGBSplit: React.FunctionComponent = (props) => {
     const {enableDrag, setEnableDrag} = useContext(EnableDragContext)
     const {mobile, setMobile} = useContext(MobileContext)
     const {image, setImage} = useContext(ImageContext)
     const {imageName, setImageName} = useContext(ImageNameContext)
-    const {outputSize, setOutputSize} = useContext(OutputSizeContext)
     const {reverse, setReverse} = useContext(ReverseContext)
-    const [noiseAmount, setNoiseAmount] = useState(0)
-    const [noiseSize, setNoiseSize] = useState(10)
-    const [noiseSpacing, setNoiseSpacing] = useState(0)
-    const [noiseHue, setNoiseHue] = useState(0)
-    const [noiseSaturation, setNoiseSaturation] = useState(0)
-    const [noiseBrightness, setNoiseBrightness] = useState(0)
-    const [noiseBlendMode, setNoiseBlendMode] = useState("source-over")
+    const {outputSize, setOutputSize} = useContext(OutputSizeContext)
+    const [rgbSplitHue, setRGBSplitHue] = useState(-94)
+    const [rgbSplitSaturation, setRGBSplitSaturation] = useState(100)
+    const [rgbSplitBrightness, setRGBSplitBrightness] = useState(100)
+    const [rgbSplitSize, setRGBSplitSize] = useState(6)
+    const [rgbSplitAngle, setRGBSplitAngle] = useState(1)
+    const [rgbSplitVariance, setRGBSplitVariance] = useState(1)
+    const [rgbSplitOpacity, setRGBSplitOpacity] = useState(100)
+    const [rgbSplitBlendMode, setRGBSplitBlendMode] = useState("multiply")
+    const [rgbSplitChannels, setRGBSplitChannels] = useState({r: true, g: true, b: false})
     const [gifData, setGIFData] = useState(null) as any
-    const [seed, setSeed] = useState(0)
     const [img, setImg] = useState(null as HTMLImageElement | null)
+    const [seed, setSeed] = useState(0)
     const ref = useRef<HTMLCanvasElement>(null)
     const history = useHistory()
 
@@ -75,6 +77,15 @@ const NoiseImage: React.FunctionComponent = (props) => {
         setImageName("")
     }
 
+    const checkOverlap = (rect1: any, rect2: any) => {
+        return (
+          rect1.x < rect2.x + rect2.width &&
+          rect1.x + rect1.width > rect2.x &&
+          rect1.y < rect2.y + rect2.height &&
+          rect1.y + rect1.height > rect2.y
+        )
+    }
+
     const getOutputDimensions = () => {
         if (!img) return {width: 0, height: 0}
         let destSize = outputSize
@@ -109,8 +120,7 @@ const NoiseImage: React.FunctionComponent = (props) => {
         }
         refCtx.restore()
     }
-
-    const applyNoise = (outputType?: string) => {
+    const applyRGBSplit = (outputType?: string) => {
     }
 
     const loadImg = () => {
@@ -149,7 +159,7 @@ const NoiseImage: React.FunctionComponent = (props) => {
         let timeout = null as any
         const animationLoop = async () => {
             draw(gifPos)
-            applyNoise()
+            applyRGBSplit()
             if (gifData) {
                 if (reverse) {
                     gifPos--
@@ -171,22 +181,18 @@ const NoiseImage: React.FunctionComponent = (props) => {
         return () => {
             clearTimeout(timeout)
         }
-    }, [img, noiseAmount, noiseSize, noiseSpacing, noiseHue, noiseBrightness, noiseSaturation, noiseBlendMode, gifData, seed])
-
-    useEffect(() => {
-        setSeed(Math.floor(Math.random() * 1000))
-    }, [noiseSize])
+    }, [img, rgbSplitAngle, rgbSplitBrightness, rgbSplitHue, rgbSplitSaturation, rgbSplitSize, rgbSplitVariance, rgbSplitChannels, rgbSplitBlendMode, rgbSplitOpacity, gifData])
 
     const jpg = async () => {
         draw(0, true)
-        const img = applyNoise("image/jpeg") as string
-        functions.download(`${path.basename(imageName, path.extname(imageName))}_noisy.jpg`, img)
+        const img = applyRGBSplit("image/jpeg") as string
+        functions.download(`${path.basename(imageName, path.extname(imageName))}_rgbsplit.jpg`, img)
     }
 
     const png = async () => {
         draw(0, true)
-        const img = applyNoise("image/png") as string
-        functions.download(`${path.basename(imageName, path.extname(imageName))}_noisy.png`, img)
+        const img = applyRGBSplit("image/png") as string
+        functions.download(`${path.basename(imageName, path.extname(imageName))}_rgbsplit.png`, img)
     }
 
     const zip = async () => {
@@ -195,17 +201,17 @@ const NoiseImage: React.FunctionComponent = (props) => {
         if (gifData) {
             for (let i = 0; i < gifData.length; i++) {
                 draw(i, true)
-                const img = applyNoise("image/png") as string
+                const img = applyRGBSplit("image/png") as string
                 const data = await fetch(img).then((r) => r.arrayBuffer())
-                zip.file(`${path.basename(imageName, path.extname(imageName))}_noisy ${i + 1}.png`, data, {binary: true})
+                zip.file(`${path.basename(imageName, path.extname(imageName))}_rgbsplit ${i + 1}.png`, data, {binary: true})
             }
         } else {
             draw(0, true)
-            const img = applyNoise("image/png") as string
+            const img = applyRGBSplit("image/png") as string
             const data = await fetch(img).then((r) => r.arrayBuffer())
-            zip.file(`${path.basename(imageName, path.extname(imageName))}_noisy 1.png`, data, {binary: true})
+            zip.file(`${path.basename(imageName, path.extname(imageName))}_rgbsplit 1.png`, data, {binary: true})
         }
-        const filename = `${path.basename(imageName, path.extname(imageName))}_noisy.zip`
+        const filename = `${path.basename(imageName, path.extname(imageName))}_rgbsplit.zip`
         const blob = await zip.generateAsync({type: "blob"})
         const url = window.URL.createObjectURL(blob)
         functions.download(filename, url)
@@ -219,14 +225,14 @@ const NoiseImage: React.FunctionComponent = (props) => {
         if (gifData) {
             for (let i = 0; i < gifData.length; i++) {
                 draw(i, true)
-                const frame = applyNoise("buffer") as ArrayBuffer
+                const frame = applyRGBSplit("buffer") as ArrayBuffer
                 frames.push(frame)
                 let delay = gifData[i].delay
                 delays.push(delay)
             }
         } else {
             draw(0, true)
-            const frame = applyNoise("buffer") as ArrayBuffer
+            const frame = applyRGBSplit("buffer") as ArrayBuffer
             frames.push(frame)
             let delay = 60
             delays.push(delay)
@@ -235,7 +241,7 @@ const NoiseImage: React.FunctionComponent = (props) => {
         const buffer = await functions.encodeGIF(frames, delays, dimensions.width, dimensions.height, {transparentColor: "#000000"})
         const blob = new Blob([buffer])
         const url = window.URL.createObjectURL(blob)
-        functions.download(`${path.basename(imageName, path.extname(imageName))}_noisy.gif`, url)
+        functions.download(`${path.basename(imageName, path.extname(imageName))}_rgbsplit.gif`, url)
         window.URL.revokeObjectURL(url)
     }
 
@@ -246,67 +252,95 @@ const NoiseImage: React.FunctionComponent = (props) => {
         if (gifData) {
             for (let i = 0; i < gifData.length; i++) {
                 draw(i, true)
-                const frame = applyNoise("buffer") as ArrayBuffer
+                const frame = applyRGBSplit("buffer") as ArrayBuffer
                 frames.push(frame)
                 let delay = gifData[i].delay
                 delays.push(delay)
             }
         } else {
             draw(0, true)
-            const frame = applyNoise("buffer") as ArrayBuffer
+            const frame = applyRGBSplit("buffer") as ArrayBuffer
             frames.push(frame)
             let delay = 60
             delays.push(delay)
         }
         const url = await functions.encodeVideo(frames, functions.msToFps(delays[0]))
-        functions.download(`${path.basename(imageName, path.extname(imageName))}_noisy.mp4`, url)
+        functions.download(`${path.basename(imageName, path.extname(imageName))}_rgbsplit.mp4`, url)
         window.URL.revokeObjectURL(url)
     }
 
     const reset = () => {
-        setNoiseAmount(0)
-        setNoiseSize(10)
-        setNoiseSpacing(0)
-        setNoiseHue(0)
-        setNoiseSaturation(0)
-        setNoiseBrightness(0)
-        setNoiseBlendMode("source-over")
+        setRGBSplitSize(6)
+        setRGBSplitHue(-180)
+        setRGBSplitSaturation(100)
+        setRGBSplitBrightness(100)
+        setRGBSplitAngle(0)
+        setRGBSplitVariance(0)
+        setRGBSplitChannels({r: true, g: true, b: false})
+        setRGBSplitOpacity(100)
+        setRGBSplitBlendMode("multiply")
     }
 
     useEffect(() => {
-        const savedNoiseSize = localStorage.getItem("noiseSize")
-        if (savedNoiseSize) setNoiseSize(Number(savedNoiseSize))
-        const savedNoiseAmount = localStorage.getItem("noiseAmount")
-        if (savedNoiseAmount) setNoiseAmount(Number(savedNoiseAmount))
-        const savedNoiseSpacing = localStorage.getItem("noiseSpacing")
-        if (savedNoiseSpacing) setNoiseSpacing(Number(savedNoiseSpacing))
-        const savedNoiseHue = localStorage.getItem("noiseHue")
-        if (savedNoiseHue) setNoiseHue(Number(savedNoiseHue))
-        const savedNoiseSaturation = localStorage.getItem("noiseSaturation")
-        if (savedNoiseSaturation) setNoiseSaturation(Number(savedNoiseSaturation))
-        const savedNoiseBrightness = localStorage.getItem("noiseBrightness")
-        if (savedNoiseBrightness) setNoiseBrightness(Number(savedNoiseBrightness))
-        const savedNoiseBlendMode = localStorage.getItem("noiseBlendMode")
-        if (savedNoiseBlendMode) setNoiseBlendMode(savedNoiseBlendMode)
+        const savedRGBSplitSize = localStorage.getItem("rgbSplitSize")
+        if (savedRGBSplitSize) setRGBSplitSize(Number(savedRGBSplitSize))
+        const savedRGBSplitHue = localStorage.getItem("rgbSplitHue")
+        if (savedRGBSplitHue) setRGBSplitHue(Number(savedRGBSplitHue))
+        const savedRGBSplitSaturation = localStorage.getItem("rgbSplitSaturation")
+        if (savedRGBSplitSaturation) setRGBSplitSaturation(Number(savedRGBSplitSaturation))
+        const savedRGBSplitBrightness = localStorage.getItem("rgbSplitBrightness")
+        if (savedRGBSplitBrightness) setRGBSplitBrightness(Number(savedRGBSplitBrightness))
+        const savedRGBSplitAngle = localStorage.getItem("rgbSplitAngle")
+        if (savedRGBSplitAngle) setRGBSplitAngle(Number(savedRGBSplitAngle))
+        const savedRGBSplitVariance = localStorage.getItem("rgbSplitVariance")
+        if (savedRGBSplitVariance) setRGBSplitVariance(Number(savedRGBSplitVariance))
+        const savedRGBSplitChannels = localStorage.getItem("rgbSplitChannels")
+        if (savedRGBSplitChannels) setRGBSplitChannels(JSON.parse(savedRGBSplitChannels))
+        const savedRGBSplitOpacity = localStorage.getItem("rgbSplitOpacity")
+        if (savedRGBSplitOpacity) setRGBSplitOpacity(Number(savedRGBSplitOpacity))
+        const savedRGBSplitBlendMode = localStorage.getItem("rgbSplitBlendMode")
+        if (savedRGBSplitBlendMode) setRGBSplitBlendMode(savedRGBSplitBlendMode)
     }, [])
 
     useEffect(() => {
-        localStorage.setItem("noiseSize", String(noiseSize))
-        localStorage.setItem("noiseAmount", String(noiseAmount))
-        localStorage.setItem("noiseSpacing", String(noiseSpacing))
-        localStorage.setItem("noiseHue", String(noiseHue))
-        localStorage.setItem("noiseSaturation", String(noiseSaturation))
-        localStorage.setItem("noiseBrightness", String(noiseBrightness))
-        localStorage.setItem("noiseBlendMode", noiseBlendMode)
-    }, [noiseSize, noiseAmount, noiseSpacing, noiseHue, noiseSaturation, noiseBrightness, noiseBlendMode])
+        localStorage.setItem("rgbSplitSize", String(rgbSplitSize))
+        localStorage.setItem("rgbSplitHue", String(rgbSplitHue))
+        localStorage.setItem("rgbSplitSaturation", String(rgbSplitSaturation))
+        localStorage.setItem("rgbSplitBrightness", String(rgbSplitBrightness))
+        localStorage.setItem("rgbSplitAngle", String(rgbSplitAngle))
+        localStorage.setItem("rgbSplitVariance", String(rgbSplitVariance))
+        localStorage.setItem("rgbSplitChannels", JSON.stringify(rgbSplitChannels))
+        localStorage.setItem("rgbSplitOpacity", String(rgbSplitOpacity))
+        localStorage.setItem("rgbSplitBlendMode", String(rgbSplitBlendMode))
+    }, [rgbSplitSize, rgbSplitHue, rgbSplitSaturation, rgbSplitBrightness, rgbSplitAngle, rgbSplitVariance, rgbSplitChannels, rgbSplitOpacity, rgbSplitBlendMode])
+
+    const getColorArray = () => {
+        const arr = [] as string[]
+        if (rgbSplitChannels.r) arr.push("r")
+        if (rgbSplitChannels.g) arr.push("g")
+        if (rgbSplitChannels.b) arr.push("b")
+        return arr
+    }
+
+    const appendColorChannel = (channel: string) => {
+        const channels = JSON.parse(JSON.stringify(rgbSplitChannels))
+        if (channel === "r") {
+            channels.r = !channels.r
+        } else if (channel === "g") {
+            channels.g = !channels.g
+        } else if (channel === "b") {
+            channels.b = !channels.b
+        }
+        setRGBSplitChannels(channels)
+    }
 
     const getBlendMode = () => {
-        if (noiseBlendMode === "source-over") return "Normal"
-        if (noiseBlendMode === "color-dodge") return "Color Dodge"
-        if (noiseBlendMode === "color-burn") return "Color Burn"
-        if (noiseBlendMode === "hard-light") return "Hard Light"
-        if (noiseBlendMode === "soft-light") return "Soft Light"
-        return functions.toProperCase(noiseBlendMode)
+        if (rgbSplitBlendMode === "source-over") return "Normal"
+        if (rgbSplitBlendMode === "color-dodge") return "Color Dodge"
+        if (rgbSplitBlendMode === "color-burn") return "Color Burn"
+        if (rgbSplitBlendMode === "hard-light") return "Hard Light"
+        if (rgbSplitBlendMode === "soft-light") return "Soft Light"
+        return functions.toProperCase(rgbSplitBlendMode)
     }
 
     return (
@@ -337,53 +371,66 @@ const NoiseImage: React.FunctionComponent = (props) => {
             </div> : null}
             <div className="point-options-container">
                 <div className="point-row">
+                    <span className="point-text-mini" style={{width: "auto", fontSize: "20px"}}>R</span>
+                    <img className="point-checkbox" src={rgbSplitChannels.r ? checkboxChecked : checkbox} onClick={() => appendColorChannel("r")} style={{marginLeft: "5px", filter: getFilter()}}/>
+                    <span className="point-text-mini" style={{width: "auto", fontSize: "20px"}}>G</span>
+                    <img className="point-checkbox" src={rgbSplitChannels.g ? checkboxChecked : checkbox} onClick={() => appendColorChannel("g")} style={{marginLeft: "5px", filter: getFilter()}}/>
+                    <span className="point-text-mini" style={{width: "auto", fontSize: "20px"}}>B</span>
+                    <img className="point-checkbox" src={rgbSplitChannels.b ? checkboxChecked : checkbox} onClick={() => appendColorChannel("b")} style={{marginLeft: "5px", filter: getFilter()}}/>
+                </div>
+                <div className="point-row">
                     <span className="options-text">Blend Mode:</span>
                     <DropdownButton title={getBlendMode()} drop="down">
-                        <Dropdown.Item active={noiseBlendMode === "source-over"} onClick={() => setNoiseBlendMode("source-over")}>Normal</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "multiply"} onClick={() => setNoiseBlendMode("multiply")}>Multiply</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "screen"} onClick={() => setNoiseBlendMode("screen")}>Screen</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "overlay"} onClick={() => setNoiseBlendMode("overlay")}>Overlay</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "darken"} onClick={() => setNoiseBlendMode("darken")}>Darken</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "lighten"} onClick={() => setNoiseBlendMode("lighten")}>Lighten</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "color-dodge"} onClick={() => setNoiseBlendMode("color-dodge")}>Color Dodge</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "color-burn"} onClick={() => setNoiseBlendMode("color-burn")}>Color Burn</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "hard-light"} onClick={() => setNoiseBlendMode("hard-light")}>Hard Light</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "soft-light"} onClick={() => setNoiseBlendMode("soft-light")}>Soft Light</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "hue"} onClick={() => setNoiseBlendMode("hue")}>Hue</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "saturation"} onClick={() => setNoiseBlendMode("saturation")}>Saturation</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "color"} onClick={() => setNoiseBlendMode("color")}>Color</Dropdown.Item>
-                        <Dropdown.Item active={noiseBlendMode === "luminosity"} onClick={() => setNoiseBlendMode("luminosity")}>Luminosity</Dropdown.Item>
+                        <Dropdown.Item active={rgbSplitBlendMode === "source-over"} onClick={() => setRGBSplitBlendMode("source-over")}>Normal</Dropdown.Item>
+                        <Dropdown.Item active={rgbSplitBlendMode === "multiply"} onClick={() => setRGBSplitBlendMode("multiply")}>Multiply</Dropdown.Item>
+                        <Dropdown.Item active={rgbSplitBlendMode === "screen"} onClick={() => setRGBSplitBlendMode("screen")}>Screen</Dropdown.Item>
+                        <Dropdown.Item active={rgbSplitBlendMode === "overlay"} onClick={() => setRGBSplitBlendMode("overlay")}>Overlay</Dropdown.Item>
+                        <Dropdown.Item active={rgbSplitBlendMode === "darken"} onClick={() => setRGBSplitBlendMode("darken")}>Darken</Dropdown.Item>
+                        <Dropdown.Item active={rgbSplitBlendMode === "lighten"} onClick={() => setRGBSplitBlendMode("lighten")}>Lighten</Dropdown.Item>
+                        <Dropdown.Item active={rgbSplitBlendMode === "color-dodge"} onClick={() => setRGBSplitBlendMode("color-dodge")}>Color Dodge</Dropdown.Item>
+                        <Dropdown.Item active={rgbSplitBlendMode === "color-burn"} onClick={() => setRGBSplitBlendMode("color-burn")}>Color Burn</Dropdown.Item>
+                        <Dropdown.Item active={rgbSplitBlendMode === "hard-light"} onClick={() => setRGBSplitBlendMode("hard-light")}>Hard Light</Dropdown.Item>
+                        <Dropdown.Item active={rgbSplitBlendMode === "soft-light"} onClick={() => setRGBSplitBlendMode("soft-light")}>Soft Light</Dropdown.Item>
+                        <Dropdown.Item active={rgbSplitBlendMode === "hue"} onClick={() => setRGBSplitBlendMode("hue")}>Hue</Dropdown.Item>
+                        <Dropdown.Item active={rgbSplitBlendMode === "saturation"} onClick={() => setRGBSplitBlendMode("saturation")}>Saturation</Dropdown.Item>
+                        <Dropdown.Item active={rgbSplitBlendMode === "color"} onClick={() => setRGBSplitBlendMode("color")}>Color</Dropdown.Item>
+                        <Dropdown.Item active={rgbSplitBlendMode === "luminosity"} onClick={() => setRGBSplitBlendMode("luminosity")}>Luminosity</Dropdown.Item>
                     </DropdownButton>
                 </div>
                 <div className="point-row">
                     <span className="point-text">Opacity: </span>
-                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setNoiseAmount(value)} min={0} max={100} step={1} value={noiseAmount}/>
-                    <span className="point-text-mini">{noiseAmount}</span>
-                </div>
-                <div className="point-row">
-                    <span className="point-text">Size: </span>
-                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setNoiseSize(value)} min={1} max={30} step={1} value={noiseSize}/>
-                    <span className="point-text-mini">{noiseSize}</span>
-                </div>
-                <div className="point-row">
-                    <span className="point-text">Spacing: </span>
-                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setNoiseSpacing(value)} min={0} max={50} step={1} value={noiseSpacing}/>
-                    <span className="point-text-mini">{noiseSpacing}</span>
+                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setRGBSplitOpacity(value)} min={0} max={100} step={1} value={rgbSplitOpacity}/>
+                    <span className="point-text-mini">{rgbSplitOpacity}</span>
                 </div>
                 <div className="point-row">
                     <span className="point-text">Hue: </span>
-                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setNoiseHue(value)} min={-90} max={90} step={1} value={noiseHue}/>
-                    <span className="point-text-mini">{noiseHue}</span>
+                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setRGBSplitHue(value)} min={-180} max={180} step={1} value={rgbSplitHue}/>
+                    <span className="point-text-mini">{rgbSplitHue}</span>
                 </div>
                 <div className="point-row">
                     <span className="point-text">Saturation: </span>
-                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setNoiseSaturation(value)} min={-100} max={100} step={1} value={noiseSaturation}/>
-                    <span className="point-text-mini">{noiseSaturation}</span>
+                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setRGBSplitSaturation(value)} min={0} max={200} step={1} value={rgbSplitSaturation}/>
+                    <span className="point-text-mini">{rgbSplitSaturation}</span>
                 </div>
                 <div className="point-row">
                     <span className="point-text">Brightness: </span>
-                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setNoiseBrightness(value)} min={-100} max={100} step={1} value={noiseBrightness}/>
-                    <span className="point-text-mini">{noiseBrightness}</span>
+                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setRGBSplitBrightness(value)} min={0} max={200} step={1} value={rgbSplitBrightness}/>
+                    <span className="point-text-mini">{rgbSplitBrightness}</span>
+                </div>
+                <div className="point-row">
+                    <span className="point-text">Angle: </span>
+                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setRGBSplitAngle(value)} min={-45} max={45} step={1} value={rgbSplitAngle}/>
+                    <span className="point-text-mini">{rgbSplitAngle}</span>
+                </div>
+                <div className="point-row">
+                    <span className="point-text">Size: </span>
+                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setRGBSplitSize(value)} min={1} max={50} step={1} value={rgbSplitSize}/>
+                    <span className="point-text-mini">{rgbSplitSize}</span>
+                </div>
+                <div className="point-row">
+                    <span className="point-text">Variance: </span>
+                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setRGBSplitVariance(value)} min={0} max={25} step={1} value={rgbSplitVariance}/>
+                    <span className="point-text-mini">{rgbSplitVariance}</span>
                 </div>
             </div>
             {image ?
@@ -416,4 +463,4 @@ const NoiseImage: React.FunctionComponent = (props) => {
     )
 }
 
-export default NoiseImage
+export default RGBSplit

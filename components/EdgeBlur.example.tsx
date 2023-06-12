@@ -3,13 +3,12 @@ import React, {useContext, useEffect, useState, useRef} from "react"
 import {useHistory} from "react-router-dom"
 import {HashLink as Link} from "react-router-hash-link"
 import path from "path"
-import {EnableDragContext, MobileContext, ImageContext, OutputSizeContext, ImageNameContext, ReverseContext, EdgeBlurRadiusContext, EdgeBlurEdgeRadiusContext, EdgeBlurSensitivityContext, EdgeBlurShowEdgesContext, patterns} from "../Context"
+import {EnableDragContext, MobileContext, ImageContext, OutputSizeContext, ImageNameContext, ReverseContext, patterns} from "../Context"
 import functions from "../structures/Functions"
 import Slider from "react-slider"
 import fileType from "magic-bytes.js"
 import uploadIcon from "../assets/icons/upload.png"
 import xIcon from "../assets/icons/x.png"
-import gifFrames from "gif-frames"
 import JSZip from "jszip"
 import checkboxChecked from "../assets/icons/checkbox-checked.png"
 import checkbox from "../assets/icons/checkbox.png"
@@ -26,10 +25,10 @@ const EdgeBlurImage: React.FunctionComponent = (props) => {
     const {imageName, setImageName} = useContext(ImageNameContext)
     const {outputSize, setOutputSize} = useContext(OutputSizeContext)
     const {reverse, setReverse} = useContext(ReverseContext)
-    const {edgeBlurRadius, setEdgeBlurRadius} = useContext(EdgeBlurRadiusContext)
-    const {edgeBlurEdgeRadius, setEdgeBlurEdgeRadius} = useContext(EdgeBlurEdgeRadiusContext)
-    const {edgeBlurSensitivity, setEdgeBlurSensitivity} = useContext(EdgeBlurSensitivityContext)
-    const {edgeBlurShowEdges, setEdgeBlurShowEdges} = useContext(EdgeBlurShowEdgesContext)
+    const [edgeBlurRadius, setEdgeBlurRadius] = useState(10)
+    const [edgeBlurEdgeRadius, setEdgeBlurEdgeRadius] = useState(3)
+    const [edgeBlurSensitivity, setEdgeBlurSensitivity] = useState(20)
+    const [edgeBlurShowEdges, setEdgeBlurShowEdges] = useState(false)
     const [gifData, setGIFData] = useState(null) as any
     const [seed, setSeed] = useState(0)
     const [img, setImg] = useState(null as HTMLImageElement | null)
@@ -61,7 +60,7 @@ const EdgeBlurImage: React.FunctionComponent = (props) => {
                     const url = URL.createObjectURL(blob)
                     const link = `${url}#.${result.typename}`
                     setImage(link)
-                    setImageName(file.name)
+                    setImageName(file.name.slice(0, 30))
                 }
                 resolve()
             }
@@ -142,15 +141,8 @@ const EdgeBlurImage: React.FunctionComponent = (props) => {
     }
 
     const parseGIF = async () => {
-        const frames = await gifFrames({url: image, frames: "all", outputType: "canvas"})
-        const newGIFData = [] as any
-        for (let i = 0; i < frames.length; i++) {
-            newGIFData.push({
-                frame: frames[i].getImage(),
-                delay: frames[i].frameInfo.delay * 10
-            })
-        }
-        setGIFData(newGIFData)
+        const frames = await functions.extractGIFFrames(image)
+        setGIFData(frames)
     }
 
     const parseAnimatedWebP = async () => {
@@ -195,7 +187,7 @@ const EdgeBlurImage: React.FunctionComponent = (props) => {
         return () => {
             clearTimeout(timeout)
         }
-    }, [img, edgeBlurRadius, edgeBlurEdgeRadius, edgeBlurSensitivity, edgeBlurShowEdges, gifData, seed])
+    }, [img, edgeImg, edgeBlurRadius, edgeBlurEdgeRadius, edgeBlurSensitivity, edgeBlurShowEdges, gifData, seed])
 
     const jpg = async () => {
         draw(0, true)
@@ -298,14 +290,14 @@ const EdgeBlurImage: React.FunctionComponent = (props) => {
         const savedEdgeBlurSensitivity = localStorage.getItem("edgeBlurSensitivity")
         if (savedEdgeBlurSensitivity) setEdgeBlurSensitivity(Number(savedEdgeBlurSensitivity))
         const savedEdgeBlurShowEdges = localStorage.getItem("edgeBlurShowEdges")
-        if (savedEdgeBlurShowEdges) setEdgeBlurShowEdges(Number(savedEdgeBlurShowEdges))
+        if (savedEdgeBlurShowEdges) setEdgeBlurShowEdges(savedEdgeBlurShowEdges === "true")
     }, [])
 
     useEffect(() => {
-        localStorage.setItem("edgeBlurRadius", edgeBlurRadius)
-        localStorage.setItem("edgeBlurEdgeRadius", edgeBlurEdgeRadius)
-        localStorage.setItem("edgeBlurSensitivity", edgeBlurSensitivity)
-        localStorage.setItem("edgeBlurShowEdges", edgeBlurShowEdges)
+        localStorage.setItem("edgeBlurRadius", String(edgeBlurRadius))
+        localStorage.setItem("edgeBlurEdgeRadius", String(edgeBlurEdgeRadius))
+        localStorage.setItem("edgeBlurSensitivity", String(edgeBlurSensitivity))
+        localStorage.setItem("edgeBlurShowEdges", String(edgeBlurShowEdges))
     }, [edgeBlurRadius, edgeBlurEdgeRadius, edgeBlurSensitivity, edgeBlurShowEdges])
 
     return (
@@ -368,11 +360,11 @@ const EdgeBlurImage: React.FunctionComponent = (props) => {
                     <button className="point-image-button" onClick={mp4}>MP4</button>
                 </div>
                 <div className="point-row">
-                    <span className="image-output-text">Output Size:</span>
-                    <input className="image-output-input" type="text" spellCheck="false" value={outputSize} onChange={(event) => setOutputSize(event.target.value)} onMouseOver={() => setEnableDrag(false)}/>
+                    <span className="point-image-output-text">Output Size:</span>
+                    <input className="point-image-output-input" type="text" spellCheck="false" value={outputSize} onChange={(event) => setOutputSize(event.target.value)} onMouseOver={() => setEnableDrag(false)}/>
                 </div>
                 <div className="point-row">
-                    <span className="image-output-text">{getOutputDimensions().width}x{getOutputDimensions().height}</span>
+                    <span className="point-image-output-text">{getOutputDimensions().width}x{getOutputDimensions().height}</span>
                 </div>
             </div> : null}
             <div className="point-options-container">

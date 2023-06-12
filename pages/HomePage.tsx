@@ -18,6 +18,8 @@ import Inflation from "../components/Inflation"
 import AIWatermark from "../components/AIWatermark"
 import Fence from "../components/Fence"
 import AdversarialNoise from "../components/AdversarialNoise"
+import CRT from "../components/CRT"
+import RGBSplit from "../components/RGBSplit"
 
 const HomePage: React.FunctionComponent = (props) => {
     const [ignored, forceUpdate] = useReducer(x => x + 1, 0)
@@ -57,6 +59,10 @@ const HomePage: React.FunctionComponent = (props) => {
             return (<AdversarialNoise/>)
         } else if (attackMode === "question mark") {
             return (<Help/>)
+        } else if (attackMode === "crt") {
+            return (<CRT/>)
+        } else if (attackMode === "rgb split") {
+            return (<RGBSplit/>)
         }
     }
 

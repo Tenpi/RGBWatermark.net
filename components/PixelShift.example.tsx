@@ -3,13 +3,12 @@ import React, {useContext, useEffect, useState, useRef} from "react"
 import {useHistory} from "react-router-dom"
 import {HashLink as Link} from "react-router-hash-link"
 import path from "path"
-import {EnableDragContext, MobileContext, ImageContext, OutputSizeContext, ImageNameContext, ReverseContext, PixelShiftContext, PixelShiftSizeContext, PixelShiftDirectionContext, patterns} from "../Context"
+import {EnableDragContext, MobileContext, ImageContext, OutputSizeContext, ImageNameContext, ReverseContext, patterns} from "../Context"
 import functions from "../structures/Functions"
 import Slider from "react-slider"
 import fileType from "magic-bytes.js"
 import uploadIcon from "../assets/icons/upload.png"
 import xIcon from "../assets/icons/x.png"
-import gifFrames from "gif-frames"
 import JSZip from "jszip"
 import checkboxChecked from "../assets/icons/checkbox-checked.png"
 import checkbox from "../assets/icons/checkbox.png"
@@ -23,10 +22,10 @@ const PixelShiftImage: React.FunctionComponent = (props) => {
     const {image, setImage} = useContext(ImageContext)
     const {imageName, setImageName} = useContext(ImageNameContext)
     const {outputSize, setOutputSize} = useContext(OutputSizeContext)
-    const {pixelShift, setPixelShift} = useContext(PixelShiftContext)
-    const {pixelShiftSize, setPixelShiftSize} = useContext(PixelShiftSizeContext)
+    const [pixelShift, setPixelShift] = useState(0)
+    const [pixelShiftSize, setPixelShiftSize] = useState(13)
+    const [pixelShiftDirection, setPixelShiftDirection] = useState("xy")
     const {reverse, setReverse} = useContext(ReverseContext)
-    const {pixelShiftDirection, setPixelShiftDirection} = useContext(PixelShiftDirectionContext)
     const [gifData, setGIFData] = useState(null) as any
     const [img, setImg] = useState(null as HTMLImageElement | null)
     const ref = useRef<HTMLCanvasElement>(null)
@@ -56,7 +55,7 @@ const PixelShiftImage: React.FunctionComponent = (props) => {
                     const url = URL.createObjectURL(blob)
                     const link = `${url}#.${result.typename}`
                     setImage(link)
-                    setImageName(file.name)
+                    setImageName(file.name.slice(0, 30))
                 }
                 resolve()
             }
@@ -121,15 +120,8 @@ const PixelShiftImage: React.FunctionComponent = (props) => {
     }
 
     const parseGIF = async () => {
-        const frames = await gifFrames({url: image, frames: "all", outputType: "canvas"})
-        const newGIFData = [] as any
-        for (let i = 0; i < frames.length; i++) {
-            newGIFData.push({
-                frame: frames[i].getImage(),
-                delay: frames[i].frameInfo.delay * 10
-            })
-        }
-        setGIFData(newGIFData)
+        const frames = await functions.extractGIFFrames(image)
+        setGIFData(frames)
     }
 
     const parseAnimatedWebP = async () => {
@@ -237,6 +229,30 @@ const PixelShiftImage: React.FunctionComponent = (props) => {
         window.URL.revokeObjectURL(url)
     }
 
+    const mp4 = async () => {
+        if (!img) return
+        let frames = [] as any
+        let delays = [] as any
+        if (gifData) {
+            for (let i = 0; i < gifData.length; i++) {
+                draw(i, true)
+                const frame = applyPixelShift("buffer") as ArrayBuffer
+                frames.push(frame)
+                let delay = gifData[i].delay
+                delays.push(delay)
+            }
+        } else {
+            draw(0, true)
+            const frame = applyPixelShift("buffer") as ArrayBuffer
+            frames.push(frame)
+            let delay = 60
+            delays.push(delay)
+        }
+        const url = await functions.encodeVideo(frames, functions.msToFps(delays[0]))
+        functions.download(`${path.basename(imageName, path.extname(imageName))}_pixelshifted.mp4`, url)
+        window.URL.revokeObjectURL(url)
+    }
+
     const reset = () => {
         setPixelShift(0)
         setPixelShiftSize(13)
@@ -250,12 +266,12 @@ const PixelShiftImage: React.FunctionComponent = (props) => {
     }, [])
 
     useEffect(() => {
-        localStorage.setItem("pixelShift", pixelShift)
-        localStorage.setItem("pixelShiftSize", pixelShiftSize)
+        localStorage.setItem("pixelShift", String(pixelShift))
+        localStorage.setItem("pixelShiftSize", String(pixelShiftSize))
     }, [pixelShift, pixelShiftSize])
 
     return (
-        <div className="point-image-component" onMouseEnter={() => setEnableDrag(false)}>
+        <div className="point-image-component" onMouseEnter={() => setEnableDrag(true)}>
             <div className="point-upload-container">
                 <div className="point-row">
                     <span className="point-text">Image:</span>
@@ -316,13 +332,14 @@ const PixelShiftImage: React.FunctionComponent = (props) => {
                     <button className="point-image-button" onClick={png}>PNG</button>
                     <button className="point-image-button" onClick={zip}>ZIP</button>
                     <button className="point-image-button" onClick={gif}>GIF</button>
+                    <button className="point-image-button" onClick={mp4}>MP4</button>
                 </div>
                 <div className="point-row">
-                    <span className="image-output-text">Output Size:</span>
-                    <input className="image-output-input" type="text" spellCheck="false" value={outputSize} onChange={(event) => setOutputSize(event.target.value)}/>
+                    <span className="point-image-output-text">Output Size:</span>
+                    <input className="point-image-output-input" type="text" spellCheck="false" value={outputSize} onChange={(event) => setOutputSize(event.target.value)} onMouseOver={() => setEnableDrag(false)}/>
                 </div>
                 <div className="point-row">
-                    <span className="image-output-text">{getOutputDimensions().width}x{getOutputDimensions().height}</span>
+                    <span className="point-image-output-text">{getOutputDimensions().width}x{getOutputDimensions().height}</span>
                 </div>
             </div> : null}
             <div className="point-options-container">

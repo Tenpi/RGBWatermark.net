@@ -3,13 +3,12 @@ import React, {useContext, useEffect, useState, useRef} from "react"
 import {useHistory} from "react-router-dom"
 import {HashLink as Link} from "react-router-hash-link"
 import path from "path"
-import {EnableDragContext, MobileContext, ImageContext, OutputSizeContext, ImageNameContext, ReverseContext, SprinkleOpacityContext, SprinkleDuplicatesContext, SprinklePointSizeContext, SprinklePointSpacingContext, SprinkleSpacingContext, SprinkleDirectionContext, patterns} from "../Context"
+import {EnableDragContext, MobileContext, ImageContext, OutputSizeContext, ImageNameContext, ReverseContext, patterns} from "../Context"
 import functions from "../structures/Functions"
 import Slider from "react-slider"
 import fileType from "magic-bytes.js"
 import uploadIcon from "../assets/icons/upload.png"
 import xIcon from "../assets/icons/x.png"
-import gifFrames from "gif-frames"
 import JSZip from "jszip"
 import checkboxChecked from "../assets/icons/checkbox-checked.png"
 import checkbox from "../assets/icons/checkbox.png"
@@ -24,12 +23,12 @@ const SprinkleImage: React.FunctionComponent = (props) => {
     const {imageName, setImageName} = useContext(ImageNameContext)
     const {outputSize, setOutputSize} = useContext(OutputSizeContext)
     const {reverse, setReverse} = useContext(ReverseContext)
-    const {sprinkleOpacity, setSprinkleOpacity} = useContext(SprinkleOpacityContext)
-    const {sprinkleSpacing, setSprinkleSpacing} = useContext(SprinkleSpacingContext)
-    const {sprinklePointSize, setSprinklePointSize} = useContext(SprinklePointSizeContext)
-    const {sprinklePointSpacing, setSprinklePointSpacing} = useContext(SprinklePointSpacingContext)
-    const {sprinkleDuplicates, setSprinkleDuplicates} = useContext(SprinkleDuplicatesContext)
-    const {sprinkleDirection, setSprinkleDirection} = useContext(SprinkleDirectionContext)
+    const [sprinklePointSize, setSprinklePointSize] = useState(3)
+    const [sprinklePointSpacing, setSprinklePointSpacing] = useState(100)
+    const [sprinkleDuplicates, setSprinkleDuplicates] = useState(4)
+    const [sprinkleSpacing, setSprinkleSpacing] = useState(35)
+    const [sprinkleOpacity, setSprinkleOpacity] = useState(100)
+    const [sprinkleDirection, setSprinkleDirection] = useState("45")
     const [gifData, setGIFData] = useState(null) as any
     const [img, setImg] = useState(null as HTMLImageElement | null)
     const [seed, setSeed] = useState(0)
@@ -125,15 +124,8 @@ const SprinkleImage: React.FunctionComponent = (props) => {
     }
 
     const parseGIF = async () => {
-        const frames = await gifFrames({url: image, frames: "all", outputType: "canvas"})
-        const newGIFData = [] as any
-        for (let i = 0; i < frames.length; i++) {
-            newGIFData.push({
-                frame: frames[i].getImage(),
-                delay: frames[i].frameInfo.delay * 10
-            })
-        }
-        setGIFData(newGIFData)
+        const frames = await functions.extractGIFFrames(image)
+        setGIFData(frames)
     }
 
     const parseAnimatedWebP = async () => {
@@ -290,11 +282,11 @@ const SprinkleImage: React.FunctionComponent = (props) => {
     }, [])
 
     useEffect(() => {
-        localStorage.setItem("sprinkleOpacity", sprinkleOpacity)
-        localStorage.setItem("sprinkleDuplicates", sprinkleDuplicates)
-        localStorage.setItem("sprinkleSpacing", sprinkleSpacing)
-        localStorage.setItem("sprinklePointSize", sprinklePointSize)
-        localStorage.setItem("sprinklePointSpacing", sprinklePointSpacing)
+        localStorage.setItem("sprinkleOpacity", String(sprinkleOpacity))
+        localStorage.setItem("sprinkleDuplicates", String(sprinkleDuplicates))
+        localStorage.setItem("sprinkleSpacing", String(sprinkleSpacing))
+        localStorage.setItem("sprinklePointSize", String(sprinklePointSize))
+        localStorage.setItem("sprinklePointSpacing", String(sprinklePointSpacing))
         localStorage.setItem("sprinkleDirection", sprinkleDirection)
     }, [sprinkleOpacity, sprinkleDuplicates, sprinkleSpacing, sprinklePointSize, sprinklePointSpacing, sprinkleDirection])
 

@@ -3,13 +3,12 @@ import React, {useContext, useEffect, useState, useRef} from "react"
 import {useHistory} from "react-router-dom"
 import {HashLink as Link} from "react-router-hash-link"
 import path from "path"
-import {EnableDragContext, MobileContext, ImageContext, OutputSizeContext, ImageNameContext, ReverseContext, PixelationSizeContext, PixelationStrengthContext, patterns} from "../Context"
+import {EnableDragContext, MobileContext, ImageContext, OutputSizeContext, ImageNameContext, ReverseContext, patterns} from "../Context"
 import functions from "../structures/Functions"
 import Slider from "react-slider"
 import fileType from "magic-bytes.js"
 import uploadIcon from "../assets/icons/upload.png"
 import xIcon from "../assets/icons/x.png"
-import gifFrames from "gif-frames"
 import JSZip from "jszip"
 import checkboxChecked from "../assets/icons/checkbox-checked.png"
 import checkbox from "../assets/icons/checkbox.png"
@@ -24,8 +23,9 @@ const PixelationImage: React.FunctionComponent = (props) => {
     const {imageName, setImageName} = useContext(ImageNameContext)
     const {outputSize, setOutputSize} = useContext(OutputSizeContext)
     const {reverse, setReverse} = useContext(ReverseContext)
-    const {pixelationSize, setPixelationSize} = useContext(PixelationSizeContext)
-    const {pixelationStrength, setPixelationStrength} = useContext(PixelationStrengthContext)
+    const [pixelationStrength, setPixelationStrength] = useState(0)
+    const [pixelationSize, setPixelationSize] = useState(1)
+    const [pixelationOpacity, setPixelationOpacity] = useState(100)
     const [gifData, setGIFData] = useState(null) as any
     const [img, setImg] = useState(null as HTMLImageElement | null)
     const ref = useRef<HTMLCanvasElement>(null)
@@ -55,7 +55,7 @@ const PixelationImage: React.FunctionComponent = (props) => {
                     const url = URL.createObjectURL(blob)
                     const link = `${url}#.${result.typename}`
                     setImage(link)
-                    setImageName(file.name)
+                    setImageName(file.name.slice(0, 30))
                 }
                 resolve()
             }
@@ -120,15 +120,8 @@ const PixelationImage: React.FunctionComponent = (props) => {
     }
 
     const parseGIF = async () => {
-        const frames = await gifFrames({url: image, frames: "all", outputType: "canvas"})
-        const newGIFData = [] as any
-        for (let i = 0; i < frames.length; i++) {
-            newGIFData.push({
-                frame: frames[i].getImage(),
-                delay: frames[i].frameInfo.delay * 10
-            })
-        }
-        setGIFData(newGIFData)
+        const frames = await functions.extractGIFFrames(image)
+        setGIFData(frames)
     }
 
     const parseAnimatedWebP = async () => {
@@ -172,18 +165,18 @@ const PixelationImage: React.FunctionComponent = (props) => {
         return () => {
             clearTimeout(timeout)
         }
-    }, [img, pixelationSize, pixelationStrength, gifData])
+    }, [img, pixelationSize, pixelationStrength, pixelationOpacity, gifData])
 
     const jpg = async () => {
         draw(0, true)
         const img = applyPixelation("image/jpeg") as string
-        functions.download(`${path.basename(imageName, path.extname(imageName))}_highcontrast.jpg`, img)
+        functions.download(`${path.basename(imageName, path.extname(imageName))}_pixelated.jpg`, img)
     }
 
     const png = async () => {
         draw(0, true)
         const img = applyPixelation("image/png") as string
-        functions.download(`${path.basename(imageName, path.extname(imageName))}_highcontrast.png`, img)
+        functions.download(`${path.basename(imageName, path.extname(imageName))}_pixelated.png`, img)
     }
 
     const zip = async () => {
@@ -194,15 +187,15 @@ const PixelationImage: React.FunctionComponent = (props) => {
                 draw(i, true)
                 const img = applyPixelation("image/png") as string
                 const data = await fetch(img).then((r) => r.arrayBuffer())
-                zip.file(`${path.basename(imageName, path.extname(imageName))}_highcontrast ${i + 1}.png`, data, {binary: true})
+                zip.file(`${path.basename(imageName, path.extname(imageName))}_pixelated ${i + 1}.png`, data, {binary: true})
             }
         } else {
             draw(0, true)
             const img = applyPixelation("image/png") as string
             const data = await fetch(img).then((r) => r.arrayBuffer())
-            zip.file(`${path.basename(imageName, path.extname(imageName))}_highcontrast 1.png`, data, {binary: true})
+            zip.file(`${path.basename(imageName, path.extname(imageName))}_pixelated 1.png`, data, {binary: true})
         }
-        const filename = `${path.basename(imageName, path.extname(imageName))}_highcontrast.zip`
+        const filename = `${path.basename(imageName, path.extname(imageName))}_pixelated.zip`
         const blob = await zip.generateAsync({type: "blob"})
         const url = window.URL.createObjectURL(blob)
         functions.download(filename, url)
@@ -232,13 +225,38 @@ const PixelationImage: React.FunctionComponent = (props) => {
         const buffer = await functions.encodeGIF(frames, delays, dimensions.width, dimensions.height, {transparentColor: "#000000"})
         const blob = new Blob([buffer])
         const url = window.URL.createObjectURL(blob)
-        functions.download(`${path.basename(imageName, path.extname(imageName))}_highcontrast.gif`, url)
+        functions.download(`${path.basename(imageName, path.extname(imageName))}_pixelated.gif`, url)
+        window.URL.revokeObjectURL(url)
+    }
+
+    const mp4 = async () => {
+        if (!img) return
+        let frames = [] as any
+        let delays = [] as any
+        if (gifData) {
+            for (let i = 0; i < gifData.length; i++) {
+                draw(i, true)
+                const frame = applyPixelation("buffer") as ArrayBuffer
+                frames.push(frame)
+                let delay = gifData[i].delay
+                delays.push(delay)
+            }
+        } else {
+            draw(0, true)
+            const frame = applyPixelation("buffer") as ArrayBuffer
+            frames.push(frame)
+            let delay = 60
+            delays.push(delay)
+        }
+        const url = await functions.encodeVideo(frames, functions.msToFps(delays[0]))
+        functions.download(`${path.basename(imageName, path.extname(imageName))}_pixelated.mp4`, url)
         window.URL.revokeObjectURL(url)
     }
 
     const reset = () => {
         setPixelationSize(1)
         setPixelationStrength(0)
+        setPixelationOpacity(100)
     }
 
     useEffect(() => {
@@ -246,15 +264,18 @@ const PixelationImage: React.FunctionComponent = (props) => {
         if (savedPixelationSize) setPixelationSize(Number(savedPixelationSize))
         const savedPixelationStrength = localStorage.getItem("pixelationStrength")
         if (savedPixelationStrength) setPixelationStrength(Number(savedPixelationStrength))
+        const savedPixelationOpacity = localStorage.getItem("pixelationOpacity")
+        if (savedPixelationOpacity) setPixelationOpacity(Number(savedPixelationOpacity))
     }, [])
 
     useEffect(() => {
-        localStorage.setItem("pixelationSize", pixelationSize)
-        localStorage.setItem("pixelationStrength", pixelationStrength)
-    }, [pixelationSize, pixelationStrength])
+        localStorage.setItem("pixelationSize", String(pixelationSize))
+        localStorage.setItem("pixelationStrength", String(pixelationStrength))
+        localStorage.setItem("pixelationOpacity", String(pixelationOpacity))
+    }, [pixelationSize, pixelationStrength, pixelationOpacity])
 
     return (
-        <div className="point-image-component" onMouseEnter={() => setEnableDrag(false)}>
+        <div className="point-image-component" onMouseEnter={() => setEnableDrag(true)}>
             <div className="point-upload-container">
                 <div className="point-row">
                     <span className="point-text">Image:</span>
@@ -281,6 +302,11 @@ const PixelationImage: React.FunctionComponent = (props) => {
             </div> : null}
             <div className="point-options-container">
                 <div className="point-row">
+                    <span className="point-text">Opacity: </span>
+                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setPixelationOpacity(value)} min={0} max={100} step={1} value={pixelationOpacity}/>
+                    <span className="point-text-mini">{pixelationOpacity}</span>
+                </div>
+                <div className="point-row">
                     <span className="point-text">Strength: </span>
                     <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setPixelationStrength(value)} min={1} max={30} step={1} value={pixelationStrength}/>
                     <span className="point-text-mini">{pixelationStrength}</span>
@@ -293,13 +319,14 @@ const PixelationImage: React.FunctionComponent = (props) => {
                     <button className="point-image-button" onClick={png}>PNG</button>
                     <button className="point-image-button" onClick={zip}>ZIP</button>
                     <button className="point-image-button" onClick={gif}>GIF</button>
+                    <button className="point-image-button" onClick={mp4}>MP4</button>
                 </div>
                 <div className="point-row">
-                    <span className="image-output-text">Output Size:</span>
-                    <input className="image-output-input" type="text" spellCheck="false" value={outputSize} onChange={(event) => setOutputSize(event.target.value)}/>
+                    <span className="point-image-output-text">Output Size:</span>
+                    <input className="point-image-output-input" type="text" spellCheck="false" value={outputSize} onChange={(event) => setOutputSize(event.target.value)} onMouseOver={() => setEnableDrag(false)}/>
                 </div>
                 <div className="point-row">
-                    <span className="image-output-text">{getOutputDimensions().width}x{getOutputDimensions().height}</span>
+                    <span className="point-image-output-text">{getOutputDimensions().width}x{getOutputDimensions().height}</span>
                 </div>
             </div> : null}
             <div className="point-options-container">

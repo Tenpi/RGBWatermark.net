@@ -3,13 +3,12 @@ import React, {useContext, useEffect, useState, useRef} from "react"
 import {useHistory} from "react-router-dom"
 import {HashLink as Link} from "react-router-hash-link"
 import path from "path"
-import {EnableDragContext, MobileContext, ImageContext, OutputSizeContext, ImageNameContext, ReverseContext, HighContrastSizeContext, HighContrastStrengthContext, HighContrastBrightnessContext, HighContrastContrastContext, HighContrastInvertContext, patterns} from "../Context"
+import {EnableDragContext, MobileContext, ImageContext, OutputSizeContext, ImageNameContext, ReverseContext, patterns} from "../Context"
 import functions from "../structures/Functions"
 import Slider from "react-slider"
 import fileType from "magic-bytes.js"
 import uploadIcon from "../assets/icons/upload.png"
 import xIcon from "../assets/icons/x.png"
-import gifFrames from "gif-frames"
 import JSZip from "jszip"
 import checkboxChecked from "../assets/icons/checkbox-checked.png"
 import checkbox from "../assets/icons/checkbox.png"
@@ -24,11 +23,12 @@ const HighContrastImage: React.FunctionComponent = (props) => {
     const {imageName, setImageName} = useContext(ImageNameContext)
     const {outputSize, setOutputSize} = useContext(OutputSizeContext)
     const {reverse, setReverse} = useContext(ReverseContext)
-    const {highContrastStrength, setHighContrastStrength} = useContext(HighContrastStrengthContext)
-    const {highContrastSize, setHighContrastSize} = useContext(HighContrastSizeContext)
-    const {highContrastBrightness, setHighContrastBrightness} = useContext(HighContrastBrightnessContext)
-    const {highContrastContrast, setHighContrastContrast} = useContext(HighContrastContrastContext)
-    const {highContrastInvert, setHighContrastInvert} = useContext(HighContrastInvertContext)
+    const [highContrastStrength, setHighContrastStrength] = useState(0)
+    const [highContrastSize, setHighContrastSize] = useState(1)
+    const [highContrastBrightness, setHighContrastBrightness] = useState(0)
+    const [highContrastContrast, setHighContrastContrast] = useState(0)
+    const [highContrastInvert, setHighContrastInvert] = useState(false)
+    const [highContrastSpacing, setHighContrastSpacing] = useState(1)
     const [gifData, setGIFData] = useState(null) as any
     const [img, setImg] = useState(null as HTMLImageElement | null)
     const ref = useRef<HTMLCanvasElement>(null)
@@ -58,7 +58,7 @@ const HighContrastImage: React.FunctionComponent = (props) => {
                     const url = URL.createObjectURL(blob)
                     const link = `${url}#.${result.typename}`
                     setImage(link)
-                    setImageName(file.name)
+                    setImageName(file.name.slice(0, 30))
                 }
                 resolve()
             }
@@ -123,15 +123,8 @@ const HighContrastImage: React.FunctionComponent = (props) => {
     }
 
     const parseGIF = async () => {
-        const frames = await gifFrames({url: image, frames: "all", outputType: "canvas"})
-        const newGIFData = [] as any
-        for (let i = 0; i < frames.length; i++) {
-            newGIFData.push({
-                frame: frames[i].getImage(),
-                delay: frames[i].frameInfo.delay * 10
-            })
-        }
-        setGIFData(newGIFData)
+        const frames = await functions.extractGIFFrames(image)
+        setGIFData(frames)
     }
 
     const parseAnimatedWebP = async () => {
@@ -175,7 +168,7 @@ const HighContrastImage: React.FunctionComponent = (props) => {
         return () => {
             clearTimeout(timeout)
         }
-    }, [img, highContrastSize, highContrastStrength, highContrastBrightness, highContrastContrast, highContrastInvert, gifData])
+    }, [img, highContrastSize, highContrastStrength, highContrastBrightness, highContrastContrast, highContrastInvert, highContrastSpacing, gifData])
 
     const jpg = async () => {
         draw(0, true)
@@ -239,11 +232,36 @@ const HighContrastImage: React.FunctionComponent = (props) => {
         window.URL.revokeObjectURL(url)
     }
 
+    const mp4 = async () => {
+        if (!img) return
+        let frames = [] as any
+        let delays = [] as any
+        if (gifData) {
+            for (let i = 0; i < gifData.length; i++) {
+                draw(i, true)
+                const frame = applyHighContrast("buffer") as ArrayBuffer
+                frames.push(frame)
+                let delay = gifData[i].delay
+                delays.push(delay)
+            }
+        } else {
+            draw(0, true)
+            const frame = applyHighContrast("buffer") as ArrayBuffer
+            frames.push(frame)
+            let delay = 60
+            delays.push(delay)
+        }
+        const url = await functions.encodeVideo(frames, functions.msToFps(delays[0]))
+        functions.download(`${path.basename(imageName, path.extname(imageName))}_highcontrast.mp4`, url)
+        window.URL.revokeObjectURL(url)
+    }
+
     const reset = () => {
         setHighContrastSize(1)
         setHighContrastStrength(0)
         setHighContrastBrightness(0)
         setHighContrastContrast(0)
+        setHighContrastSpacing(1)
         setHighContrastInvert(false)
     }
 
@@ -258,18 +276,21 @@ const HighContrastImage: React.FunctionComponent = (props) => {
         if (savedHighContrastContrast) setHighContrastContrast(Number(savedHighContrastContrast))
         const savedHighContrastInvert = localStorage.getItem("highContrastInvert")
         if (savedHighContrastInvert) setHighContrastInvert(savedHighContrastInvert === "true")
+        const savedHighContrastSpacing = localStorage.getItem("highContrastSpacing")
+        if (savedHighContrastSpacing) setHighContrastSpacing(Number(savedHighContrastSpacing))
     }, [])
 
     useEffect(() => {
-        localStorage.setItem("highContrastSize", highContrastSize)
-        localStorage.setItem("highContrastStrength", highContrastStrength)
-        localStorage.setItem("highContrastBrightness", highContrastBrightness)
-        localStorage.setItem("highContrastContrast", highContrastContrast)
-        localStorage.setItem("highContrastInvert", highContrastInvert)
-    }, [highContrastSize, highContrastStrength, highContrastBrightness, highContrastContrast, highContrastInvert])
+        localStorage.setItem("highContrastSize", String(highContrastSize))
+        localStorage.setItem("highContrastStrength", String(highContrastStrength))
+        localStorage.setItem("highContrastBrightness", String(highContrastBrightness))
+        localStorage.setItem("highContrastContrast", String(highContrastContrast))
+        localStorage.setItem("highContrastSpacing", String(highContrastSpacing))
+        localStorage.setItem("highContrastInvert", String(highContrastInvert))
+    }, [highContrastSize, highContrastStrength, highContrastBrightness, highContrastContrast, highContrastInvert, highContrastSpacing])
 
     return (
-        <div className="point-image-component" onMouseEnter={() => setEnableDrag(false)}>
+        <div className="point-image-component" onMouseEnter={() => setEnableDrag(true)}>
             <div className="point-upload-container">
                 <div className="point-row">
                     <span className="point-text">Image:</span>
@@ -310,6 +331,11 @@ const HighContrastImage: React.FunctionComponent = (props) => {
                     <span className="point-text-mini">{highContrastSize}</span>
                 </div>
                 <div className="point-row">
+                    <span className="point-text">Spacing: </span>
+                    <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setHighContrastSpacing(value)} min={1} max={50} step={1} value={highContrastSpacing}/>
+                    <span className="point-text-mini">{highContrastSpacing}</span>
+                </div>
+                <div className="point-row">
                     <span className="point-text">Brightness: </span>
                     <Slider className="point-slider" trackClassName="point-slider-track" thumbClassName="point-slider-thumb" onChange={(value) => setHighContrastBrightness(value)} min={0} max={100} step={1} value={highContrastBrightness}/>
                     <span className="point-text-mini">{highContrastBrightness}</span>
@@ -327,13 +353,14 @@ const HighContrastImage: React.FunctionComponent = (props) => {
                     <button className="point-image-button" onClick={png}>PNG</button>
                     <button className="point-image-button" onClick={zip}>ZIP</button>
                     <button className="point-image-button" onClick={gif}>GIF</button>
+                    <button className="point-image-button" onClick={mp4}>MP4</button>
                 </div>
                 <div className="point-row">
-                    <span className="image-output-text">Output Size:</span>
-                    <input className="image-output-input" type="text" spellCheck="false" value={outputSize} onChange={(event) => setOutputSize(event.target.value)}/>
+                    <span className="point-image-output-text">Output Size:</span>
+                    <input className="point-image-output-input" type="text" spellCheck="false" value={outputSize} onChange={(event) => setOutputSize(event.target.value)} onMouseOver={() => setEnableDrag(false)}/>
                 </div>
                 <div className="point-row">
-                    <span className="image-output-text">{getOutputDimensions().width}x{getOutputDimensions().height}</span>
+                    <span className="point-image-output-text">{getOutputDimensions().width}x{getOutputDimensions().height}</span>
                 </div>
             </div> : null}
             <div className="point-options-container">

@@ -23,6 +23,8 @@ import inflation from "../assets/icons/inflation.png"
 import networkrandomizer from "../assets/icons/networkrandomizer.png"
 import networkshifter from "../assets/icons/networkshifter.png"
 import aiwatermark from "../assets/icons/aiwatermark.png"
+import crt from "../assets/icons/crt.png"
+import rgbsplit from "../assets/icons/rgbsplit.png"
 
 interface Props {
     rerender: () => void
@@ -57,6 +59,8 @@ const NavBar: React.FunctionComponent<Props> = (props) => {
             <img className="navbar-item" src={sprinkles} onClick={() => setAttackMode("sprinkles")}/>
             <img className="navbar-item" src={fence} onClick={() => setAttackMode("fence")}/>
             <img className="navbar-item" src={adversarialnoise} onClick={() => setAttackMode("adversarial noise")}/>
+            <img className="navbar-item" src={crt} onClick={() => setAttackMode("crt")}/>
+            <img className="navbar-item" src={rgbsplit} onClick={() => setAttackMode("rgb split")}/>
             <img className="navbar-item" src={conversion} onClick={() => setAttackMode("conversion")}/>
             <img className="navbar-item" src={inflation} onClick={() => setAttackMode("inflation")}/>
             <img className="navbar-item" src={networkrandomizer} onClick={() => setAttackMode("network randomizer")}/>

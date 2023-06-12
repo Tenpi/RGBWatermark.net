@@ -14,7 +14,7 @@ const Footer: React.FunctionComponent = (props) => {
     const {type, setType} = useContext(TypeContext)
     const {attackMode, setAttackMode} = useContext(AttackModeContext)
     
-    const version = "1.1.7"
+    const version = "1.1.8"
 
     const windows = async () => {
         const filename = `RGBWatermark-Setup-${version}.exe`
@@ -248,11 +248,19 @@ const Footer: React.FunctionComponent = (props) => {
                 </div> : null}
                 {attackMode === "fence" ?
                 <div className="footer-row">
-                    <span className="footer-text-4">The fence adds a protective fence that looks and performs similar to trifiction.</span>
+                    <span className="footer-text-4">The fence adds a diamond fence that looks better than trifiction but is a bit weaker.</span>
                 </div> : null}
                 {attackMode === "adversarial noise" ?
                 <div className="footer-row">
-                    <span className="footer-text-5">Adversarial noise adds pre-computed adversarial noise, offering close results to regular adversarial noise without the lengthy computation.</span>
+                    <span className="footer-text-5">Adversarial noise adds pre-computed adversarial noise, which should add grain and interfere with controlnet.</span>
+                </div> : null}
+                {attackMode === "crt" ?
+                <div className="footer-row">
+                    <span className="footer-text-5">CRT adds a texture similar to old CRT TV's that interferes with controlnet.</span>
+                </div> : null}
+                {attackMode === "rgb split" ?
+                <div className="footer-row">
+                    <span className="footer-text-2">RGB Split is a modified version of lineifiction only applied on certain color channels.</span>
                 </div> : null}
                 {showRenderingText() ?
                 <div className="footer-row">

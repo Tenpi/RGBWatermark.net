@@ -12,3 +12,5 @@ components/EdgeBlur.tsx
 components/Sprinkles.tsx
 components/Fence.tsx
 components/AdversarialNoise.tsx
+components/CRT.tsx
+components/RGBSplit.tsx
