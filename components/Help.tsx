@@ -24,7 +24,9 @@ import imagesplitting from "../assets/images/protection methods/imagesplitting.j
 import glaze from "../assets/images/protection methods/glaze.jpg"
 import mist from "../assets/images/protection methods/mist.jpg"
 import fileconversion from "../assets/images/protection methods/fileconversion.jpg"
-import fileinflation from "../assets/images/protection methods/fileinflation.jpg"*/
+import fileinflation from "../assets/images/protection methods/fileinflation.jpg"
+import crt from "../assets/images/protection methods/crt.jpg"
+import rgbsplit from "../assets/images/protection methods/rgbsplit.jpg"*/
 
 const rainbowWatermarks = "https://i.imgur.com/IOnJNnG.png"
 const pointifiction = "https://i.imgur.com/v8zOBpw.jpg"
@@ -47,8 +49,10 @@ const fence = "https://i.imgur.com/4wNnnd2.jpg"
 const adversarialnoise = "https://i.imgur.com/R9OQybt.png"
 const fileconversion = "https://i.imgur.com/zBe9hoE.png"
 const fileinflation = "https://i.imgur.com/f776qKD.png"
+const crt = "https://i.imgur.com/83Cuxdd.png"
+const rgbsplit = "https://i.imgur.com/ykTCBhP.png"
 
-let protectionMethods = [rainbowWatermarks, pointifiction, lineifiction, trifiction, rectifiction, pixelshift, pixelation, highcontrast, noise, edgeblur, sprinkles, fence, adversarialnoise, glaze, mist, fileconversion, fileinflation, networkrandomizer, networkshifter, imageencryption, imagesplitting]
+let protectionMethods = [rainbowWatermarks, pointifiction, lineifiction, trifiction, rectifiction, pixelshift, pixelation, highcontrast, noise, edgeblur, sprinkles, fence, adversarialnoise, crt, rgbsplit, glaze, mist, fileconversion, fileinflation, networkrandomizer, networkshifter, imageencryption, imagesplitting]
 
 /*
 import aiarttheft1 from "../assets/images/ai art theft/aiarttheft1.jpg"
