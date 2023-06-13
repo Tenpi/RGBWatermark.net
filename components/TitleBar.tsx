@@ -18,7 +18,8 @@ const colorList = {
     "--sliderBG": "#030e1f",
     "--inputBG": "#092655",
     "--patternBorder": "#153fdd",
-    "--patternBorder2": "#dd34a5"
+    "--patternBorder2": "#dd34a5",
+    "--drop-color": "rgba(26, 89, 226, 0.9)"
 }
 
 interface Props {

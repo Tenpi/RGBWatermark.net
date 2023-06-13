@@ -2,6 +2,7 @@ import React, {useEffect, useContext, useReducer, useState} from "react"
 import {EnableDragContext, AttackModeContext} from "../Context"
 import TitleBar from "../components/TitleBar"
 import NavBar from "../components/NavBar"
+import DragAndDrop from "../components/DragAndDrop"
 import RainbowOptions from "../components/RainbowOptions"
 import RainbowImage from "../components/RainbowImage"
 import PointImage from "../components/Pointifiction"
@@ -68,6 +69,7 @@ const HomePage: React.FunctionComponent = (props) => {
 
     return (
         <>
+        <DragAndDrop/>
         <TitleBar rerender={forceUpdate}/>
         <NavBar rerender={forceUpdate}/>
         <div className="body">
