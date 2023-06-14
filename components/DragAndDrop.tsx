@@ -71,8 +71,8 @@ const DragAndDrop: React.FunctionComponent = (props) => {
         await new Promise<void>((resolve) => {
             fileReader.onloadend = async (f: any) => {
                 let bytes = new Uint8Array(f.target.result)
-                const result = fileType(bytes)?.[0]
-                const jpg = result?.mime === "image/jpeg"
+                const result = fileType(bytes)?.[0] || {}
+                const jpg = result?.mime === "image/jpeg" || path.extname(file.name) === ".jpg"
                 const png = result?.mime === "image/png"
                 const gif = result?.mime === "image/gif"
                 const webp = result?.mime === "image/webp"
@@ -81,6 +81,8 @@ const DragAndDrop: React.FunctionComponent = (props) => {
                 if (jpg || png || gif || webp || bmp || avif) {
                     const blob = new Blob([bytes])
                     const url = URL.createObjectURL(blob)
+                    if (jpg) result.typename = "jpg"
+                    if (avif) result.typename = "avif"
                     const link = `${url}#.${result.typename}`
                     setImage(link)
                     setImageName(file.name.slice(0, 30))

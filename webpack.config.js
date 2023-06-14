@@ -2,7 +2,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin")
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const TerserJSPlugin = require("terser-webpack-plugin")
-const CopyWebpackPlugin = require("copy-webpack-plugin")
+const CopyPlugin = require("copy-webpack-plugin")
 const nodeExternals = require("webpack-node-externals")
 const WebpackObfuscator = require("webpack-obfuscator")
 const webpack = require("webpack")
@@ -32,7 +32,8 @@ module.exports = [
         {test: /\.less$/, exclude: webExclude, use: [{loader: MiniCssExtractPlugin.loader, options: {hmr: true}}, "css-loader", {loader: "less-loader"}]},
         {test: /\.css$/, exclude: webExclude, use: [{loader: MiniCssExtractPlugin.loader}, "css-loader"]},
         {test: /\.(tsx?|jsx?)$/, resolve: {fullySpecified: false}, exclude: webExclude, use: [{loader: "ts-loader", options: {transpileOnly: true}}]},
-        {test: /\.m?js$/, resolve: {fullySpecified: false}}
+        {test: /\.m?js$/, resolve: {fullySpecified: false}},
+        {test: /jphs\.wasm$/, type: "javascript/auto", loader: "file-loader"}
       ]
     },
     plugins: [
@@ -52,7 +53,13 @@ module.exports = [
       }),
       new webpack.ProvidePlugin({
           process: "process/browser",
-      })
+      }),
+      new CopyPlugin({
+        patterns: [
+            {from: "./structures/jphs.js", to: "[name][ext]"},
+            {from: "./structures/jphs.wasm", to: "[name][ext]"},
+        ],
+      }),
     ]
   }, 
   {

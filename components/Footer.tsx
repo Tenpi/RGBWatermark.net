@@ -262,6 +262,10 @@ const Footer: React.FunctionComponent = (props) => {
                 <div className="footer-row">
                     <span className="footer-text-2">RGB Split is a modified version of lineifiction only applied on certain color channels.</span>
                 </div> : null}
+                {attackMode === "steganography" ?
+                <div className="footer-row">
+                    <span className="footer-text-3">Steganography hides secret messages in PNG/JPG files. You could use this to track your image.</span>
+                </div> : null}
                 {showRenderingText() ?
                 <div className="footer-row">
                     <span className="footer-text">All editing and rendering is done locally in your browser.</span>

@@ -21,6 +21,7 @@ import Fence from "../components/Fence"
 import AdversarialNoise from "../components/AdversarialNoise"
 import CRT from "../components/CRT"
 import RGBSplit from "../components/RGBSplit"
+import Steganography from "../components/Steganography"
 
 const HomePage: React.FunctionComponent = (props) => {
     const [ignored, forceUpdate] = useReducer(x => x + 1, 0)
@@ -64,6 +65,8 @@ const HomePage: React.FunctionComponent = (props) => {
             return (<CRT/>)
         } else if (attackMode === "rgb split") {
             return (<RGBSplit/>)
+        } else if (attackMode === "steganography") {
+            return (<Steganography/>)
         }
     }
 

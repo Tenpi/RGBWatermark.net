@@ -25,6 +25,7 @@ import networkshifter from "../assets/icons/networkshifter.png"
 import aiwatermark from "../assets/icons/aiwatermark.png"
 import crt from "../assets/icons/crt.png"
 import rgbsplit from "../assets/icons/rgbsplit.png"
+import steganography from "../assets/icons/steganography.png"
 
 interface Props {
     rerender: () => void
@@ -63,9 +64,8 @@ const NavBar: React.FunctionComponent<Props> = (props) => {
             <img className="navbar-item" src={rgbsplit} onClick={() => setAttackMode("rgb split")}/>
             <img className="navbar-item" src={conversion} onClick={() => setAttackMode("conversion")}/>
             <img className="navbar-item" src={inflation} onClick={() => setAttackMode("inflation")}/>
-            <img className="navbar-item" src={networkrandomizer} onClick={() => setAttackMode("network randomizer")}/>
-            <img className="navbar-item" src={networkshifter} onClick={() => setAttackMode("network shifter")}/>
             <img className="navbar-item" src={aiwatermark} onClick={() => setAttackMode("ai watermark")}/>
+            <img className="navbar-item" src={steganography} onClick={() => setAttackMode("steganography")}/>
             <img className="navbar-item" src={questionmark} onClick={() => setAttackMode("question mark")}/>
         </div>
     )
