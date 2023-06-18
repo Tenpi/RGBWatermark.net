@@ -26,7 +26,8 @@ import mist from "../assets/images/protection methods/mist.jpg"
 import fileconversion from "../assets/images/protection methods/fileconversion.jpg"
 import fileinflation from "../assets/images/protection methods/fileinflation.jpg"
 import crt from "../assets/images/protection methods/crt.jpg"
-import rgbsplit from "../assets/images/protection methods/rgbsplit.jpg"*/
+import rgbsplit from "../assets/images/protection methods/rgbsplit.jpg"
+import clipbreaker from "../assets/images/protection methods/clipbreaker.jpg"*/
 
 const rainbowWatermarks = "https://i.imgur.com/IOnJNnG.png"
 const pointifiction = "https://i.imgur.com/v8zOBpw.jpg"
@@ -51,8 +52,9 @@ const fileconversion = "https://i.imgur.com/zBe9hoE.png"
 const fileinflation = "https://i.imgur.com/f776qKD.png"
 const crt = "https://i.imgur.com/83Cuxdd.png"
 const rgbsplit = "https://i.imgur.com/ykTCBhP.png"
+const clipbreaker = "https://i.imgur.com/4NSP9gI.jpg"
 
-let protectionMethods = [rainbowWatermarks, pointifiction, lineifiction, trifiction, rectifiction, pixelshift, pixelation, highcontrast, noise, edgeblur, sprinkles, fence, adversarialnoise, crt, rgbsplit, glaze, mist, fileconversion, fileinflation, networkrandomizer, networkshifter, imageencryption, imagesplitting]
+let protectionMethods = [rainbowWatermarks, pointifiction, lineifiction, trifiction, rectifiction, pixelshift, pixelation, highcontrast, noise, edgeblur, sprinkles, fence, adversarialnoise, crt, rgbsplit, glaze, mist, fileconversion, fileinflation, networkrandomizer, networkshifter, imageencryption, imagesplitting, clipbreaker]
 
 /*
 import aiarttheft1 from "../assets/images/ai art theft/aiarttheft1.jpg"
@@ -82,12 +84,16 @@ let howAIArtWorks = [howaiartworks, howaiartworks2]
 
 /*
 import aiisuseless from "../assets/images/misc/aiisuseless.jpg"
-import aiwatermark from "../assets/images/misc/aiwatermark.jpg"*/
+import aiwatermark from "../assets/images/misc/aiwatermark.jpg"
+import steganography from "../assets/images/misc/steganography.jpg"
+import invisiblewatermark from "../assets/images/misc/invisiblewatermark.jpg"*/
 
 const aiisuseless = "https://i.imgur.com/g9N7iqP.png"
 const aiwatermark = "https://i.imgur.com/YxQHTMz.png"
+const steganography = "https://i.imgur.com/gcuhJ33.png"
+const invisiblewatermark = "https://i.imgur.com/zWIoEen.png"
 
-let misc = [aiisuseless, aiwatermark]
+let misc = [aiisuseless, aiwatermark, steganography, invisiblewatermark]
 
 const Help: React.FunctionComponent = (props) => {
     const {enableDrag, setEnableDrag} = useContext(EnableDragContext)

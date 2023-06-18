@@ -32,7 +32,7 @@ const Steganography: React.FunctionComponent = (props) => {
     const [filename, setFilename] = useState("secret.txt")
     const [embedFile, setEmbedFile] = useState("")
     const [embedFileName, setEmbedFileName] = useState("")
-    const [error, setError] = useState(false)
+    const [error, setError] = useState("")
     const ref = useRef<HTMLCanvasElement>(null)
     const history = useHistory()
 
@@ -217,8 +217,13 @@ const Steganography: React.FunctionComponent = (props) => {
             }
             const png = new StegImage(img!)
             const passwordKey = scrypt(encryptionKey, "klee", {N:2**16, r:8, p:1})
-            const url = await png.hide(file, passwordKey)
-            functions.download(`${path.basename(imageName, path.extname(imageName))}_steganography.png`, url)
+            try {
+                const url = await png.hide(file, passwordKey)
+                functions.download(`${path.basename(imageName, path.extname(imageName))}_steganography.png`, url)
+            } catch {
+                setError("File too big to store!")
+                setTimeout(() => {setError("")}, 2000)
+            }
         } else {
             draw(0, true)
             const dataURL = convert("image/jpeg") as string
@@ -233,19 +238,24 @@ const Steganography: React.FunctionComponent = (props) => {
                 // @ts-ignore
                 FS.writeFile(filename, text)
             }
-            // @ts-ignore
-            Module.ccall("hide", "number", ["string", "string", "string", "string"], ["hide.jpg", "output.jpg", filename, encryptionKey], null)
-            // @ts-ignore
-            const contents = FS.readFile("output.jpg")
-            const blob = new Blob([contents])
-            const url = URL.createObjectURL(blob)
-            functions.download(`${path.basename(imageName, path.extname(imageName))}_steganography.jpg`, url)
-            // @ts-ignore
-            FS.unlink("hide.jpg")
-            // @ts-ignore
-            FS.unlink("output.jpg")
-            // @ts-ignore
-            FS.unlink(filename)
+            try {
+                // @ts-ignore
+                Module.ccall("hide", "number", ["string", "string", "string", "string"], ["hide.jpg", "output.jpg", filename, encryptionKey], null)
+                // @ts-ignore
+                const contents = FS.readFile("output.jpg")
+                const blob = new Blob([contents])
+                const url = URL.createObjectURL(blob)
+                functions.download(`${path.basename(imageName, path.extname(imageName))}_steganography.jpg`, url)
+                // @ts-ignore
+                FS.unlink("hide.jpg")
+                // @ts-ignore
+                FS.unlink("output.jpg")
+                // @ts-ignore
+                FS.unlink(filename)
+            } catch {
+                setError("File too big to store!")
+                setTimeout(() => {setError("")}, 2000)
+            }
         }
     }
 
@@ -259,8 +269,8 @@ const Steganography: React.FunctionComponent = (props) => {
                 const url = URL.createObjectURL(blob)
                 functions.download(filename, url)
             } catch {
-                setError(true)
-                setTimeout(() => {setError(false)}, 2000)
+                setError("Doesn't appear to have a message...")
+                setTimeout(() => {setError("")}, 2000)
             }
         } else if (path.extname(image).toLowerCase() === ".jpg" || path.extname(image).toLowerCase() === ".jpeg") {
             const arrayBuffer = await fetch(image).then((r) => r.arrayBuffer())
@@ -277,8 +287,8 @@ const Steganography: React.FunctionComponent = (props) => {
                 // @ts-ignore
                 FS.unlink("seek.jpg")
             } catch {
-                setError(true)
-                setTimeout(() => {setError(false)}, 2000)
+                setError("Doesn't appear to have a message...")
+                setTimeout(() => {setError("")}, 2000)
             }
         }
     }
@@ -320,8 +330,7 @@ const Steganography: React.FunctionComponent = (props) => {
             <div className="steg-options-container">
                 <div className="steg-upload-container">
                     <div className="steg-row">
-                        <span className="steg-text">Text:</span>
-                        <label htmlFor="embedFile" className="steg-image-button" style={{backgroundColor: "#dd34a5", marginTop: "0px", marginBottom: "0px", marginLeft: "10px", marginRight: "0px"}}>
+                        <label htmlFor="embedFile" className="steg-image-button" style={{backgroundColor: "#dd34a5", marginTop: "0px", marginBottom: "0px", marginLeft: "0px", marginRight: "0px"}}>
                             <span className="button-hover">
                                 <span className="button-text" style={{fontSize: "17px"}}>File</span>
                             </span>
@@ -335,19 +344,22 @@ const Steganography: React.FunctionComponent = (props) => {
                         : null}
                     </div>
                     <div className="steg-row">
+                        <span className="steg-text">Text:</span> 
+                    </div>
+                    <div className="steg-row">
                         <textarea className="steg-textarea" spellCheck={false} onMouseOver={() => setEnableDrag(false)} value={text} onChange={(event) => setText(event.target.value)}></textarea>
                     </div>
                     <div className="steg-row">
                         <span className="steg-text">Encryption Key:</span>
-                        <input className="steg-input" spellCheck={false} onMouseOver={() => setEnableDrag(false)} value={encryptionKey} onChange={(event) => setEncryptionKey(event.target.value)}></input>
+                        <input className="steg-input" spellCheck={false} onMouseOver={() => setEnableDrag(false)} value={encryptionKey} onChange={(event) => setEncryptionKey(event.target.value)} style={{width: "200px"}}></input>
                     </div>
                     <div className="steg-row">
                         <span className="steg-text">Filename:</span>
-                        <input className="steg-input" spellCheck={false} onMouseOver={() => setEnableDrag(false)} value={filename} onChange={(event) => setFilename(event.target.value)}></input>
+                        <input className="steg-input" spellCheck={false} onMouseOver={() => setEnableDrag(false)} value={filename} onChange={(event) => setFilename(event.target.value)} style={{width: "100px"}}></input>
                     </div>
                 </div>
             </div>
-            {error ? <span className="steg-error">Doesn't appear to have a message...</span> : null}
+            {error ? <span className="steg-error">{error}</span> : null}
             <div className="steg-image-container">
                     <div className="steg-image-buttons-container">
                         <button className="steg-image-button" onClick={hide} style={{backgroundColor: "#400bff"}}>Hide</button>
