@@ -224,11 +224,14 @@ const PitchShift: React.FunctionComponent<Props> = (props) => {
             const rendered = await renderLFO(original, effect)
             setDuration(rendered.duration / audioSpeed)
             setOriginalDuration(rendered.duration)
+            gainNode?.disconnect()
             gainNode = audioContext.createGain()
             gainNode.gain.value = volume 
             await audioContext.audioWorklet.addModule("./phase-vocoder.js")
+            pitchCorrectNode?.disconnect()
             pitchCorrectNode = new AudioWorkletNode(audioContext, "phase-vocoder-processor")
             await audioContext.audioWorklet.addModule("./soundtouch.js")
+            pitchShifterNode?.disconnect()
             pitchShifterNode = createScheduledSoundTouchNode(audioContext, rendered)
             pitchShifterNode.loop = true
             await functions.timeout(100)
@@ -245,11 +248,14 @@ const PitchShift: React.FunctionComponent<Props> = (props) => {
             setDuration(audioBuffer.duration / audioSpeed)
             setOriginalDuration(audioBuffer.duration)
             await audioContext.audioWorklet.addModule("./phase-vocoder.js")
+            pitchCorrectNode?.disconnect()
             pitchCorrectNode = new AudioWorkletNode(audioContext, "phase-vocoder-processor")
             pitchCorrectNode.parameters.get("pitchFactor").value = preservesPitch ? 1 / audioSpeed : 1
+            gainNode?.disconnect()
             gainNode = audioContext.createGain()
             gainNode.gain.value = volume
             await audioContext.audioWorklet.addModule("./soundtouch.js")
+            pitchShifterNode?.disconnect()
             pitchShifterNode = createScheduledSoundTouchNode(audioContext, audioBuffer)
             pitchShifterNode.loop = true
             pitchShifterNode.parameters.get("pitch").value = functions.semitonesToScale(pitchShift)

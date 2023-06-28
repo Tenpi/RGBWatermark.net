@@ -211,13 +211,17 @@ const Bitcrush: React.FunctionComponent<Props> = (props) => {
             const downsampled = reduceSampleRate(audioBuffer, sampleRate)
             const bitcrushed = reduceBitDepth(downsampled, bitDepth)
             await audioContext.audioWorklet.addModule("./phase-vocoder.js")
+            pitchCorrectNode?.disconnect()
             pitchCorrectNode = new AudioWorkletNode(audioContext, "phase-vocoder-processor")
             pitchCorrectNode.parameters.get("pitchFactor").value = preservesPitch ? 1 / audioSpeed : 1
+            lowpassFilterNode?.disconnect()
             lowpassFilterNode = audioContext.createBiquadFilter()
             lowpassFilterNode.type = "lowpass"
             lowpassFilterNode.frequency.value = lowpassCutoff
+            gainNode?.disconnect()
             gainNode = audioContext.createGain()
             gainNode.gain.value = volume
+            sourceNode?.disconnect()
             const source = audioContext.createBufferSource()
             source.buffer = bitcrushed
             source.loop = true
@@ -234,17 +238,22 @@ const Bitcrush: React.FunctionComponent<Props> = (props) => {
             setPaused(false)
         } else {
             await audioContext.audioWorklet.addModule("./bitcrusher.js")
+            bitcrusherNode?.disconnect()
             bitcrusherNode = new AudioWorkletNode(audioContext, "bitcrush-processor")
             bitcrusherNode.parameters.get("bitDepth").value = bitDepth
             bitcrusherNode.parameters.get("sampleRate").value = sampleRate
             await audioContext.audioWorklet.addModule("./phase-vocoder.js")
+            pitchCorrectNode?.disconnect()
             pitchCorrectNode = new AudioWorkletNode(audioContext, "phase-vocoder-processor")
             pitchCorrectNode.parameters.get("pitchFactor").value = preservesPitch ? 1 / audioSpeed : 1
+            lowpassFilterNode?.disconnect()
             lowpassFilterNode = audioContext.createBiquadFilter()
             lowpassFilterNode.type = "lowpass"
             lowpassFilterNode.frequency.value = lowpassCutoff
+            gainNode?.disconnect()
             gainNode = audioContext.createGain()
             gainNode.gain.value = volume
+            sourceNode?.disconnect()
             const source = audioContext.createBufferSource()
             source.buffer = audioBuffer
             source.loop = true

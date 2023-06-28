@@ -38,6 +38,7 @@ interface Props {
 let pitchShifterNode = null as any
 let pitchCorrectNode = null as any
 let gainNode = null as any
+let processing = false
 
 const BlockReverse: React.FunctionComponent<Props> = (props) => {
     const {enableDrag, setEnableDrag} = useContext(EnableDragContext)
@@ -128,7 +129,7 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
             }
             setSavedTime(currentTime)
             if (String(pitchShifterNode?.playing) === "false") {
-                setSeekTo(0)
+                if (!processing) setSeekTo(0)
             }
             await new Promise<void>((resolve) => {
                 clearTimeout(timeout)
@@ -214,6 +215,7 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
     const applyBlockReverse = async () => {
         if (!audio) return
         stop()
+        processing = true
         const arrayBuffer = await fetch(audio).then((r) => r.arrayBuffer())
         let audioBuffer = await audioContext.decodeAudioData(arrayBuffer)
         if (audioReverse) audioBuffer = functions.reverseAudioBuffer(audioBuffer)
@@ -222,11 +224,14 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
         const rendered = await renderLFO(original, effect)
         setDuration(rendered.duration / audioSpeed)
         setOriginalDuration(rendered.duration)
+        gainNode?.disconnect()
         gainNode = audioContext.createGain()
         gainNode.gain.value = volume 
         await audioContext.audioWorklet.addModule("./phase-vocoder.js")
+        pitchCorrectNode?.disconnect()
         pitchCorrectNode = new AudioWorkletNode(audioContext, "phase-vocoder-processor")
         await audioContext.audioWorklet.addModule("./soundtouch.js")
+        pitchShifterNode?.disconnect()
         pitchShifterNode = createScheduledSoundTouchNode(audioContext, rendered)
         pitchShifterNode.loop = true
         await functions.timeout(100)
@@ -238,6 +243,7 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
         setStartTime(audioContext.currentTime)
         audioContext.resume()
         setPaused(false)
+        processing = false
     }
 
     const updateSongCover = async () => {
