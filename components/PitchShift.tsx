@@ -280,14 +280,14 @@ const PitchShift: React.FunctionComponent<Props> = (props) => {
 
     useEffect(() => {
         if (pitchShifterNode) {
-            pitchShifterNode.parameters.get("pitch").value = pitchShift
+            if (!lfoMode) pitchShifterNode.parameters.get("pitch").value = pitchShift
             pitchShifterNode.parameters.get("tempo").value = audioRate
             pitchShifterNode.parameters.get("rate").value = audioSpeed
         }
         if (pitchCorrectNode) {
             pitchCorrectNode.parameters.get("pitchFactor").value = preservesPitch ? 1 / audioSpeed : 1
         }
-    }, [pitchShift, audioRate, audioSpeed, preservesPitch])
+    }, [pitchShift, audioRate, audioSpeed, preservesPitch, lfoMode])
 
     useEffect(() => {
         if (updateEffect) {
@@ -406,8 +406,6 @@ const PitchShift: React.FunctionComponent<Props> = (props) => {
 
     const render = async () => {
         if (lfoMode) {
-            const arrayBuffer = await fetch(audio).then((r) => r.arrayBuffer())
-            let audioBuffer = await audioContext.decodeAudioData(arrayBuffer)
             const original = await renderOriginal()
             const effect = await renderEffect()
             return renderLFO(original, effect)
@@ -493,7 +491,7 @@ const PitchShift: React.FunctionComponent<Props> = (props) => {
             setSecondsProgress(seekTo)
             setSeekTo(null)
         }
-    }, [seekTo, audioReverse, pitchShift, audioRate, audioSpeed, reverseActive, elapsedTime, startTime, duration])
+    }, [seekTo, audioReverse, pitchShift, audioRate, audioSpeed, reverseActive, elapsedTime, startTime, duration, lfoMode])
 
     const updatePlay = async (alwaysPlay?: boolean) => {
         if (paused || alwaysPlay) {
@@ -518,7 +516,7 @@ const PitchShift: React.FunctionComponent<Props> = (props) => {
             setReverseActive(false)
         }
         pitchShifterNode = createScheduledSoundTouchNode(audioContext, audioBuffer)
-        pitchShifterNode.parameters.get("pitch").value = pitchShift
+        if (!lfoMode) pitchShifterNode.parameters.get("pitch").value = pitchShift
         pitchShifterNode.parameters.get("tempo").value = audioRate
         pitchShifterNode.parameters.get("rate").value = audioSpeed
         await functions.timeout(100)
