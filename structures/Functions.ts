@@ -479,10 +479,17 @@ export default class Functions {
     public static noteFactor = (scaleFactor: number) => {
         if (scaleFactor === 1) return 0
         if (scaleFactor < 1) {
-            return Math.round(-1 * ((1 / scaleFactor) * 600))
+            return (-1 * ((1 / scaleFactor) * 6)).toFixed(2)
         } else {
-            return Math.round(scaleFactor * 600)
+            return (scaleFactor * 6).toFixed(2)
         }
+    }
+
+    public static semitonesToScale = (semitones: number) => {
+        var scaleFactor = Math.pow(2, semitones / 12)
+        scaleFactor = Math.max(0.5, scaleFactor)
+        scaleFactor = Math.min(2, scaleFactor)
+        return scaleFactor
     }
 
     public static formatDate(date: Date) {

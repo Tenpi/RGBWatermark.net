@@ -127,6 +127,9 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
                 }
             }
             setSavedTime(currentTime)
+            if (String(pitchShifterNode?.playing) === "false") {
+                setSeekTo(0)
+            }
             await new Promise<void>((resolve) => {
                 clearTimeout(timeout)
                 timeout = setTimeout(() => {
@@ -555,12 +558,12 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
     }, [coverImg])
 
     const getLFORate = () => {
-        if (lfoRate === 5) return "1/1"
-        if (lfoRate === 4) return "1/2"
-        if (lfoRate === 3) return "1/4"
-        if (lfoRate === 2) return "1/8"
-        if (lfoRate === 1) return "1/16"
-        if (lfoRate === 0) return "1/32"
+        if (lfoRate === 5) return "2/1"
+        if (lfoRate === 4) return "1/1"
+        if (lfoRate === 3) return "1/2"
+        if (lfoRate === 2) return "1/4"
+        if (lfoRate === 1) return "1/8"
+        if (lfoRate === 0) return "1/16"
     }
 
     return (

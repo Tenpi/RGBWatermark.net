@@ -90,7 +90,9 @@ import invisiblewatermark from "../assets/images/misc/invisiblewatermark.jpg"
 import downscale from "../assets/images/misc/downscale.jpg"
 import glyphswap from "../assets/images/misc/glyphswap.jpg"
 import textspoof from "../assets/images/misc/textspoof.jpg"
-import bitcrush from "../assets/images/misc/bitcrush.jpg"*/
+import bitcrush from "../assets/images/misc/bitcrush.jpg"
+import pitchshift from "../assets/images/misc/pitchshift.jpg"
+import blockreverse from "../assets/images/misc/blockreverse.jpg"*/
 
 const aiisuseless = "https://i.imgur.com/g9N7iqP.png"
 const aiwatermark = "https://i.imgur.com/YxQHTMz.png"
@@ -100,8 +102,10 @@ const downscale = "https://i.imgur.com/g3206y7.png"
 const glyphswap = "https://i.imgur.com/iBMMRQU.png"
 const textspoof = "https://i.imgur.com/GnMmk3B.png"
 const bitcrush = "https://i.imgur.com/VNjlhts.png"
+const pitchshift = "https://i.imgur.com/r357CIS.jpg"
+const blockreverse = "https://i.imgur.com/K1GkPWL.jpg"
 
-let misc = [aiisuseless, aiwatermark, steganography, invisiblewatermark, downscale, glyphswap, textspoof, bitcrush]
+let misc = [aiisuseless, aiwatermark, steganography, invisiblewatermark, downscale, glyphswap, textspoof, bitcrush, pitchshift, blockreverse]
 
 const Help: React.FunctionComponent = (props) => {
     const {enableDrag, setEnableDrag} = useContext(EnableDragContext)

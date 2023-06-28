@@ -48,7 +48,7 @@ const PitchShift: React.FunctionComponent<Props> = (props) => {
     const {siteSaturation, setSiteSaturation} = useContext(SiteSaturationContext)
     const {siteLightness, setSiteLightness} = useContext(SiteLightnessContext)
     const {attackMode, setAttackMode} = useContext(AttackModeContext)
-    const [pitchShift, setPitchShift] = useState(1)
+    const [pitchShift, setPitchShift] = useState(0)
     const [audioRate, setAudioRate] = useState(1)
     const [lfoMode, setLFOMode] = useState(false)
     const [lfoRate, setLFORate] = useState(0)
@@ -130,6 +130,9 @@ const PitchShift: React.FunctionComponent<Props> = (props) => {
                 }
             }
             setSavedTime(currentTime)
+            if (String(pitchShifterNode?.playing) === "false") {
+                setSeekTo(0)
+            }
             await new Promise<void>((resolve) => {
                 clearTimeout(timeout)
                 timeout = setTimeout(() => {
@@ -249,7 +252,7 @@ const PitchShift: React.FunctionComponent<Props> = (props) => {
             await audioContext.audioWorklet.addModule("./soundtouch.js")
             pitchShifterNode = createScheduledSoundTouchNode(audioContext, audioBuffer)
             pitchShifterNode.loop = true
-            pitchShifterNode.parameters.get("pitch").value = pitchShift
+            pitchShifterNode.parameters.get("pitch").value = functions.semitonesToScale(pitchShift)
             pitchShifterNode.parameters.get("tempo").value = audioRate
             pitchShifterNode.parameters.get("rate").value = audioSpeed
             await functions.timeout(100)
@@ -280,7 +283,7 @@ const PitchShift: React.FunctionComponent<Props> = (props) => {
 
     useEffect(() => {
         if (pitchShifterNode) {
-            if (!lfoMode) pitchShifterNode.parameters.get("pitch").value = pitchShift
+            if (!lfoMode) pitchShifterNode.parameters.get("pitch").value = functions.semitonesToScale(pitchShift)
             pitchShifterNode.parameters.get("tempo").value = audioRate
             pitchShifterNode.parameters.get("rate").value = audioSpeed
         }
@@ -309,7 +312,7 @@ const PitchShift: React.FunctionComponent<Props> = (props) => {
     }
 
     const reset = () => {
-        setPitchShift(1)
+        setPitchShift(0)
         setAudioRate(1)
         setLFORate(0)
         setLFOMode(false)
@@ -391,7 +394,7 @@ const PitchShift: React.FunctionComponent<Props> = (props) => {
         await offlineContext.audioWorklet.addModule("./soundtouch.js")
         const pitchShifterNode = createScheduledSoundTouchNode(offlineContext, audioBuffer)
         pitchShifterNode.loop = true
-        pitchShifterNode.parameters.get("pitch").value = pitchShift
+        pitchShifterNode.parameters.get("pitch").value = functions.semitonesToScale(pitchShift)
         pitchShifterNode.parameters.get("tempo").value = audioRate
         pitchShifterNode.parameters.get("rate").value = audioSpeed
         await functions.timeout(100)
@@ -516,7 +519,7 @@ const PitchShift: React.FunctionComponent<Props> = (props) => {
             setReverseActive(false)
         }
         pitchShifterNode = createScheduledSoundTouchNode(audioContext, audioBuffer)
-        if (!lfoMode) pitchShifterNode.parameters.get("pitch").value = pitchShift
+        if (!lfoMode) pitchShifterNode.parameters.get("pitch").value = functions.semitonesToScale(pitchShift)
         pitchShifterNode.parameters.get("tempo").value = audioRate
         pitchShifterNode.parameters.get("rate").value = audioSpeed
         await functions.timeout(100)
@@ -650,12 +653,12 @@ const PitchShift: React.FunctionComponent<Props> = (props) => {
     }, [coverImg])
 
     const getLFORate = () => {
-        if (lfoRate === 5) return "1/1"
-        if (lfoRate === 4) return "1/2"
-        if (lfoRate === 3) return "1/4"
-        if (lfoRate === 2) return "1/8"
-        if (lfoRate === 1) return "1/16"
-        if (lfoRate === 0) return "1/32"
+        if (lfoRate === 5) return "2/1"
+        if (lfoRate === 4) return "1/1"
+        if (lfoRate === 3) return "1/2"
+        if (lfoRate === 2) return "1/4"
+        if (lfoRate === 1) return "1/8"
+        if (lfoRate === 0) return "1/16"
     }
 
     const updateLFOMode = () => {
@@ -735,7 +738,7 @@ const PitchShift: React.FunctionComponent<Props> = (props) => {
                 </div>
                 <div className="bitcrush-row">
                     <span className="bitcrush-text">Pitch Shift: </span>
-                    <Slider className="bitcrush-slider" trackClassName="bitcrush-slider-track" thumbClassName="bitcrush-slider-thumb" onChange={(value) => setPitchShift(value)} min={0.5} max={2} step={0.05} value={pitchShift}/>
+                    <Slider className="bitcrush-slider" trackClassName="bitcrush-slider-track" thumbClassName="bitcrush-slider-thumb" onChange={(value) => setPitchShift(value)} min={-12} max={12} step={0.25} value={pitchShift}/>
                     <span className="bitcrush-text-mini">{pitchShift}</span>
                 </div>
                 <div className="bitcrush-row">

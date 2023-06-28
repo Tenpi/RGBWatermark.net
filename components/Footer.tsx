@@ -336,7 +336,7 @@ const Footer: React.FunctionComponent = (props) => {
                 </div> : null}
                 {attackMode === "pitch shift" ?
                 <div className="footer-row">
-                    <span className="footer-text-5">Pitch shifting changes the pitch and/or speed of the audio. You can also apply this effect in blocks.</span>
+                    <span className="footer-text-5">Pitch shifting changes the pitch and/or speed of the audio. You can also apply this effect with a square LFO.</span>
                 </div> : null}
                 {attackMode === "block reverse" ?
                 <div className="footer-row">
