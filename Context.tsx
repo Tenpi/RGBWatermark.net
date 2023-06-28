@@ -3,6 +3,9 @@ import React, {useState} from "react"
 export const EnableDragContext = React.createContext<any>(null)
 export const MobileContext = React.createContext<any>(null)
 export const ImageContext = React.createContext<any>(null)
+export const ImageNameContext = React.createContext<any>(null)
+export const AudioContext = React.createContext<any>(null)
+export const AudioNameContext = React.createContext<any>(null)
 export const WatermarkImageContext = React.createContext<any>(null)
 export const TextContext = React.createContext<any>(null)
 export const FontContext = React.createContext<any>(null)
@@ -12,8 +15,9 @@ export const SizeContext = React.createContext<any>(null)
 export const AngleContext = React.createContext<any>(null)
 export const MarginContext = React.createContext<any>(null)
 export const SpeedContext = React.createContext<any>(null)
-export const ImageNameContext = React.createContext<any>(null)
 export const ReverseContext = React.createContext<any>(null)
+export const AudioSpeedContext = React.createContext<any>(null)
+export const AudioReverseContext = React.createContext<any>(null)
 export const HueContext = React.createContext<any>(null)
 export const SaturationContext = React.createContext<any>(null)
 export const BrightnessContext = React.createContext<any>(null)
@@ -35,6 +39,22 @@ export const HelpModeContext = React.createContext<any>(null)
 export const SiteHueContext = React.createContext<any>(null)
 export const SiteSaturationContext = React.createContext<any>(null)
 export const SiteLightnessContext = React.createContext<any>(null)
+
+export const SourceNodeContext = React.createContext<any>(null)
+export const SecondsProgressContext = React.createContext<any>(null)
+export const ProgressContext = React.createContext<any>(null)
+export const VolumeContext = React.createContext<any>(null)
+export const PreviousVolumeContext = React.createContext<any>(null)
+export const PauseContext = React.createContext<any>(null)
+export const PreservesPitchContext = React.createContext<any>(null)
+export const DurationContext = React.createContext<any>(null)
+export const OriginalDurationContext = React.createContext<any>(null)
+export const StartTimeContext = React.createContext<any>(null)
+export const ElapsedTimeContext = React.createContext<any>(null)
+export const SeekToContext = React.createContext<any>(null)
+export const ReverseActiveContext = React.createContext<any>(null)
+export const UpdateEffectContext = React.createContext<any>(null)
+export const SavedTimeContext = React.createContext<any>(null)
 
 import square from "./assets/patterns/square.svg"
 import circle from "./assets/patterns/circle.svg"
@@ -66,6 +86,9 @@ export const defaultColorStops = [
 
 const Context: React.FunctionComponent = (props) => {
     const [image, setImage] = useState("")
+    const [imageName, setImageName] = useState("")
+    const [audio, setAudio] = useState("")
+    const [audioName, setAudioName] = useState("")
     const [watermarkImage, setWatermarkImage] = useState("")
     const [text, setText] = useState("Sample")
     const [font, setFont] = useState("dotline")
@@ -75,8 +98,9 @@ const Context: React.FunctionComponent = (props) => {
     const [angle, setAngle] = useState(45)
     const [margin, setMargin] = useState(25)
     const [speed, setSpeed] = useState(75)
-    const [imageName, setImageName] = useState("")
     const [reverse, setReverse] = useState(false)
+    const [audioSpeed, setAudioSpeed] = useState(1)
+    const [audioReverse, setAudioReverse] = useState(false)
     const [saturation, setSaturation] = useState(100)
     const [brightness, setBrightness] = useState(100)
     const [pixelate, setPixelate] = useState(1)
@@ -97,9 +121,43 @@ const Context: React.FunctionComponent = (props) => {
     const [posY, setPosY] = useState(0)
     const [attackMode, setAttackMode] = useState("rainbow watermarks")
     const [helpMode, setHelpMode] = useState("ai protection methods")
+    const [sourceNode, setSourceNode] = useState(null)
+    const [secondsProgress, setSecondsProgress] = useState(0)
+    const [progress, setProgress] = useState(0)
+    const [volume, setVolume] = useState(0.75)
+    const [previousVolume, setPreviousVolume] = useState(0)
+    const [paused, setPaused] = useState(true)
+    const [preservesPitch, setPreservesPitch] = useState(true)
+    const [duration, setDuration] = useState(0)
+    const [originalDuration, setOriginalDuration] = useState(0)
+    const [startTime, setStartTime] = useState(0)
+    const [elapsedTime, setElapsedTime] = useState(0)
+    const [seekTo, setSeekTo] = useState(null) as any
+    const [reverseActive, setReverseActive] = useState(false)
+    const [updateEffect, setUpdateEffect] = useState(false)
+    const [savedTime, setSavedTime] = useState(0)
 
     return (
         <>  
+            <OriginalDurationContext.Provider value={{originalDuration, setOriginalDuration}}>
+            <SavedTimeContext.Provider value={{savedTime, setSavedTime}}>
+            <UpdateEffectContext.Provider value={{updateEffect, setUpdateEffect}}>
+            <ReverseActiveContext.Provider value={{reverseActive, setReverseActive}}>
+            <SeekToContext.Provider value={{seekTo, setSeekTo}}>
+            <ElapsedTimeContext.Provider value={{elapsedTime, setElapsedTime}}>
+            <StartTimeContext.Provider value={{startTime, setStartTime}}>
+            <DurationContext.Provider value={{duration, setDuration}}>
+            <PreservesPitchContext.Provider value={{preservesPitch, setPreservesPitch}}>
+            <PauseContext.Provider value={{paused, setPaused}}>
+            <PreviousVolumeContext.Provider value={{previousVolume, setPreviousVolume}}>
+            <VolumeContext.Provider value={{volume, setVolume}}>
+            <ProgressContext.Provider value={{progress, setProgress}}>
+            <SecondsProgressContext.Provider value={{secondsProgress, setSecondsProgress}}>
+            <SourceNodeContext.Provider value={{sourceNode, setSourceNode}}>
+            <AudioReverseContext.Provider value={{audioReverse, setAudioReverse}}>
+            <AudioSpeedContext.Provider value={{audioSpeed, setAudioSpeed}}>
+            <AudioNameContext.Provider value={{audioName, setAudioName}}>
+            <AudioContext.Provider value={{audio, setAudio}}>
             <HelpModeContext.Provider value={{helpMode, setHelpMode}}>
             <AttackModeContext.Provider value={{attackMode, setAttackMode}}>
             <PosYContext.Provider value={{posY, setPosY}}>
@@ -165,6 +223,25 @@ const Context: React.FunctionComponent = (props) => {
             </PosYContext.Provider>
             </AttackModeContext.Provider>
             </HelpModeContext.Provider>
+            </AudioContext.Provider>
+            </AudioNameContext.Provider>
+            </AudioSpeedContext.Provider>
+            </AudioReverseContext.Provider>
+            </SourceNodeContext.Provider>
+            </SecondsProgressContext.Provider>
+            </ProgressContext.Provider>
+            </VolumeContext.Provider>
+            </PreviousVolumeContext.Provider>
+            </PauseContext.Provider>
+            </PreservesPitchContext.Provider>
+            </DurationContext.Provider>
+            </StartTimeContext.Provider>
+            </ElapsedTimeContext.Provider>
+            </SeekToContext.Provider>
+            </ReverseActiveContext.Provider>
+            </UpdateEffectContext.Provider>
+            </SavedTimeContext.Provider>
+            </OriginalDurationContext.Provider>
         </>
     )
 }

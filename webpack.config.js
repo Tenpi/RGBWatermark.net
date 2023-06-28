@@ -23,6 +23,7 @@ module.exports = [
     resolve: {extensions: [".js", ".jsx", ".ts", ".tsx"], alias: {"react-dom$": "react-dom/profiling", "scheduler/tracing": "scheduler/tracing-profiling"},
     fallback: {"process/browser": require.resolve("process/browser"), fs: false, child_process: false, path: require.resolve("path-browserify"), crypto: require.resolve("crypto-browserify"), stream: require.resolve("stream-browserify"), assert: require.resolve("assert/"), zlib: require.resolve("browserify-zlib"), buffer: require.resolve("buffer/"), url: require.resolve("url/"), os: require.resolve("os-browserify/browser")}},
     performance: {hints: false},
+    experiments: {asyncWebAssembly: true},
     optimization: {minimize: testing ? false : true, minimizer: [new TerserJSPlugin({extractComments: false})], moduleIds: "named"},
     module: {
       rules: [
@@ -33,7 +34,7 @@ module.exports = [
         {test: /\.css$/, exclude: webExclude, use: [{loader: MiniCssExtractPlugin.loader}, "css-loader"]},
         {test: /\.(tsx?|jsx?)$/, resolve: {fullySpecified: false}, exclude: webExclude, use: [{loader: "ts-loader", options: {transpileOnly: true}}]},
         {test: /\.m?js$/, resolve: {fullySpecified: false}},
-        {test: /jphs\.wasm$/, type: "javascript/auto", loader: "file-loader"}
+        {test: /\.wasm$/, type: "javascript/auto", loader: "file-loader"},
       ]
     },
     plugins: [
@@ -56,10 +57,11 @@ module.exports = [
       }),
       new CopyPlugin({
         patterns: [
-            {from: "./structures/jphs.js", to: "[name][ext]"},
-            {from: "./structures/jphs.wasm", to: "[name][ext]"},
-        ],
-      }),
+          {from: "structures/bitcrusher.js", to: "[name][ext]"},
+          {from: "structures/soundtouch.js", to: "[name][ext]"},
+          {from: "structures/phase-vocoder.js", to: "[name][ext]"}
+        ]
+      })
     ]
   }, 
   {

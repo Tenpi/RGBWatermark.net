@@ -6,6 +6,12 @@ import fileType from "magic-bytes.js"
 import gifFrames from "gif-frames"
 import {hexToRgb, Color, Solver} from "./Color"
 import {createFFmpeg, fetchFile} from "@ffmpeg/ffmpeg"
+import * as mm from "music-metadata-browser"
+import {ID3Writer} from "browser-id3-writer"
+import lamejs from "lamejs"
+import * as oggEncoder from "vorbis-encoder-js"
+import * as Flac from "libflacjs/dist/libflac.js"
+import {FlacEncoder} from "./FlacEncoder"
 
 let newScrollY = 0
 let lastScrollTop = 0
@@ -439,7 +445,6 @@ export default class Functions {
 
     public static encodeVideo = async (frames: string[], framerate?: number, audio?: string) => {
         if (!ffmpeg.isLoaded()) await ffmpeg.load()
-        console.log(frames)
         for (let i = 0; i < frames.length; i++) {
             const num = `00${i}`.slice(-3)
             ffmpeg.FS("writeFile", `${num}.png`, await fetchFile(frames[i]))
@@ -823,7 +828,7 @@ export default class Functions {
     }
 
     public static random = (seed: number) => {
-        var t = seed += 0x6D2B79F5
+        let t = seed += 0x6D2B79F5
         t = Math.imul(t ^ t >>> 15, t | 1)
         t ^= t + Math.imul(t ^ t >>> 7, t | 61)
         return ((t ^ t >>> 14) >>> 0) / 4294967296
@@ -869,9 +874,320 @@ export default class Functions {
     }
 
     public static concatTypedArrays = (a: any, b: any) => {
-        var c = new (a.constructor)(a.length + b.length)
+        let c = new (a.constructor)(a.length + b.length)
         c.set(a, 0)
         c.set(b, a.length)
         return c
+    }
+
+    public static convertToWAV = async (audio: string) => {
+        const arrayBuffer = await fetch(audio).then((r) => r.arrayBuffer())
+        const audioContext = new AudioContext()
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer)
+        return Functions.encodeWAV(audioBuffer)
+    }
+
+    public static convertToMP3 = async (audio: string, bitrate: number = 320) => {
+        const arrayBuffer = await fetch(audio).then((r) => r.arrayBuffer())
+        const audioContext = new window.AudioContext()
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer)
+        return Functions.encodeMP3(audioBuffer, bitrate)
+    }
+
+    public static getOggTags = async (image?: string, metaAudio?: string) => {
+        let tags = {} as any
+        if (image) tags["COVERART"] = image
+        if (metaAudio) {
+            const metaBuffer = await fetch(metaAudio).then((r) => r.arrayBuffer())
+            const tagInfo = await mm.parseBuffer(new Uint8Array(metaBuffer))
+            if (tagInfo.common.title) tags["TITLE"] = tagInfo.common.title
+            if (tagInfo.common.artist) tags["ARTIST"] = tagInfo.common.artist
+            if (tagInfo.common.album) tags["ALBUM"] = tagInfo.common.album
+            if (tagInfo.common.genre) tags["GENRE"] = tagInfo.common.genre?.join(" ")
+            if (tagInfo.common.date) tags["DATE"] = tagInfo.common.date
+            let comment = tagInfo.common.comment?.join(" ")
+            if (!comment) {
+                const key = Object.keys(tagInfo.native)[0]
+                const comm = tagInfo.native[key].find((t) => t.id === "COMM:Description")
+                if (comm) comment = comm.value.text
+            }
+            if (comment) tags["COMMENT"] = comment
+        }
+        return tags
+    }
+
+    public static interleave = (audioBuffer: AudioBuffer) => {
+        const numChannels = audioBuffer.numberOfChannels
+        const bufferLength = audioBuffer.length
+        const interleavedBufferLength = numChannels * bufferLength
+        const interleavedBuffer = new Int32Array(interleavedBufferLength)
+
+        for (let channel = 0; channel < numChannels; channel++) {
+            const channelData = audioBuffer.getChannelData(channel)
+            for (let i = 0; i < bufferLength; i++) {
+                const interleavedIndex = i * numChannels + channel
+                interleavedBuffer[interleavedIndex] = Math.round(channelData[i] * (2 ** 31 - 1))
+            }
+        }
+        return interleavedBuffer
+    }
+
+    public static getWavInfo = (header: Uint8Array) => {
+        function int32ToDec(bin: string) {
+            const binArr = bin.split("-")
+            let binDigits = ""
+            for (let i = 0; i < binArr.length; i++) {
+                binDigits += ("00000000"+Number(binArr[i]).toString(2)).slice(-8)
+            }
+            const num = parseInt(binDigits, 2)
+            return num
+        }
+        let littleEndian = false
+        let bitDepth = 0
+        let sampleRate = 0
+        let channels = 0
+        let topCode = ""
+        for (let i = 0; i < 4; i++) {
+            topCode += String.fromCharCode(header[i])
+        }
+        if (topCode === "RIFF") {
+            littleEndian = true
+        }
+        if (littleEndian) {
+            bitDepth = Number(`${header[35]}${header[34]}`)
+            sampleRate = Number(int32ToDec(`${(header[27])}-${(header[26])}-${(header[25])}-${(header[24])}`))
+            channels = Number(`${header[23]}${header[22]}`)
+        } else {
+            bitDepth = Number(`${header[34]}${header[35]}`)
+            sampleRate = Number(int32ToDec(`${header[24]}-${(header[25])}-${(header[26])}-${(header[27])}`))
+            channels = Number(`${header[22]}${header[23]}`)
+        }
+        const byteDepth = (bitDepth) / 8
+        return {byteDepth, bitDepth, sampleRate, channels}
+    }
+
+    public static songCover = async (audio: string) => {
+        const buffer = await fetch(audio).then((r) => r.arrayBuffer())
+        const tagInfo = await mm.parseBuffer(new Uint8Array(buffer))
+        const picture = tagInfo.common.picture
+        if (picture) {
+            let buffer = new Uint8Array() as Buffer
+            for (let i = 0; i < picture.length; i++) {
+                buffer = Buffer.concat([buffer, picture[i].data])
+            }
+            return `data:${picture[0].format};base64,${buffer.toString("base64")}`
+        } else {
+            return ""
+        }
+    }
+
+    public static writeSongCover = async (audio: string, image: string, metaAudio?: string) => {
+        const audioBuffer = await fetch(audio).then((r) => r.arrayBuffer())
+        const imageBuffer = await fetch(image).then((r) => r.arrayBuffer())
+        const writer = new ID3Writer(audioBuffer)
+        writer.setFrame("APIC", {
+            type: 3,
+            data: imageBuffer,
+            description: "Cover"
+        })
+        if (metaAudio) {
+            const metaBuffer = await fetch(metaAudio).then((r) => r.arrayBuffer())
+            const tagInfo = await mm.parseBuffer(new Uint8Array(metaBuffer))
+            if (tagInfo.common.title) writer.setFrame("TIT2", tagInfo.common.title)
+            if (tagInfo.common.artist) writer.setFrame("TPE1", [tagInfo.common.artist])
+            if (tagInfo.format.duration) writer.setFrame("TLEN", String(tagInfo.format.duration))
+            if (tagInfo.common.year) writer.setFrame("TYER", String(tagInfo.common.year))
+            if (tagInfo.common.bpm) writer.setFrame("TBPM", String(tagInfo.common.bpm))
+            if (tagInfo.common.key) writer.setFrame("TKEY", tagInfo.common.key)
+            if (tagInfo.common.genre) writer.setFrame("TCON", tagInfo.common.genre)
+            if (tagInfo.common.album) writer.setFrame("TALB", tagInfo.common.album)
+            if (tagInfo.common.albumartist) writer.setFrame("TPE2", tagInfo.common.albumartist)
+            if (tagInfo.common.track.no) writer.setFrame("TRCK", String(tagInfo.common.track.no))
+            let comment = tagInfo.common.comment?.join(" ")
+            if (!comment) {
+                const key = Object.keys(tagInfo.native)[0]
+                const comm = tagInfo.native[key].find((t) => t.id === "COMM:Description")
+                if (comm) comment = comm.value.text
+            }
+            if (comment) writer.setFrame("COMM", {
+                description: "Description",
+                text: comment ?? "",
+                language: "eng"
+            })
+        }
+        writer.addTag()
+        return writer.getURL()
+    }
+
+    public static reverseAudioBuffer = (audioBuffer: AudioBuffer) => {
+        const channels = audioBuffer.numberOfChannels
+      
+        const reversedBuffer = new AudioBuffer({
+          numberOfChannels: channels,
+          length: audioBuffer.length,
+          sampleRate: audioBuffer.sampleRate
+        })
+      
+        for (let channel = 0; channel < channels; channel++) {
+          const samples = audioBuffer.getChannelData(channel)
+          const newSamples = reversedBuffer.getChannelData(channel)
+          for (let i = 0; i < audioBuffer.length; i++) {
+            newSamples[i] = samples[audioBuffer.length - 1 - i]
+          }
+        }
+        return reversedBuffer
+    }
+
+    public static upsampleAudioBuffer = (audioBuffer: AudioBuffer, sampleRate: number) => {
+        let originalSampleRate = audioBuffer.sampleRate
+        let ratio = sampleRate / originalSampleRate
+        let length = audioBuffer.length
+        let upsampledLength = Math.floor(length * ratio)
+        let result = new Float32Array(upsampledLength)
+      
+        for (let i = 0; i < upsampledLength; i++) {
+          let originalIndex = Math.floor(i / ratio)
+          result[i] = audioBuffer.getChannelData(0)[originalIndex]
+        }
+      
+        let audioContext = new AudioContext()
+        let newBuffer = audioContext.createBuffer(1, upsampledLength, sampleRate)
+        newBuffer.getChannelData(0).set(result)
+        return newBuffer
+    }
+
+    public static encodeWAV = (audioBuffer: AudioBuffer) => {
+        let HEADER_LENGTH = 44
+        let MAX_AMPLITUDE = 0x7FFF
+        let nChannels = audioBuffer.numberOfChannels
+        let bufferLength = audioBuffer.length
+        let arrayBuffer = new ArrayBuffer(HEADER_LENGTH + 2 * bufferLength * nChannels)
+        let int16 = new Int16Array(arrayBuffer)
+        let uint8 = new Uint8Array(arrayBuffer)
+        let sr = audioBuffer.sampleRate;
+        let l2 = bufferLength * nChannels * 2
+        let l1 = l2 + 36
+        let br = sr * nChannels * 2
+        uint8.set([
+            0x52, 0x49, 0x46, 0x46, // R I F F
+            l1 & 255, (l1 >> 8) & 255, (l1 >> 16) & 255, (l1 >> 24) & 255, // chunk size
+            0x57, 0x41, 0x56, 0x45, // W A V E
+            0x66, 0x6D, 0x74, 0x20, // F T M █
+            0x10, 0x00, 0x00, 0x00, // sub chunk size = 16
+            0x01, 0x00, // audio format = 1 (PCM, linear quantization)
+            nChannels, 0x00, // number of channels
+            sr & 255, (sr >> 8) & 255, (sr >> 16) & 255, (sr >> 24) & 255, // sample rate
+            br & 255, (br >> 8) & 255, (br >> 16) & 255, (br >> 24) & 255, // byte rate
+            0x04, 0x00, // block align = 4
+            0x10, 0x00, // bit per sample = 16
+            0x64, 0x61, 0x74, 0x61, // d a t a
+            l2 & 255, (l2 >> 8) & 255, (l2 >> 16) & 255, (l2 >> 24) & 255 // sub chunk 2 size
+        ])
+        let buffers = [] as any
+        for (let channel = 0; channel < nChannels; channel++) {
+            buffers.push(audioBuffer.getChannelData(channel))
+        }
+        for (let i = 0, index = HEADER_LENGTH / 2; i < bufferLength; i++) {
+            for (let channel = 0; channel < nChannels; channel++) {
+                let sample = buffers[channel][i]
+                sample = Math.min(1, Math.max(-1, sample))
+                sample = Math.round(sample * MAX_AMPLITUDE)
+                int16[index++] = sample
+            }
+        }
+        let blob = new Blob([uint8], {type: "audio/x-wav"})
+        return URL.createObjectURL(blob)
+    }
+
+    public static encodeMP3 = async (audioBuffer: AudioBuffer, bitrate: number = 128) => {
+        let MAX_AMPLITUDE = 0x7FFF
+        let nChannels = audioBuffer.numberOfChannels
+        if (bitrate < 96) {
+            nChannels = 1
+        }
+        let bufferLength = audioBuffer.length
+        let buffers = [] as any
+
+        for (let channel = 0; channel < nChannels; channel++) {
+            let buffer = audioBuffer.getChannelData(channel)
+            let samples = new Int16Array(bufferLength)
+
+            for (let i = 0; i < bufferLength; ++i) {
+                let sample = buffer[i]
+                sample = Math.min(1, Math.max(-1, sample))
+                sample = Math.round(sample * MAX_AMPLITUDE)
+                samples[i] = sample
+            }
+            buffers.push(samples)
+        }
+        let BLOCK_SIZE = 1152
+        let mp3encoder = new lamejs.Mp3Encoder(nChannels, 44100, bitrate);
+        let mp3Data = [] as any
+
+        let blockIndex = 0
+        const encodeChunk = () => {
+            let mp3buf = []
+            if (nChannels === 1) {
+                let chunk = buffers[0].subarray(blockIndex, blockIndex + BLOCK_SIZE)
+                mp3buf = mp3encoder.encodeBuffer(chunk)
+            } else {
+                let chunkL = buffers[0].subarray(blockIndex, blockIndex + BLOCK_SIZE)
+                let chunkR = buffers[1].subarray(blockIndex, blockIndex + BLOCK_SIZE)
+                mp3buf = mp3encoder.encodeBuffer(chunkL, chunkR)
+            }
+            if (mp3buf.length > 0) {
+                mp3Data.push(mp3buf)
+            }
+            blockIndex += BLOCK_SIZE
+        }
+
+        return new Promise<string>((resolve) => {
+            const update = () => {
+                if (blockIndex >= bufferLength) {
+                    let mp3buf = mp3encoder.flush()
+                    if (mp3buf.length > 0) {
+                        mp3Data.push(mp3buf)
+                    }
+                    const blob = new Blob(mp3Data, { type: "audio/mp3"})
+                    const url = URL.createObjectURL(blob)
+                    resolve(url)
+                }
+                let start = performance.now()
+                while (blockIndex < bufferLength && performance.now() - start < 15) {
+                    encodeChunk()
+                }
+                setTimeout(update, 16.7)
+            }
+            update()
+        })
+    }
+
+    public static encodeOGG = async (audioBuffer: AudioBuffer, coverImg?: string, metaAudio?: string) => {
+        let sampleRate = audioBuffer.sampleRate
+        let numberOfChannels = audioBuffer.numberOfChannels
+        let quality = 0
+        let tags = await Functions.getOggTags(coverImg, metaAudio)
+        let encoder = new oggEncoder.encoder(sampleRate, numberOfChannels, quality, tags)
+        encoder.encodeFrom(audioBuffer)
+        let blob = encoder.finish()
+        return URL.createObjectURL(blob)
+    }
+
+    public static encodeFLAC = async (audioBuffer: AudioBuffer) => {
+        const wav = Functions.encodeWAV(audioBuffer)
+        const arrayBuffer = await fetch(wav).then((r) => r.arrayBuffer())
+        const encoder = new FlacEncoder(Flac, {
+            sampleRate: audioBuffer.sampleRate,
+            channels: audioBuffer.numberOfChannels,
+            bitsPerSample: 16,
+            compression: 5,
+            verify: true,
+            isOgg: false
+        })
+        let encData = []
+	    let result = encoder.encodeFlac(arrayBuffer, encData, true, false)
+	    let metadata = result.metaData
+        const blob = encoder.exportFlacFile(encData, metadata, false)
+        return URL.createObjectURL(blob)
     }
 }

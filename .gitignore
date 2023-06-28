@@ -14,3 +14,4 @@ components/Fence.tsx
 components/AdversarialNoise.tsx
 components/CRT.tsx
 components/RGBSplit.tsx
+structures/confusables.json

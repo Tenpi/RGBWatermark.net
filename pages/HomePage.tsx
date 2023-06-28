@@ -22,6 +22,11 @@ import AdversarialNoise from "../components/AdversarialNoise"
 import CRT from "../components/CRT"
 import RGBSplit from "../components/RGBSplit"
 import Steganography from "../components/Steganography"
+import GlyphSwap from "../components/GlyphSwap"
+import TextSpoof from "../components/TextSpoof"
+import Bitcrush from "../components/Bitcrush"
+
+let audioContext = new window.AudioContext()
 
 const HomePage: React.FunctionComponent = (props) => {
     const [ignored, forceUpdate] = useReducer(x => x + 1, 0)
@@ -67,6 +72,12 @@ const HomePage: React.FunctionComponent = (props) => {
             return (<RGBSplit/>)
         } else if (attackMode === "steganography") {
             return (<Steganography/>)
+        } else if (attackMode === "glyph swap") {
+            return (<GlyphSwap/>)
+        } else if (attackMode === "text spoof") {
+            return (<TextSpoof/>)
+        } else if (attackMode === "bitcrush") {
+            return (<Bitcrush audioContext={audioContext}/>)
         }
     }
 

@@ -202,6 +202,62 @@ const Footer: React.FunctionComponent = (props) => {
                 <div className="footer-row">
                     <span className="footer-text">Protect your art against AI/machine learning theft with sprinkles.</span>
                 </div> : null}
+                {attackMode === "fence" ?
+                <div className="footer-row">
+                    <span className="footer-text">Protect your art against AI/machine learning theft with a fence.</span>
+                </div> : null}
+                {attackMode === "adversarial noise" ?
+                <div className="footer-row">
+                    <span className="footer-text">Protect your art against AI/machine learning theft with pre-computed adversarial noise.</span>
+                </div> : null}
+                {attackMode === "crt" ?
+                <div className="footer-row">
+                    <span className="footer-text">Protect your art against AI/machine learning theft with crt.</span>
+                </div> : null}
+                {attackMode === "rgb split" ?
+                <div className="footer-row">
+                    <span className="footer-text">Protect your art against AI/machine learning theft with rgb split.</span>
+                </div> : null}
+                {attackMode === "conversion" ?
+                <div className="footer-row">
+                    <span className="footer-text">Protect your art against AI/machine learning theft with file conversion.</span>
+                </div> : null}
+                {attackMode === "inflation" ?
+                <div className="footer-row">
+                    <span className="footer-text">Protect your art against AI/machine learning theft with file inflation.</span>
+                </div> : null}
+                {attackMode === "ai watermark" ?
+                <div className="footer-row">
+                    <span className="footer-text">Add watermarks to AI-generated art with AI watermarker.</span>
+                </div> : null}
+                {attackMode === "steganography" ?
+                <div className="footer-row">
+                    <span className="footer-text">Hide hidden messages in PNG/JPG files with steganography.</span>
+                </div> : null}
+                {attackMode === "glyph swap" ?
+                <div className="footer-row">
+                    <span className="footer-text">Protect your writing against AI/machine learning theft with glyph swapping.</span>
+                </div> : null}
+                {attackMode === "text spoof" ?
+                <div className="footer-row">
+                    <span className="footer-text">Protect your writing against AI/machine learning theft with text spoofing.</span>
+                </div> : null}
+                {attackMode === "bitcrush" ?
+                <div className="footer-row">
+                    <span className="footer-text">Protect your music against AI/machine learning theft with sample rate/bit depth reduction.</span>
+                </div> : null}
+                {attackMode === "pitch shift" ?
+                <div className="footer-row">
+                    <span className="footer-text">Protect your music against AI/machine learning theft with pitch shifting.</span>
+                </div> : null}
+                {attackMode === "block reverse" ?
+                <div className="footer-row">
+                    <span className="footer-text">Protect your music against AI/machine learning theft with block reversing.</span>
+                </div> : null}
+                {attackMode === "pink noise" ?
+                <div className="footer-row">
+                    <span className="footer-text">Protect your music against AI/machine learning theft with intermittent pink noise.</span>
+                </div> : null}
                 {attackMode === "rainbow watermarks" ?
                 <div className="footer-row">
                     <span className="footer-text-2">Rainbow watermarks will result in a lot of noise and grain in the outputs. It is recommended to use dotted fonts and particles to make them difficult to remove.</span>
@@ -266,9 +322,33 @@ const Footer: React.FunctionComponent = (props) => {
                 <div className="footer-row">
                     <span className="footer-text-3">Steganography hides secret messages in PNG/JPG files. You could use this to track your image.</span>
                 </div> : null}
+                {attackMode === "glyph swap" ?
+                <div className="footer-row">
+                    <span className="footer-text-5">Glyph swapping swaps the glyphs of a font file, allowing you to post encrypted text online and display it normally.</span>
+                </div> : null}
+                {attackMode === "text spoof" ?
+                <div className="footer-row">
+                    <span className="footer-text-3">Text spoofing replaces the text characters with unicode look-alikes. It works on sites that you don't control, but it is easy to bypass. Text is automatically copied.</span>
+                </div> : null}
+                {attackMode === "bitcrush" ?
+                <div className="footer-row">
+                    <span className="footer-text">Bitcrush reduces the sample rate and/or bitdepth of the audio, which reduces the quality and makes it sound crushy.</span>
+                </div> : null}
+                {attackMode === "pitch shift" ?
+                <div className="footer-row">
+                    <span className="footer-text-5">Pitch shifting changes the pitch and/or speed of the audio. You can also apply this effect in blocks.</span>
+                </div> : null}
+                {attackMode === "block reverse" ?
+                <div className="footer-row">
+                    <span className="footer-text-2">Block reverse reverses the audio file, divides it into blocks, and plays the blocks in the forward direction.</span>
+                </div> : null}
+                {attackMode === "pink noise" ?
+                <div className="footer-row">
+                    <span className="footer-text-5">Pink noise adds pink noise to the audio file at regular intervals.</span>
+                </div> : null}
                 {showRenderingText() ?
                 <div className="footer-row">
-                    <span className="footer-text">All editing and rendering is done locally in your browser.</span>
+                    <span className="footer-text">Editing is done locally in your browser.</span>
                 </div> : null}
                 {attackMode === "rainbow watermarks" ?
                 <div className="footer-column">

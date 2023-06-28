@@ -26,6 +26,12 @@ import aiwatermark from "../assets/icons/aiwatermark.png"
 import crt from "../assets/icons/crt.png"
 import rgbsplit from "../assets/icons/rgbsplit.png"
 import steganography from "../assets/icons/steganography.png"
+import glyphswap from "../assets/icons/glyphswap.png"
+import textspoof from "../assets/icons/textspoof.png"
+import bitcrush from "../assets/icons/bitcrush.png"
+import pitchshift from "../assets/icons/pitchshift.png"
+import blockreverse from "../assets/icons/blockreverse.png"
+import pinknoise from "../assets/icons/pinknoise.png"
 
 interface Props {
     rerender: () => void
@@ -66,6 +72,12 @@ const NavBar: React.FunctionComponent<Props> = (props) => {
             <img className="navbar-item" src={inflation} onClick={() => setAttackMode("inflation")}/>
             <img className="navbar-item" src={aiwatermark} onClick={() => setAttackMode("ai watermark")}/>
             <img className="navbar-item" src={steganography} onClick={() => setAttackMode("steganography")}/>
+            <img className="navbar-item" src={glyphswap} onClick={() => setAttackMode("glyph swap")}/>
+            <img className="navbar-item" src={textspoof} onClick={() => setAttackMode("text spoof")}/>
+            <img className="navbar-item" src={bitcrush} onClick={() => setAttackMode("bitcrush")}/>
+            {/* <img className="navbar-item" src={pitchshift} onClick={() => setAttackMode("pitch shift")}/> */}
+            {/* <img className="navbar-item" src={blockreverse} onClick={() => setAttackMode("block reverse")}/> */}
+            {/* <img className="navbar-item" src={pinknoise} onClick={() => setAttackMode("pink noise")}/> */}
             <img className="navbar-item" src={questionmark} onClick={() => setAttackMode("question mark")}/>
         </div>
     )

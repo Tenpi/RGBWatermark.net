@@ -86,14 +86,22 @@ let howAIArtWorks = [howaiartworks, howaiartworks2]
 import aiisuseless from "../assets/images/misc/aiisuseless.jpg"
 import aiwatermark from "../assets/images/misc/aiwatermark.jpg"
 import steganography from "../assets/images/misc/steganography.jpg"
-import invisiblewatermark from "../assets/images/misc/invisiblewatermark.jpg"*/
+import invisiblewatermark from "../assets/images/misc/invisiblewatermark.jpg"
+import downscale from "../assets/images/misc/downscale.jpg"
+import glyphswap from "../assets/images/misc/glyphswap.jpg"
+import textspoof from "../assets/images/misc/textspoof.jpg"
+import bitcrush from "../assets/images/misc/bitcrush.jpg"*/
 
 const aiisuseless = "https://i.imgur.com/g9N7iqP.png"
 const aiwatermark = "https://i.imgur.com/YxQHTMz.png"
 const steganography = "https://i.imgur.com/gcuhJ33.png"
 const invisiblewatermark = "https://i.imgur.com/zWIoEen.png"
+const downscale = "https://i.imgur.com/g3206y7.png"
+const glyphswap = "https://i.imgur.com/iBMMRQU.png"
+const textspoof = "https://i.imgur.com/GnMmk3B.png"
+const bitcrush = "https://i.imgur.com/VNjlhts.png"
 
-let misc = [aiisuseless, aiwatermark, steganography, invisiblewatermark]
+let misc = [aiisuseless, aiwatermark, steganography, invisiblewatermark, downscale, glyphswap, textspoof, bitcrush]
 
 const Help: React.FunctionComponent = (props) => {
     const {enableDrag, setEnableDrag} = useContext(EnableDragContext)
