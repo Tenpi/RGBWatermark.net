@@ -35,7 +35,6 @@ interface Props {
     audioContext: AudioContext
 }
 
-let pitchShifterNode = null as any
 let pitchCorrectNode = null as any
 let gainNode = null as any
 let processing = false
@@ -103,7 +102,7 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
 
     const getCurrentTime = () => {
         let currentTime = 0
-        if (pitchShifterNode && pitchShifterNode.playbackState === pitchShifterNode.PLAYING_STATE) {
+        if (sourceNode && sourceNode.playbackState === sourceNode.PLAYING_STATE) {
           currentTime = elapsedTime + audioContext.currentTime - startTime
         } else {
           currentTime = elapsedTime
@@ -128,7 +127,7 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
                 }
             }
             setSavedTime(currentTime)
-            if (String(pitchShifterNode?.playing) === "false") {
+            if (String(sourceNode?.playing) === "false") {
                 if (!processing) setSeekTo(0)
             }
             await new Promise<void>((resolve) => {
@@ -231,15 +230,15 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
         pitchCorrectNode?.disconnect()
         pitchCorrectNode = new AudioWorkletNode(audioContext, "phase-vocoder-processor")
         await audioContext.audioWorklet.addModule("./soundtouch.js")
-        pitchShifterNode?.disconnect()
-        pitchShifterNode = createScheduledSoundTouchNode(audioContext, rendered)
-        pitchShifterNode.loop = true
+        sourceNode?.disconnect()
+        const source = createScheduledSoundTouchNode(audioContext, rendered)
+        source.loop = true
         await functions.timeout(100)
-        pitchShifterNode.connect(pitchCorrectNode)
+        source.connect(pitchCorrectNode)
         pitchCorrectNode.connect(gainNode)
         gainNode.connect(audioContext.destination)
-        pitchShifterNode.start()
-        //setSourceNode(pitchShifterNode)
+        source.start()
+        setSourceNode(source)
         setStartTime(audioContext.currentTime)
         audioContext.resume()
         setPaused(false)
@@ -261,10 +260,10 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
     }, [audio])
 
     useEffect(() => {
-        if (pitchShifterNode) {
-            //pitchShifterNode.parameters.get("pitch").value = pitchShift
-            //pitchShifterNode.parameters.get("tempo").value = audioRate
-            pitchShifterNode.parameters.get("rate").value = audioSpeed
+        if (sourceNode) {
+            //sourceNode.parameters.get("pitch").value = pitchShift
+            //sourceNode.parameters.get("tempo").value = audioRate
+            sourceNode.parameters.get("rate").value = audioSpeed
         }
         if (pitchCorrectNode) {
             pitchCorrectNode.parameters.get("pitchFactor").value = preservesPitch ? 1 / audioSpeed : 1
@@ -418,10 +417,10 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
     }
 
     const start = async (offset: number) => {
-        if (!pitchShifterNode) return
-        pitchShifterNode.stop()
-        pitchShifterNode.disconnect()
-        let audioBuffer = pitchShifterNode.audioBuffer
+        if (!sourceNode) return
+        sourceNode.stop()
+        sourceNode.disconnect()
+        let audioBuffer = sourceNode.audioBuffer
         if (audioReverse && !reverseActive) {
             audioBuffer = functions.reverseAudioBuffer(audioBuffer)
             setReverseActive(true)
@@ -429,30 +428,28 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
             audioBuffer = functions.reverseAudioBuffer(audioBuffer)
             setReverseActive(false)
         }
-        pitchShifterNode = createScheduledSoundTouchNode(audioContext, audioBuffer)
-        //pitchShifterNode.parameters.get("pitch").value = pitchShift
-        //pitchShifterNode.parameters.get("tempo").value = audioRate
-        pitchShifterNode.parameters.get("rate").value = audioSpeed
+        const source = createScheduledSoundTouchNode(audioContext, audioBuffer)
+        source.parameters.get("rate").value = audioSpeed
         await functions.timeout(100)
-        pitchShifterNode.loop = true
-        pitchShifterNode.connect(pitchCorrectNode)
-        pitchShifterNode.start(0, offset)
-        //setSourceNode(pitchShifterNode)
+        source.loop = true
+        source.connect(pitchCorrectNode)
+        source.start(0, offset)
+        setSourceNode(source)
         setStartTime(audioContext.currentTime)
         setElapsedTime(offset)
         audioContext.resume()
     }
 
     const stop = () => {
-        if (!pitchShifterNode) return
-        pitchShifterNode?.stop()
-        pitchShifterNode?.disconnect()
+        if (!sourceNode) return
+        sourceNode?.stop()
+        sourceNode?.disconnect()
         audioContext.suspend()
         setStartTime(audioContext.currentTime)
         setElapsedTime(0)
         setProgress(0)
         setSecondsProgress(0)
-        //setSourceNode(null)
+        setSourceNode(null)
     }
 
     const updateMute = () => {
