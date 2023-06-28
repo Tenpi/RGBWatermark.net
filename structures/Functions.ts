@@ -12,6 +12,7 @@ import lamejs from "lamejs"
 import * as oggEncoder from "vorbis-encoder-js"
 import * as Flac from "libflacjs/dist/libflac.js"
 import {FlacEncoder} from "./FlacEncoder"
+import {guess} from "web-audio-beat-detector"
 
 let newScrollY = 0
 let lastScrollTop = 0
@@ -1189,5 +1190,75 @@ export default class Functions {
 	    let metadata = result.metaData
         const blob = encoder.exportFlacFile(encData, metadata, false)
         return URL.createObjectURL(blob)
+    }
+
+    /*
+    public static audioBufferSamples = (audioBuffer: AudioBuffer) => {
+        const channelCount = audioBuffer.numberOfChannels
+        const frameCount = audioBuffer.length
+        const float32Array = new Float32Array(channelCount * frameCount)
+
+        for (let channel = 0; channel < channelCount; channel++) {
+            const channelData = audioBuffer.getChannelData(channel)
+            float32Array.set(channelData, channel * frameCount)
+        }
+        return float32Array
+    }*/
+    
+    public static audioBufferSamples = (audioBuffer: AudioBuffer) => {
+        const numberOfChannels = audioBuffer.numberOfChannels
+        const length = audioBuffer.length
+        const samples = new Uint8Array(length * numberOfChannels)
+      
+        for (let channel = 0; channel < numberOfChannels; channel++) {
+          const channelData = audioBuffer.getChannelData(channel)
+      
+          for (let i = 0; i < length; i++) {
+            const sample = Math.floor((channelData[i] + 1) * 0.5 * 255)
+            samples[i * numberOfChannels + channel] = sample
+          }
+        }
+        return samples
+    }
+
+    public static getBPM = async (audioBuffer: AudioBuffer) => {
+        return guess(audioBuffer)
+    }
+
+    public static createWavHeader = (numSamples: number, sampleRate: number, numChannels: number, bitsPerSample: number) => {
+        const dataSize = numSamples * numChannels * (bitsPerSample / 8)
+        const buffer = new ArrayBuffer(44)
+        const view = new DataView(buffer)
+        function writeString(offset, string) {
+          for (let i = 0; i < string.length; i++) {
+            view.setUint8(offset + i, string.charCodeAt(i));
+          }
+        }
+        writeString(0, 'R')
+        writeString(1, 'I')
+        writeString(2, 'F')
+        writeString(3, 'F')
+        view.setUint32(4, dataSize + 36, true)
+        writeString(8, 'W')
+        writeString(9, 'A')
+        writeString(10, 'V')
+        writeString(11, 'E')
+        writeString(12, 'f')
+        writeString(13, 'm')
+        writeString(14, 't')
+        writeString(15, ' ')
+        view.setUint32(16, 16, true)
+        view.setUint16(20, 1, true)
+        view.setUint16(22, numChannels, true)
+        view.setUint32(24, sampleRate, true)
+        view.setUint32(28, sampleRate * numChannels * (bitsPerSample / 8), true)
+        view.setUint16(32, numChannels * (bitsPerSample / 8), true)
+        view.setUint16(34, bitsPerSample, true)
+        writeString(36, 'd')
+        writeString(37, 'a')
+        writeString(38, 't')
+        writeString(39, 'a')
+        view.setUint32(40, dataSize, true)
+        return new Uint8Array(buffer)
     }
 }

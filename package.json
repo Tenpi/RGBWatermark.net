@@ -109,6 +109,7 @@
     "tga": "^1.0.7",
     "url": "^0.11.0",
     "utif": "^3.1.0",
-    "vorbis-encoder-js": "github:Jimbly/vorbis-encoder-js"
+    "vorbis-encoder-js": "github:Jimbly/vorbis-encoder-js",
+    "web-audio-beat-detector": "^8.1.49"
   }
 }

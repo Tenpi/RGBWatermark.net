@@ -25,6 +25,8 @@ import Steganography from "../components/Steganography"
 import GlyphSwap from "../components/GlyphSwap"
 import TextSpoof from "../components/TextSpoof"
 import Bitcrush from "../components/Bitcrush"
+import PitchShift from "../components/PitchShift"
+import BlockReverse from "../components/BlockReverse"
 
 let audioContext = new window.AudioContext()
 
@@ -78,6 +80,10 @@ const HomePage: React.FunctionComponent = (props) => {
             return (<TextSpoof/>)
         } else if (attackMode === "bitcrush") {
             return (<Bitcrush audioContext={audioContext}/>)
+        } else if (attackMode === "pitch shift") {
+            return (<PitchShift audioContext={audioContext}/>)
+        } else if (attackMode === "block reverse") {
+            return (<BlockReverse audioContext={audioContext}/>)
         }
     }
 
