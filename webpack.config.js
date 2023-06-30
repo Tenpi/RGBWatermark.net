@@ -59,7 +59,8 @@ module.exports = [
         patterns: [
           {from: "structures/bitcrusher.js", to: "[name][ext]"},
           {from: "structures/soundtouch.js", to: "[name][ext]"},
-          {from: "structures/phase-vocoder.js", to: "[name][ext]"}
+          {from: "structures/lfo.js", to: "[name][ext]"},
+          {from: "structures/interval.js", to: "[name][ext]"}
         ]
       })
     ]

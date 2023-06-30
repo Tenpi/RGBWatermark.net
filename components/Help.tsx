@@ -92,7 +92,8 @@ import glyphswap from "../assets/images/misc/glyphswap.jpg"
 import textspoof from "../assets/images/misc/textspoof.jpg"
 import bitcrush from "../assets/images/misc/bitcrush.jpg"
 import pitchshift from "../assets/images/misc/pitchshift.jpg"
-import blockreverse from "../assets/images/misc/blockreverse.jpg"*/
+import blockreverse from "../assets/images/misc/blockreverse.jpg"
+import pinknoise from "../assets/images/misc/pinknoise.jpg"*/
 
 const aiisuseless = "https://i.imgur.com/g9N7iqP.png"
 const aiwatermark = "https://i.imgur.com/YxQHTMz.png"
@@ -104,8 +105,9 @@ const textspoof = "https://i.imgur.com/GnMmk3B.png"
 const bitcrush = "https://i.imgur.com/VNjlhts.png"
 const pitchshift = "https://i.imgur.com/r357CIS.jpg"
 const blockreverse = "https://i.imgur.com/K1GkPWL.jpg"
+const pinknoise = "https://i.imgur.com/1KY3mZn.png"
 
-let misc = [aiisuseless, aiwatermark, steganography, invisiblewatermark, downscale, glyphswap, textspoof, bitcrush, pitchshift, blockreverse]
+let misc = [aiisuseless, aiwatermark, steganography, invisiblewatermark, downscale, glyphswap, textspoof, bitcrush, pitchshift, blockreverse, pinknoise]
 
 const Help: React.FunctionComponent = (props) => {
     const {enableDrag, setEnableDrag} = useContext(EnableDragContext)

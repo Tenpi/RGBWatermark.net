@@ -1198,19 +1198,6 @@ export default class Functions {
         const blob = encoder.exportFlacFile(encData, metadata, false)
         return URL.createObjectURL(blob)
     }
-
-    /*
-    public static audioBufferSamples = (audioBuffer: AudioBuffer) => {
-        const channelCount = audioBuffer.numberOfChannels
-        const frameCount = audioBuffer.length
-        const float32Array = new Float32Array(channelCount * frameCount)
-
-        for (let channel = 0; channel < channelCount; channel++) {
-            const channelData = audioBuffer.getChannelData(channel)
-            float32Array.set(channelData, channel * frameCount)
-        }
-        return float32Array
-    }*/
     
     public static audioBufferSamples = (audioBuffer: AudioBuffer) => {
         const numberOfChannels = audioBuffer.numberOfChannels
@@ -1229,43 +1216,54 @@ export default class Functions {
     }
 
     public static getBPM = async (audioBuffer: AudioBuffer) => {
-        return guess(audioBuffer)
+        try {
+            const {bpm, offset} = await guess(audioBuffer)
+            return {bpm, offset}
+        } catch {
+            return {bpm: 150, offset: 0}
+        }
     }
 
     public static createWavHeader = (numSamples: number, sampleRate: number, numChannels: number, bitsPerSample: number) => {
         const dataSize = numSamples * numChannels * (bitsPerSample / 8)
         const buffer = new ArrayBuffer(44)
         const view = new DataView(buffer)
-        function writeString(offset, string) {
+        const writeString = (offset: number, string: string) => {
           for (let i = 0; i < string.length; i++) {
-            view.setUint8(offset + i, string.charCodeAt(i));
+            view.setUint8(offset + i, string.charCodeAt(i))
           }
         }
-        writeString(0, 'R')
-        writeString(1, 'I')
-        writeString(2, 'F')
-        writeString(3, 'F')
-        view.setUint32(4, dataSize + 36, true)
-        writeString(8, 'W')
-        writeString(9, 'A')
-        writeString(10, 'V')
-        writeString(11, 'E')
-        writeString(12, 'f')
-        writeString(13, 'm')
-        writeString(14, 't')
-        writeString(15, ' ')
-        view.setUint32(16, 16, true)
-        view.setUint16(20, 1, true)
-        view.setUint16(22, numChannels, true)
-        view.setUint32(24, sampleRate, true)
-        view.setUint32(28, sampleRate * numChannels * (bitsPerSample / 8), true)
-        view.setUint16(32, numChannels * (bitsPerSample / 8), true)
-        view.setUint16(34, bitsPerSample, true)
-        writeString(36, 'd')
-        writeString(37, 'a')
-        writeString(38, 't')
-        writeString(39, 'a')
-        view.setUint32(40, dataSize, true)
+        const setUint32 = (offset: number, value: number) => {
+          view.setUint32(offset, value, true)
+        }
+        const setUint16 = (offset: number, value: number) => {
+          view.setUint16(offset, value, true)
+        }
+        writeString(0, "RIFF")
+        setUint32(4, dataSize + 36)
+        writeString(8, "WAVE")
+        writeString(12, "fmt ")
+        setUint32(16, 16)
+        setUint16(20, 1)
+        setUint16(22, numChannels)
+        setUint32(24, sampleRate)
+        setUint32(28, sampleRate * numChannels * (bitsPerSample / 8))
+        setUint16(32, numChannels * (bitsPerSample / 8))
+        setUint16(34, bitsPerSample)
+        writeString(36, "data")
+        setUint32(40, dataSize)
         return new Uint8Array(buffer)
+    }
+
+    public static createAudioBuffer = (left: Float32Array, right: Float32Array, sampleRate: number) => {
+        const audioContext = new AudioContext()
+        const audioBuffer = audioContext.createBuffer(2, left.length, sampleRate)
+        const channelDataL = audioBuffer.getChannelData(0)
+        const channelDataR = audioBuffer.getChannelData(1)
+        for (let i = 0; i < left.length; i++) {
+          channelDataL[i] = left[i]
+          channelDataR[i] = right[i]
+        }
+        return audioBuffer
     }
 }

@@ -27,6 +27,7 @@ import TextSpoof from "../components/TextSpoof"
 import Bitcrush from "../components/Bitcrush"
 import PitchShift from "../components/PitchShift"
 import BlockReverse from "../components/BlockReverse"
+import PinkNoise from "../components/PinkNoise"
 
 let audioContext = new window.AudioContext()
 
@@ -84,6 +85,8 @@ const HomePage: React.FunctionComponent = (props) => {
             return (<PitchShift audioContext={audioContext}/>)
         } else if (attackMode === "block reverse") {
             return (<BlockReverse audioContext={audioContext}/>)
+        } else if (attackMode === "pink noise") {
+            return (<PinkNoise audioContext={audioContext}/>)
         }
     }
 

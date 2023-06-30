@@ -77,7 +77,7 @@ const NavBar: React.FunctionComponent<Props> = (props) => {
             <img className="navbar-item" src={bitcrush} onClick={() => setAttackMode("bitcrush")}/>
             <img className="navbar-item" src={pitchshift} onClick={() => setAttackMode("pitch shift")}/>
             <img className="navbar-item" src={blockreverse} onClick={() => setAttackMode("block reverse")}/>
-            {/* <img className="navbar-item" src={pinknoise} onClick={() => setAttackMode("pink noise")}/> */}
+            <img className="navbar-item" src={pinknoise} onClick={() => setAttackMode("pink noise")}/>
             <img className="navbar-item" src={questionmark} onClick={() => setAttackMode("question mark")}/>
         </div>
     )

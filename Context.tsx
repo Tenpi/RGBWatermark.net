@@ -41,6 +41,7 @@ export const SiteSaturationContext = React.createContext<any>(null)
 export const SiteLightnessContext = React.createContext<any>(null)
 
 export const SourceNodeContext = React.createContext<any>(null)
+export const EffectNodeContext = React.createContext<any>(null)
 export const SecondsProgressContext = React.createContext<any>(null)
 export const ProgressContext = React.createContext<any>(null)
 export const VolumeContext = React.createContext<any>(null)
@@ -122,6 +123,7 @@ const Context: React.FunctionComponent = (props) => {
     const [attackMode, setAttackMode] = useState("rainbow watermarks")
     const [helpMode, setHelpMode] = useState("ai protection methods")
     const [sourceNode, setSourceNode] = useState(null)
+    const [effectNode, setEffectNode] = useState(null)
     const [secondsProgress, setSecondsProgress] = useState(0)
     const [progress, setProgress] = useState(0)
     const [volume, setVolume] = useState(0.75)
@@ -139,6 +141,7 @@ const Context: React.FunctionComponent = (props) => {
 
     return (
         <>  
+            <EffectNodeContext.Provider value={{effectNode, setEffectNode}}>
             <OriginalDurationContext.Provider value={{originalDuration, setOriginalDuration}}>
             <SavedTimeContext.Provider value={{savedTime, setSavedTime}}>
             <UpdateEffectContext.Provider value={{updateEffect, setUpdateEffect}}>
@@ -242,6 +245,7 @@ const Context: React.FunctionComponent = (props) => {
             </UpdateEffectContext.Provider>
             </SavedTimeContext.Provider>
             </OriginalDurationContext.Provider>
+            </EffectNodeContext.Provider>
         </>
     )
 }

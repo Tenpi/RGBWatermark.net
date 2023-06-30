@@ -5,7 +5,7 @@ import path from "path"
 import {EnableDragContext, MobileContext, SiteHueContext, SiteSaturationContext, SiteLightnessContext, AttackModeContext, AudioContext, 
 AudioNameContext, AudioSpeedContext, AudioReverseContext, SourceNodeContext, SecondsProgressContext, ProgressContext, VolumeContext,
 PreviousVolumeContext, PreservesPitchContext, StartTimeContext, ElapsedTimeContext, ReverseActiveContext, DurationContext, PauseContext,
-SeekToContext, UpdateEffectContext, SavedTimeContext, OriginalDurationContext, patterns} from "../Context"
+SeekToContext, UpdateEffectContext, SavedTimeContext, EffectNodeContext, OriginalDurationContext, patterns} from "../Context"
 import functions from "../structures/Functions"
 import Slider from "react-slider"
 import audioReverseIcon from "../assets/icons/audio-reverse.png"
@@ -35,9 +35,8 @@ interface Props {
     audioContext: AudioContext
 }
 
-let pitchCorrectNode = null as any
 let gainNode = null as any
-let processing = false
+let lfoNode = null as any
 
 const BlockReverse: React.FunctionComponent<Props> = (props) => {
     const {enableDrag, setEnableDrag} = useContext(EnableDragContext)
@@ -48,8 +47,10 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
     const {siteSaturation, setSiteSaturation} = useContext(SiteSaturationContext)
     const {siteLightness, setSiteLightness} = useContext(SiteLightnessContext)
     const {attackMode, setAttackMode} = useContext(AttackModeContext)
-    const [lfoRate, setLFORate] = useState(1)
+    const [lfoRate, setLFORate] = useState(2)
     const {sourceNode, setSourceNode} = useContext(SourceNodeContext)
+    const {effectNode, setEffectNode} = useContext(EffectNodeContext)
+    const [restartFlag, setRestartFlag] = useState(false)
     const [showSpeedDropdown, setShowSpeedDropdown] = useState(false)
     const [showVolumeSlider, setShowVolumeSlider] = useState(false)
     const [showSpeedSlider, setShowSpeedSlider] = useState(false)
@@ -128,7 +129,7 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
             }
             setSavedTime(currentTime)
             if (String(sourceNode?.playing) === "false") {
-                if (!processing) setSeekTo(0)
+                setSeekTo(0)
             }
             await new Promise<void>((resolve) => {
                 clearTimeout(timeout)
@@ -169,80 +170,90 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
         if (event.target) event.target.value = ""
     }
 
-    const renderLFO = async (normalBuffer: AudioBuffer, effectBuffer: AudioBuffer) => {
-        const normalWAV = functions.encodeWAV(normalBuffer)
-        const effectWAV = functions.encodeWAV(effectBuffer)
-        const normalArrayBuffer = await fetch(normalWAV).then((r) => r.arrayBuffer())
-        const effectArrayBuffer = await fetch(effectWAV).then((r) => r.arrayBuffer())
-        const normalArray = new Uint8Array(normalArrayBuffer)
-        const effectArray = new Uint8Array(effectArrayBuffer)
-        const header = normalArray.slice(0, 44)
-        const normalSamples = normalArray.slice(44)
-        const effectSamples = effectArray.slice(44)
-        const {bpm} = await functions.getBPM(normalBuffer)
-        const blockSize = Math.round(Math.ceil(60/bpm * normalBuffer.sampleRate) * ((2**lfoRate)/2))
-        let normalBlocks = [] as any
-        for (let i = 0; i < normalSamples.length; i+=blockSize) {
-            let block = [] as any
-            for (let j = i; j < i + blockSize; j++) {
-                block.push(normalSamples[j])
+    const forwardReverseBuffer = (audioBuffer: AudioBuffer, bpm: number) => {
+        const reverseBuffer = functions.reverseAudioBuffer(audioBuffer)
+        const blockSize = Math.round(Math.ceil(60/bpm * audioBuffer.sampleRate) * ((2**lfoRate)/8))
+        let blocksL = [] as any
+        let blocksR = [] as any
+        const samplesL = audioBuffer.getChannelData(0)
+        const samplesR = audioBuffer.numberOfChannels > 1 ? audioBuffer.getChannelData(1) : audioBuffer.getChannelData(0)
+        for (let i = 0; i < samplesL.length; i+=blockSize) {
+            let blockL = [] as any
+            let blockR = [] as any
+            for (let j = i; j < Math.min(i + blockSize, samplesL.length); j++) {
+                blockL.push(samplesL[j])
+                blockR.push(samplesR[j])
             }
-            normalBlocks.push(block)
+            blocksL.push(blockL)
+            blocksR.push(blockR)
         }
-        let effectBlocks = [] as any
-        for (let i = 0; i < effectSamples.length; i+=blockSize) {
-            let block = [] as any
-            for (let j = i; j < i + blockSize; j++) {
-                block.push(effectSamples[j])
+        let reverseBlocksL = [] as any
+        let reverseBlocksR = [] as any
+        const reverseSamplesL = reverseBuffer.getChannelData(0)
+        const reverseSamplesR = reverseBuffer.numberOfChannels > 1 ? reverseBuffer.getChannelData(1) : reverseBuffer.getChannelData(0)
+        for (let i = 0; i < reverseSamplesL.length; i+=blockSize) {
+            let reverseBlockL = [] as any
+            let reverseBlockR = [] as any
+            for (let j = i; j < Math.min(i + blockSize, reverseSamplesL.length); j++) {
+                reverseBlockL.push(reverseSamplesL[j])
+                reverseBlockR.push(reverseSamplesR[j])
             }
-            effectBlocks.push(block)
+            reverseBlocksL.push(reverseBlockL)
+            reverseBlocksR.push(reverseBlockR)
         }
-        effectBlocks = effectBlocks.reverse()
-        let blockArray = [] as any
-        for (let i = 0; i < normalBlocks.length + effectBlocks.length; i+=2) {
-            blockArray.push(normalBlocks[i])
-            blockArray.push(effectBlocks[i+1])
+        reverseBlocksL = reverseBlocksL.reverse()
+        reverseBlocksR = reverseBlocksR.reverse()
+        let mergedBlocksL = [] as any
+        let mergedBlocksR = [] as any
+        for (let i = 0; i < blocksL.length + reverseBlocksL.length; i+=2) {
+            mergedBlocksL.push(blocksL[i])
+            mergedBlocksL.push(reverseBlocksL[i+1])
+            mergedBlocksR.push(blocksR[i])
+            mergedBlocksR.push(reverseBlocksR[i+1])
         }
-        blockArray = blockArray.flat(Infinity)
-        const array = [...header, ...blockArray]
-        const blob = new Blob([new Uint8Array(array)])
-        const url = URL.createObjectURL(blob)
-        const arrayBuffer = await fetch((url)).then((r) => r.arrayBuffer())
-        return audioContext.decodeAudioData(arrayBuffer)
+        const newSamplesL = mergedBlocksL.flat()
+        const newSamplesR = mergedBlocksR.flat()
+        const newBuffer = new AudioBuffer({
+            numberOfChannels: audioBuffer.numberOfChannels,
+            length: audioBuffer.length,
+            sampleRate: audioBuffer.sampleRate,
+        })
+        newBuffer.copyToChannel(new Float32Array(newSamplesL), 0)
+        if (newBuffer.numberOfChannels > 1) {
+            newBuffer.copyToChannel(new Float32Array(newSamplesR), 1)
+        }
+        return newBuffer
     }
 
-    const applyBlockReverse = async () => {
+    const applyBlockReverse = async (offset: number = 0) => {
         if (!audio) return
-        stop()
-        processing = true
+        if (!offset) stop()
         const arrayBuffer = await fetch(audio).then((r) => r.arrayBuffer())
         let audioBuffer = await audioContext.decodeAudioData(arrayBuffer)
         if (audioReverse) audioBuffer = functions.reverseAudioBuffer(audioBuffer)
-        const original = audioBuffer
-        const effect = functions.reverseAudioBuffer(audioBuffer)
-        const rendered = await renderLFO(original, effect)
-        setDuration(rendered.duration / audioSpeed)
-        setOriginalDuration(rendered.duration)
+        const {bpm} = await functions.getBPM(audioBuffer)
+        const effectBuffer = forwardReverseBuffer(audioBuffer, bpm)
+        setDuration(audioBuffer.duration / audioSpeed)
+        setOriginalDuration(audioBuffer.duration)
         gainNode?.disconnect()
         gainNode = audioContext.createGain()
         gainNode.gain.value = volume 
-        await audioContext.audioWorklet.addModule("./phase-vocoder.js")
-        pitchCorrectNode?.disconnect()
-        pitchCorrectNode = new AudioWorkletNode(audioContext, "phase-vocoder-processor")
         await audioContext.audioWorklet.addModule("./soundtouch.js")
+        const pitchCorrect = preservesPitch ? 1 / audioSpeed : 1
         sourceNode?.disconnect()
-        const source = createScheduledSoundTouchNode(audioContext, rendered)
+        effectNode?.disconnect()
+        const source = createScheduledSoundTouchNode(audioContext, effectBuffer)
+        source.parameters.get("pitch").value = pitchCorrect
         source.loop = true
         await functions.timeout(100)
-        source.connect(pitchCorrectNode)
-        pitchCorrectNode.connect(gainNode)
+        source.connect(gainNode)
         gainNode.connect(audioContext.destination)
         source.start()
         setSourceNode(source)
+        setEffectNode(null)
         setStartTime(audioContext.currentTime)
         audioContext.resume()
         setPaused(false)
-        processing = false
     }
 
     const updateSongCover = async () => {
@@ -261,21 +272,26 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
 
     useEffect(() => {
         if (sourceNode) {
-            //sourceNode.parameters.get("pitch").value = pitchShift
-            //sourceNode.parameters.get("tempo").value = audioRate
+            const pitchCorrect = preservesPitch ? 1 / audioSpeed : 1
+            sourceNode.parameters.get("pitch").value = pitchCorrect
             sourceNode.parameters.get("rate").value = audioSpeed
         }
-        if (pitchCorrectNode) {
-            pitchCorrectNode.parameters.get("pitchFactor").value = preservesPitch ? 1 / audioSpeed : 1
+        if (lfoNode) {
+            lfoNode.parameters.get("lfoRate").value = lfoRate
         }
-    }, [audioSpeed, preservesPitch])
+    }, [audioSpeed, preservesPitch, lfoRate])
 
     useEffect(() => {
         if (updateEffect) {
-            applyBlockReverse()
+            if (restartFlag) {
+                applyBlockReverse()
+                setRestartFlag(false)
+            } else {
+                applyBlockReverse(getCurrentTime())
+            }
             setUpdateEffect(false)
         }
-    }, [sourceNode, startTime, elapsedTime, duration, audioReverse, audioSpeed, preservesPitch, updateEffect, lfoRate])
+    }, [sourceNode, startTime, elapsedTime, duration, audioReverse, audioSpeed, preservesPitch, updateEffect, lfoRate, restartFlag])
 
     useEffect(() => {
         if (gainNode) {
@@ -303,6 +319,7 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
         const savedPreservesPitch = localStorage.getItem("preservesPitch")
         if (savedPreservesPitch) setPreservesPitch(Number(savedPreservesPitch))
         setTimeout(() => {
+            setRestartFlag(true)
             setUpdateEffect(true)
             setTimeout(() => {
                 setSeekTo(savedTime)
@@ -321,10 +338,25 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
         const arrayBuffer = await fetch(audio).then((r) => r.arrayBuffer())
         let audioBuffer = await audioContext.decodeAudioData(arrayBuffer)
         if (audioReverse) audioBuffer = functions.reverseAudioBuffer(audioBuffer)
+        const offlineContext = new OfflineAudioContext({
+            numberOfChannels: audioBuffer.numberOfChannels, 
+            length: audioBuffer.length / audioSpeed, 
+            sampleRate: audioBuffer.sampleRate
+        })
         const {bpm} = await functions.getBPM(audioBuffer)
-        const original = audioBuffer
-        const effect = functions.reverseAudioBuffer(audioBuffer)
-        return renderLFO(original, effect)
+        const effectBuffer = forwardReverseBuffer(audioBuffer, bpm)
+        const gainNode = offlineContext.createGain()
+        gainNode.gain.value = 1
+        await offlineContext.audioWorklet.addModule("./soundtouch.js")
+        const pitchCorrect = preservesPitch? 1 / audioSpeed : 1
+        const source = createScheduledSoundTouchNode(offlineContext, effectBuffer)
+        source.parameters.get("pitch").value = pitchCorrect
+        source.loop = true
+        await functions.timeout(100)
+        source.connect(gainNode)
+        gainNode.connect(offlineContext.destination)
+        source.start()
+        return offlineContext.startRendering()
     }
 
     const mp3 = async () => {
@@ -420,6 +452,9 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
         if (!sourceNode) return
         sourceNode.stop()
         sourceNode.disconnect()
+        effectNode?.stop()
+        effectNode?.disconnect()
+        setSourceNode(null)
         let audioBuffer = sourceNode.audioBuffer
         if (audioReverse && !reverseActive) {
             audioBuffer = functions.reverseAudioBuffer(audioBuffer)
@@ -428,13 +463,16 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
             audioBuffer = functions.reverseAudioBuffer(audioBuffer)
             setReverseActive(false)
         }
+        const pitchCorrect = preservesPitch ? 1 / audioSpeed : 1
         const source = createScheduledSoundTouchNode(audioContext, audioBuffer)
+        source.parameters.get("pitch").value = pitchCorrect
         source.parameters.get("rate").value = audioSpeed
         await functions.timeout(100)
         source.loop = true
-        source.connect(pitchCorrectNode)
+        source.connect(gainNode)
         source.start(0, offset)
         setSourceNode(source)
+        setEffectNode(null)
         setStartTime(audioContext.currentTime)
         setElapsedTime(offset)
         audioContext.resume()
@@ -444,12 +482,15 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
         if (!sourceNode) return
         sourceNode?.stop()
         sourceNode?.disconnect()
+        effectNode?.stop()
+        effectNode?.disconnect()
         audioContext.suspend()
         setStartTime(audioContext.currentTime)
         setElapsedTime(0)
         setProgress(0)
         setSecondsProgress(0)
         setSourceNode(null)
+        setEffectNode(null)
     }
 
     const updateMute = () => {
@@ -561,12 +602,13 @@ const BlockReverse: React.FunctionComponent<Props> = (props) => {
     }, [coverImg])
 
     const getLFORate = () => {
-        if (lfoRate === 5) return "2/1"
-        if (lfoRate === 4) return "1/1"
-        if (lfoRate === 3) return "1/2"
-        if (lfoRate === 2) return "1/4"
-        if (lfoRate === 1) return "1/8"
-        if (lfoRate === 0) return "1/16"
+        if (lfoRate === 5) return "1/1"
+        if (lfoRate === 4) return "1/2"
+        if (lfoRate === 3) return "1/4"
+        if (lfoRate === 2) return "1/8"
+        if (lfoRate === 1) return "1/16"
+        if (lfoRate === 0) return "1/32"
+        return "1/16"
     }
 
     return (
