@@ -33,6 +33,7 @@ import pitchshift from "../assets/icons/pitchshift.png"
 import blockreverse from "../assets/icons/blockreverse.png"
 import pinknoise from "../assets/icons/pinknoise.png"
 import decimation from "../assets/icons/decimation.png"
+import subdivision from "../assets/icons/subdivision.png"
 
 interface Props {
     rerender: () => void
@@ -80,6 +81,7 @@ const NavBar: React.FunctionComponent<Props> = (props) => {
             <img className="navbar-item" src={blockreverse} onClick={() => setAttackMode("block reverse")}/>
             <img className="navbar-item" src={pinknoise} onClick={() => setAttackMode("pink noise")}/>
             <img className="navbar-item" src={decimation} onClick={() => setAttackMode("decimation")}/>
+            <img className="navbar-item" src={subdivision} onClick={() => setAttackMode("subdivision")}/>
             <img className="navbar-item" src={questionmark} onClick={() => setAttackMode("question mark")}/>
         </div>
     )

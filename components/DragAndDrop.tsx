@@ -126,6 +126,7 @@ const DragAndDrop: React.FunctionComponent = (props) => {
     const loadModel = async (files: any) => {
         let textures = [] as string[]
         let textureNames = [] as string[]
+        let hasModel = false
         let hasMaterial = false
         const fileReader = new FileReader()
         for (let i = 0; i < files.length; i++) {
@@ -160,7 +161,7 @@ const DragAndDrop: React.FunctionComponent = (props) => {
                         const link = `${url}#.${result.typename}`
                         setModel(link)
                         setModelName(file.name.slice(0, 30))
-                        if (dae) hasMaterial = true
+                        hasModel = true
                     }
                     if (mtl) {
                         const blob = new Blob([bytes])
@@ -175,6 +176,7 @@ const DragAndDrop: React.FunctionComponent = (props) => {
                         const link = `${url}#.${result.typename}`
                         textures.push(link)
                         textureNames.push(path.basename(file.name, path.extname(file.name)))
+                        if (hasModel) hasMaterial = true
                     }
                     resolve()
                 }

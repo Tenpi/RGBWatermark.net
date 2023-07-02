@@ -97,7 +97,8 @@ import bitcrush from "../assets/images/misc/bitcrush.jpg"
 import pitchshift from "../assets/images/misc/pitchshift.jpg"
 import blockreverse from "../assets/images/misc/blockreverse.jpg"
 import pinknoise from "../assets/images/misc/pinknoise.jpg"
-import decimation from "../assets/images/misc/decimation.jpg"*/
+import decimation from "../assets/images/misc/decimation.jpg"
+import subdivision from "../assets/images/misc/subdivision.jpg"*/
 
 const aiisuseless = "https://i.imgur.com/g9N7iqP.png"
 const aiwatermark = "https://i.imgur.com/YxQHTMz.png"
@@ -111,9 +112,10 @@ const pitchshift = "https://i.imgur.com/r357CIS.jpg"
 const blockreverse = "https://i.imgur.com/K1GkPWL.jpg"
 const pinknoise = "https://i.imgur.com/1KY3mZn.png"
 const decimation = "https://i.imgur.com/Q01rJMx.png"
+const subdivision = "https://i.imgur.com/XNZkdJI.png"
 
 let misc = [aiisuseless, aiwatermark, steganography, invisiblewatermark, downscale, glyphswap, 
-            textspoof, bitcrush, pitchshift, blockreverse, pinknoise, decimation]
+            textspoof, bitcrush, pitchshift, blockreverse, pinknoise, decimation, subdivision]
 
 const Help: React.FunctionComponent = (props) => {
     const {enableDrag, setEnableDrag} = useContext(EnableDragContext)
