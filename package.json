@@ -107,6 +107,8 @@
     "steg": "^0.1.5",
     "svgo": "^3.0.2",
     "tga": "^1.0.7",
+    "three": "^0.124.0",
+    "three-stdlib": "^2.22.9",
     "url": "^0.11.0",
     "utif": "^3.1.0",
     "vorbis-encoder-js": "github:Jimbly/vorbis-encoder-js",

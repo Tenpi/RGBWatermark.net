@@ -24,14 +24,14 @@ class LFOProcessor extends AudioWorkletProcessor {
       const output = outputs[0]
 
       if (!input1?.[0]) return true
-      const fillerInput2 = new Float32Array(input1[0].length).fill(0)
+      const fillerInput2 = new Float32Array(input1[0]?.length || 128).fill(0)
 
       const lfoRate = parameters.lfoRate[0]
       const bpm = parameters.bpm[0]
       if (!Number.isNaN(lfoRate)) this.lfoRate = lfoRate
       if (!Number.isNaN(bpm)) this.bpm = bpm
 
-      const inputLength = input1[0].length
+      const inputLength = input1[0]?.length || 128
 
       const samplesPerCycle = Math.round(Math.ceil(60/this.bpm * sampleRate) * (2**this.lfoRate/8))
   

@@ -23,7 +23,7 @@ class IntervalProcessor extends AudioWorkletProcessor {
       const output = outputs[0]
 
       if (!input1?.[0]) return true
-      const fillerInput2 = new Float32Array(input1[0].length).fill(0)
+      const fillerInput2 = new Float32Array(input1[0]?.length || 128).fill(0)
   
       const interval = parameters.interval[0]
       const duration = parameters.duration[0]

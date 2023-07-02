@@ -14,7 +14,7 @@ const Footer: React.FunctionComponent = (props) => {
     const {type, setType} = useContext(TypeContext)
     const {attackMode, setAttackMode} = useContext(AttackModeContext)
     
-    const version = "1.2.4"
+    const version = "1.2.5"
 
     const windows = async () => {
         const filename = `RGBWatermark-Setup-${version}.exe`
@@ -258,6 +258,10 @@ const Footer: React.FunctionComponent = (props) => {
                 <div className="footer-row">
                     <span className="footer-text">Protect your music against AI/machine learning theft with intermittent pink noise.</span>
                 </div> : null}
+                {attackMode === "decimation" ?
+                <div className="footer-row">
+                    <span className="footer-text">Protect your 3D art against AI/machine learning theft with decimation.</span>
+                </div> : null}
                 {attackMode === "rainbow watermarks" ?
                 <div className="footer-row">
                     <span className="footer-text-2">Rainbow watermarks will result in a lot of noise and grain in the outputs. It is recommended to use dotted fonts and particles to make them difficult to remove.</span>
@@ -345,6 +349,10 @@ const Footer: React.FunctionComponent = (props) => {
                 {attackMode === "pink noise" ?
                 <div className="footer-row">
                     <span className="footer-text-5">Pink noise adds pink noise to the audio file at regular intervals.</span>
+                </div> : null}
+                {attackMode === "decimation" ?
+                <div className="footer-row">
+                    <span className="footer-text-2">Decimation reduces the amount of polygons and texture resolution while retaining the overall shape.</span>
                 </div> : null}
                 {showRenderingText() ?
                 <div className="footer-row">

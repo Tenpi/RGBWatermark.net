@@ -28,6 +28,7 @@ import Bitcrush from "../components/Bitcrush"
 import PitchShift from "../components/PitchShift"
 import BlockReverse from "../components/BlockReverse"
 import PinkNoise from "../components/PinkNoise"
+import Decimation from "../components/Decimation"
 
 let audioContext = new window.AudioContext()
 
@@ -87,6 +88,8 @@ const HomePage: React.FunctionComponent = (props) => {
             return (<BlockReverse audioContext={audioContext}/>)
         } else if (attackMode === "pink noise") {
             return (<PinkNoise audioContext={audioContext}/>)
+        } else if (attackMode === "decimation") {
+            return (<Decimation/>)
         }
     }
 

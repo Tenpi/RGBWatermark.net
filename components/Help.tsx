@@ -54,7 +54,10 @@ const crt = "https://i.imgur.com/83Cuxdd.png"
 const rgbsplit = "https://i.imgur.com/ykTCBhP.png"
 const clipbreaker = "https://i.imgur.com/4NSP9gI.jpg"
 
-let protectionMethods = [rainbowWatermarks, pointifiction, lineifiction, trifiction, rectifiction, pixelshift, pixelation, highcontrast, noise, edgeblur, sprinkles, fence, adversarialnoise, crt, rgbsplit, glaze, mist, fileconversion, fileinflation, networkrandomizer, networkshifter, imageencryption, imagesplitting, clipbreaker]
+let protectionMethods = [rainbowWatermarks, pointifiction, lineifiction, trifiction, 
+    rectifiction, pixelshift, pixelation, highcontrast, noise, edgeblur, sprinkles, fence, 
+    adversarialnoise, crt, rgbsplit, glaze, mist, fileconversion, fileinflation, networkrandomizer, 
+    networkshifter, imageencryption, imagesplitting, clipbreaker]
 
 /*
 import aiarttheft1 from "../assets/images/ai art theft/aiarttheft1.jpg"
@@ -93,7 +96,8 @@ import textspoof from "../assets/images/misc/textspoof.jpg"
 import bitcrush from "../assets/images/misc/bitcrush.jpg"
 import pitchshift from "../assets/images/misc/pitchshift.jpg"
 import blockreverse from "../assets/images/misc/blockreverse.jpg"
-import pinknoise from "../assets/images/misc/pinknoise.jpg"*/
+import pinknoise from "../assets/images/misc/pinknoise.jpg"
+import decimation from "../assets/images/misc/decimation.jpg"*/
 
 const aiisuseless = "https://i.imgur.com/g9N7iqP.png"
 const aiwatermark = "https://i.imgur.com/YxQHTMz.png"
@@ -106,8 +110,10 @@ const bitcrush = "https://i.imgur.com/VNjlhts.png"
 const pitchshift = "https://i.imgur.com/r357CIS.jpg"
 const blockreverse = "https://i.imgur.com/K1GkPWL.jpg"
 const pinknoise = "https://i.imgur.com/1KY3mZn.png"
+const decimation = "https://i.imgur.com/Q01rJMx.png"
 
-let misc = [aiisuseless, aiwatermark, steganography, invisiblewatermark, downscale, glyphswap, textspoof, bitcrush, pitchshift, blockreverse, pinknoise]
+let misc = [aiisuseless, aiwatermark, steganography, invisiblewatermark, downscale, glyphswap, 
+            textspoof, bitcrush, pitchshift, blockreverse, pinknoise, decimation]
 
 const Help: React.FunctionComponent = (props) => {
     const {enableDrag, setEnableDrag} = useContext(EnableDragContext)

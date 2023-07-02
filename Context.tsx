@@ -4,8 +4,6 @@ export const EnableDragContext = React.createContext<any>(null)
 export const MobileContext = React.createContext<any>(null)
 export const ImageContext = React.createContext<any>(null)
 export const ImageNameContext = React.createContext<any>(null)
-export const AudioContext = React.createContext<any>(null)
-export const AudioNameContext = React.createContext<any>(null)
 export const WatermarkImageContext = React.createContext<any>(null)
 export const TextContext = React.createContext<any>(null)
 export const FontContext = React.createContext<any>(null)
@@ -40,6 +38,8 @@ export const SiteHueContext = React.createContext<any>(null)
 export const SiteSaturationContext = React.createContext<any>(null)
 export const SiteLightnessContext = React.createContext<any>(null)
 
+export const AudioContext = React.createContext<any>(null)
+export const AudioNameContext = React.createContext<any>(null)
 export const SourceNodeContext = React.createContext<any>(null)
 export const EffectNodeContext = React.createContext<any>(null)
 export const SecondsProgressContext = React.createContext<any>(null)
@@ -56,6 +56,12 @@ export const SeekToContext = React.createContext<any>(null)
 export const ReverseActiveContext = React.createContext<any>(null)
 export const UpdateEffectContext = React.createContext<any>(null)
 export const SavedTimeContext = React.createContext<any>(null)
+
+export const ModelContext = React.createContext<any>(null)
+export const MTLContext = React.createContext<any>(null)
+export const TexturesContext = React.createContext<any>(null)
+export const TextureNamesContext = React.createContext<any>(null)
+export const ModelNameContext = React.createContext<any>(null)
 
 import square from "./assets/patterns/square.svg"
 import circle from "./assets/patterns/circle.svg"
@@ -138,9 +144,19 @@ const Context: React.FunctionComponent = (props) => {
     const [reverseActive, setReverseActive] = useState(false)
     const [updateEffect, setUpdateEffect] = useState(false)
     const [savedTime, setSavedTime] = useState(0)
+    const [model, setModel] = useState("")
+    const [mtl, setMTL] = useState("")
+    const [textures, setTextures] = useState([])
+    const [textureNames, setTextureNames] = useState([])
+    const [modelName, setModelName] = useState("")
 
     return (
         <>  
+            <TextureNamesContext.Provider value={{textureNames, setTextureNames}}>
+            <TexturesContext.Provider value={{textures, setTextures}}>
+            <MTLContext.Provider value={{mtl, setMTL}}>
+            <ModelNameContext.Provider value={{modelName, setModelName}}>
+            <ModelContext.Provider value={{model, setModel}}>
             <EffectNodeContext.Provider value={{effectNode, setEffectNode}}>
             <OriginalDurationContext.Provider value={{originalDuration, setOriginalDuration}}>
             <SavedTimeContext.Provider value={{savedTime, setSavedTime}}>
@@ -246,6 +262,11 @@ const Context: React.FunctionComponent = (props) => {
             </SavedTimeContext.Provider>
             </OriginalDurationContext.Provider>
             </EffectNodeContext.Provider>
+            </ModelContext.Provider>
+            </ModelNameContext.Provider>
+            </MTLContext.Provider>
+            </TexturesContext.Provider>
+            </TextureNamesContext.Provider>
         </>
     )
 }
