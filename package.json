@@ -72,6 +72,7 @@
     "@jsquash/avif": "^1.0.2",
     "@jsquash/webp": "^1.1.3",
     "@noble/hashes": "^1.3.1",
+    "@patcher56/upng": "^2.0.0-beta.0",
     "@tenpi/jxl": "^1.0.2",
     "assert": "^2.0.0",
     "axios": "^0.26.1",

@@ -25,6 +25,8 @@ import networkshifter from "../assets/icons/networkshifter.png"
 import aiwatermark from "../assets/icons/aiwatermark.png"
 import crt from "../assets/icons/crt.png"
 import rgbsplit from "../assets/icons/rgbsplit.png"
+import apng from "../assets/icons/apng.png"
+import dissolve from "../assets/icons/dissolve.png"
 import steganography from "../assets/icons/steganography.png"
 import glyphswap from "../assets/icons/glyphswap.png"
 import textspoof from "../assets/icons/textspoof.png"
@@ -70,6 +72,8 @@ const NavBar: React.FunctionComponent<Props> = (props) => {
             <img className="navbar-item" src={adversarialnoise} onClick={() => setAttackMode("adversarial noise")}/>
             <img className="navbar-item" src={crt} onClick={() => setAttackMode("crt")}/>
             <img className="navbar-item" src={rgbsplit} onClick={() => setAttackMode("rgb split")}/>
+            <img className="navbar-item" src={apng} onClick={() => setAttackMode("apng")}/>
+            <img className="navbar-item" src={dissolve} onClick={() => setAttackMode("dissolve")}/>
             <img className="navbar-item" src={conversion} onClick={() => setAttackMode("conversion")}/>
             <img className="navbar-item" src={inflation} onClick={() => setAttackMode("inflation")}/>
             <img className="navbar-item" src={aiwatermark} onClick={() => setAttackMode("ai watermark")}/>

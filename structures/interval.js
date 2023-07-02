@@ -23,7 +23,6 @@ class IntervalProcessor extends AudioWorkletProcessor {
       const output = outputs[0]
 
       if (!input1?.[0]) return true
-      const fillerInput2 = new Float32Array(input1[0]?.length || 128).fill(0)
   
       const interval = parameters.interval[0]
       const duration = parameters.duration[0]
@@ -36,26 +35,24 @@ class IntervalProcessor extends AudioWorkletProcessor {
       const durationSamples = Math.round(this.duration * (sampleRate / 1000) * 2)
   
       for (let channel = 0; channel < output.length; channel++) {
-        const outputChannel = output[channel]
-        const input1Channel = input1[channel]
-        const input2Channel = input2 ? input2[channel] : fillerInput2
-  
-        for (let i = 0; i < outputChannel.length; i++) {
+        for (let i = 0; i < output[channel].length; i++) {
+          const input1Value = input1?.[channel]?.[i] ? input1[channel][i] : 0
+          const input2Value = input2?.[channel]?.[i] ? input2[channel][i] : 0
           if (this.intervalTimer >= intervalSamples) {
             this.switch = !this.switch
             this.intervalTimer = 0
           }
           if (this.switch) {
-            let merged = input1Channel[i] + input2Channel[i] * this.volume * 1.8
-            if (merged > 1) merged = input2Channel[i]
-            outputChannel[i] = merged
+            let merged = input1Value + input2Value * this.volume * 1.8
+            if (merged > 1) merged = input2Value
+            output[channel][i] = merged
             if (this.durationTimer >= durationSamples) {
                 this.switch = !this.switch
                 this.durationTimer= 0
             }
             this.durationTimer++
           } else {
-            outputChannel[i] = input1Channel[i]
+            output[channel][i] = input1Value
           }
           this.intervalTimer++
         }

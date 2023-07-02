@@ -24,7 +24,6 @@ class LFOProcessor extends AudioWorkletProcessor {
       const output = outputs[0]
 
       if (!input1?.[0]) return true
-      const fillerInput2 = new Float32Array(input1[0]?.length || 128).fill(0)
 
       const lfoRate = parameters.lfoRate[0]
       const bpm = parameters.bpm[0]
@@ -48,8 +47,8 @@ class LFOProcessor extends AudioWorkletProcessor {
         }
 
         for (let channel = 0; channel < output.length; channel++) {
-          const inputValue1 = input1[channel][i]
-          const inputValue2 = input2 ? input2[channel][i] : fillerInput2[i]
+          const inputValue1 = input1?.[channel]?.[i] ? input1[channel][i] : 0
+          const inputValue2 = input2?.[channel]?.[i] ? input2[channel][i] : 0
           output[channel][i] = lfoValue > 0 ? inputValue1 : inputValue2
         }
   

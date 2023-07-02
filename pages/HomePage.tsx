@@ -30,6 +30,8 @@ import BlockReverse from "../components/BlockReverse"
 import PinkNoise from "../components/PinkNoise"
 import Decimation from "../components/Decimation"
 import Subdivison from "../components/Subdivision"
+import Dissolve from "../components/Dissolve"
+import APNG from "../components/APNG"
 
 let audioContext = new window.AudioContext()
 
@@ -93,6 +95,10 @@ const HomePage: React.FunctionComponent = (props) => {
             return (<Decimation/>)
         } else if (attackMode === "subdivision") {
             return (<Subdivison/>)
+        } else if (attackMode === "dissolve") {
+            return (<Dissolve/>)
+        } else if (attackMode === "apng") {
+            return (<APNG/>)
         }
     }
 

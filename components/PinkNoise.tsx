@@ -372,6 +372,7 @@ const PinkNoise: React.FunctionComponent<Props> = (props) => {
     }
 
     const mp3 = async () => {
+        if (!audio) return
         const audioBuffer = await render()
         const wav = functions.encodeWAV(audioBuffer)
         let mp3 = await functions.convertToMP3(wav)
@@ -380,18 +381,21 @@ const PinkNoise: React.FunctionComponent<Props> = (props) => {
     }
 
     const wav = async () => {
+        if (!audio) return
         const audioBuffer = await render()
         const wav = functions.encodeWAV(audioBuffer)
         functions.download(`${path.basename(audioName, path.extname(audioName))}_pitchshift.wav`, wav)
     }
 
     const ogg = async () => {
+        if (!audio) return
         const audioBuffer = await render()
         const ogg = await functions.encodeOGG(audioBuffer, coverImg, audio)
         functions.download(`${path.basename(audioName, path.extname(audioName))}_pitchshift.ogg`, ogg)
     }
 
     const flac = async () => {
+        if (!audio) return
         const audioBuffer = await render()
         const flac = await functions.encodeFLAC(audioBuffer)
         functions.download(`${path.basename(audioName, path.extname(audioName))}_pitchshift.flac`, flac)
@@ -698,7 +702,6 @@ const PinkNoise: React.FunctionComponent<Props> = (props) => {
                     <span className="bitcrush-text-mini">{noiseVolume}</span>
                 </div>
             </div>
-            {audio ?
             <div className="bitcrush-image-container">
                 <div className="bitcrush-image-buttons-container">
                     <button className="bitcrush-image-button" onClick={mp3}>MP3</button>
@@ -706,7 +709,7 @@ const PinkNoise: React.FunctionComponent<Props> = (props) => {
                     <button className="bitcrush-image-button" onClick={ogg}>OGG</button>
                     <button className="bitcrush-image-button" onClick={flac}>FLAC</button>
                 </div>
-            </div> : null}
+            </div>
             <div className="bitcrush-options-container">
                 <div className="bitcrush-row">
                     <button className="bitcrush-button" onClick={reset} style={{padding: "0px 5px", marginTop: "7px"}}>
