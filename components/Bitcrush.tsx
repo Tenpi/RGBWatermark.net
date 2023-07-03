@@ -8,19 +8,19 @@ PreviousVolumeContext, PreservesPitchContext, StartTimeContext, ElapsedTimeConte
 SeekToContext, UpdateEffectContext, SavedTimeContext, EffectNodeContext, OriginalDurationContext, patterns} from "../Context"
 import functions from "../structures/Functions"
 import Slider from "react-slider"
-import audioReverseIcon from "../assets/icons/audio-reverse.png"
-import audioSpeedIcon from "../assets/icons/audio-speed.png"
-import audioClearIcon from "../assets/icons/audio-clear.png"
-import audioPlayIcon from "../assets/icons/audio-play.png"
-import audioPauseIcon from "../assets/icons/audio-pause.png"
-import audioRewindIcon from "../assets/icons/audio-rewind.png"
-import audioFastforwardIcon from "../assets/icons/audio-fastforward.png"
-import audioPreservePitchIcon from "../assets/icons/audio-preservepitch.png"
-import audioPreservePitchOnIcon from "../assets/icons/audio-preservepitch-on.png"
-import audioFullscreenIcon from "../assets/icons/audio-fullscreen.png"
-import audioVolumeIcon from "../assets/icons/audio-volume.png"
-import audioVolumeLowIcon from "../assets/icons/audio-volume-low.png"
-import audioVolumeMuteIcon from "../assets/icons/audio-volume-mute.png"
+import audioReverseIcon from "../assets/icons/audio/audio-reverse.png"
+import audioSpeedIcon from "../assets/icons/audio/audio-speed.png"
+import audioClearIcon from "../assets/icons/audio/audio-clear.png"
+import audioPlayIcon from "../assets/icons/audio/audio-play.png"
+import audioPauseIcon from "../assets/icons/audio/audio-pause.png"
+import audioRewindIcon from "../assets/icons/audio/audio-rewind.png"
+import audioFastforwardIcon from "../assets/icons/audio/audio-fastforward.png"
+import audioPreservePitchIcon from "../assets/icons/audio/audio-preservepitch.png"
+import audioPreservePitchOnIcon from "../assets/icons/audio/audio-preservepitch-on.png"
+import audioFullscreenIcon from "../assets/icons/audio/audio-fullscreen.png"
+import audioVolumeIcon from "../assets/icons/audio/audio-volume.png"
+import audioVolumeLowIcon from "../assets/icons/audio/audio-volume-low.png"
+import audioVolumeMuteIcon from "../assets/icons/audio/audio-volume-mute.png"
 import fileType from "magic-bytes.js"
 import uploadIcon from "../assets/icons/upload.png"
 import xIcon from "../assets/icons/x.png"
@@ -666,7 +666,7 @@ const Bitcrush: React.FunctionComponent<Props> = (props) => {
         changePreservesPitch(false)
         setAudioSpeed(1)
         setPaused(false)
-        setShowSpeedDropdown(false)
+        setShowSpeedSlider(false)
         updatePlay(true)
         setSeekTo(0)
     }

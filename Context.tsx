@@ -33,6 +33,7 @@ export const PosXContext = React.createContext<any>(null)
 export const PosYContext = React.createContext<any>(null)
 export const AttackModeContext = React.createContext<any>(null)
 export const HelpModeContext = React.createContext<any>(null)
+export const GIFSpeedContext = React.createContext<any>(null)
 
 export const SiteHueContext = React.createContext<any>(null)
 export const SiteSaturationContext = React.createContext<any>(null)
@@ -107,6 +108,7 @@ const Context: React.FunctionComponent = (props) => {
     const [speed, setSpeed] = useState(75)
     const [reverse, setReverse] = useState(false)
     const [audioSpeed, setAudioSpeed] = useState(1)
+    const [gifSpeed, setGIFSpeed] = useState(1)
     const [audioReverse, setAudioReverse] = useState(false)
     const [saturation, setSaturation] = useState(100)
     const [brightness, setBrightness] = useState(100)
@@ -152,6 +154,7 @@ const Context: React.FunctionComponent = (props) => {
 
     return (
         <>  
+            <GIFSpeedContext.Provider value={{gifSpeed, setGIFSpeed}}>
             <TextureNamesContext.Provider value={{textureNames, setTextureNames}}>
             <TexturesContext.Provider value={{textures, setTextures}}>
             <MTLContext.Provider value={{mtl, setMTL}}>
@@ -267,6 +270,7 @@ const Context: React.FunctionComponent = (props) => {
             </MTLContext.Provider>
             </TexturesContext.Provider>
             </TextureNamesContext.Provider>
+            </GIFSpeedContext.Provider>
         </>
     )
 }

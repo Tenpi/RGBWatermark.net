@@ -1338,4 +1338,22 @@ export default class Functions {
         }
         return ret
     }
+
+    public static randomColor = (seed: number = 0) => {
+        return Math.floor(Functions.random(seed)*16777215).toString(16)
+    }
+    
+    public static gifSpeed = (data: any[], speed: number) => {
+        if (speed === 1) return data 
+        const constraint = speed > 1 ? data.length / speed : data.length
+        let step = Math.ceil(data.length / constraint)
+        let newData = [] as any 
+        for (let i = 0; i < data.length; i += step) {
+            const frame = data[i].frame 
+            let delay = data[i].delay 
+            if (speed < 1) delay = delay / speed 
+            newData.push({frame, delay})
+        }
+        return newData
+    }
 }

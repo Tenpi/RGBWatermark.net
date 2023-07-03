@@ -23,6 +23,7 @@ import JSZip from "jszip"
 import "./styles/decimation.less"
 
 let id = null as any
+let wireTimer = null as any
 
 const Decimation: React.FunctionComponent= (props) => {
     const {enableDrag, setEnableDrag} = useContext(EnableDragContext)
@@ -390,6 +391,15 @@ const Decimation: React.FunctionComponent= (props) => {
     useEffect(() => {
         setUpdateEffect(true)
     }, [polygonReduction, textureReduction, wireframe, matcap])
+
+
+    useEffect(() => {
+        if (wireTimer) return 
+        wireTimer = setTimeout(() => {
+            wireTimer = null
+            setUpdateEffect(true)
+        }, 200)
+    }, [siteHue, siteSaturation, siteLightness])
 
     const reset = () => {
         setPolygonReduction(0)
