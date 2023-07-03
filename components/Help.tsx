@@ -27,7 +27,9 @@ import fileconversion from "../assets/images/protection methods/fileconversion.j
 import fileinflation from "../assets/images/protection methods/fileinflation.jpg"
 import crt from "../assets/images/protection methods/crt.jpg"
 import rgbsplit from "../assets/images/protection methods/rgbsplit.jpg"
-import clipbreaker from "../assets/images/protection methods/clipbreaker.jpg"*/
+import clipbreaker from "../assets/images/protection methods/clipbreaker.jpg"
+import apng from "../assets/images/protection methods/apng.jpg"
+import dissolve from "../assets/images/protection methods/dissolve.jpg"*/
 
 const rainbowWatermarks = "https://i.imgur.com/IOnJNnG.png"
 const pointifiction = "https://i.imgur.com/v8zOBpw.jpg"
@@ -53,11 +55,13 @@ const fileinflation = "https://i.imgur.com/f776qKD.png"
 const crt = "https://i.imgur.com/83Cuxdd.png"
 const rgbsplit = "https://i.imgur.com/ykTCBhP.png"
 const clipbreaker = "https://i.imgur.com/4NSP9gI.jpg"
+const apng = "https://i.imgur.com/xjKWnhF.png"
+const dissolve = "https://i.imgur.com/ae9XoyV.png"
 
 let protectionMethods = [rainbowWatermarks, pointifiction, lineifiction, trifiction, 
     rectifiction, pixelshift, pixelation, highcontrast, noise, edgeblur, sprinkles, fence, 
     adversarialnoise, crt, rgbsplit, glaze, mist, fileconversion, fileinflation, networkrandomizer, 
-    networkshifter, imageencryption, imagesplitting, clipbreaker]
+    networkshifter, imageencryption, imagesplitting, clipbreaker, apng, dissolve]
 
 /*
 import aiarttheft1 from "../assets/images/ai art theft/aiarttheft1.jpg"
